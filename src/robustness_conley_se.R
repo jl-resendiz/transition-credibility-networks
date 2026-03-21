@@ -190,7 +190,7 @@ cat(sprintf("Panel with coordinates: %d rows\n", nrow(panel_geo)))
 cat("\nEstimating channel decomposition...\n\n")
 
 est <- feols(car ~ w_geo + w_fuel + w_reg + same_sector,
-             data = panel_geo, lean = TRUE)
+             data = panel_geo, lean = FALSE)
 
 # Event-clustered (baseline)
 se_event <- summary(est, cluster = ~event_id)
