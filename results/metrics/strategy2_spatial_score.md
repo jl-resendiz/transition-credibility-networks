@@ -86,6 +86,41 @@ Test: events 2020+ (N = 7030, events = 15)
 | 9 | NORTHWESTERN ENRGY GROUP INC | USA | +0.0035 | 187 |
 | 10 | GENESIS ENERGY LTD | NZL | +0.0035 | 55 |
 
+## Part 4: Out-of-Sample Portfolio Sorts (Temporal Split)
+
+### Pre-2020 (training)
+
+| Quintile | Mean CAR |
+|---|---:|
+| Q1 | +0.0267 |
+| Q2 | +0.0009 |
+| Q3 | +0.0387 |
+| Q4 | +0.0076 |
+| Q5 | +0.0237 |
+
+Q5-Q1 spread: -0.0030 (t = -0.853)
+Events: 160
+
+### Post-2020 (test)
+
+| Quintile | Mean CAR |
+|---|---:|
+| Q1 | +0.0752 |
+| Q2 | -0.0097 |
+| Q3 | +0.0144 |
+| Q4 | +0.0645 |
+| Q5 | -0.0023 |
+
+Q5-Q1 spread: -0.0775 (t = -6.104***)
+Events: 15
+
+### Comparison: does the signal persist?
+
+| Period | STS Q5-Q1 | t-stat | Fuel Q5-Q1 | t-stat | N events |
+|---|---:|---:|---:|---:|---:|
+| Pre-2020 | -0.0030 | -0.853 | -0.0017 | -0.400 | 160 |
+| Post-2020 | -0.0775 | -6.104*** | +0.0246 | 1.758* | 15 |
+
 ## Key Finding
 
 The Spatial Transition Score is a freely computable measure, constructed entirely from publicly available plant-level data (GEM trackers, ETS membership records, GPS coordinates), that outperforms Refinitiv ESG environmental scores in predicting transition-related repricing around coal retirement events. In-sample, STS predicts CARs with a t-statistic of -3.94 (R-squared = 0.0002), while the ESG score is not significant (t = -0.59, R-squared = 0.0000). Out-of-sample, STS achieves lower MSPE (0.132813) than ESG (0.133049). Investors can construct this score without purchasing proprietary ESG ratings, using only publicly observable information about power plant locations, fuel mix, and carbon pricing jurisdiction.

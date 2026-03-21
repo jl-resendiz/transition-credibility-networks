@@ -807,6 +807,118 @@ for i, f in enumerate(least_exposed):
 
 
 # ══════════════════════════════════════════════════════════════════════
+# PART 4: Out-of-Sample Portfolio Sorts (Temporal Split)
+# ══════════════════════════════════════════════════════════════════════
+
+_print()
+_print('=' * 70)
+_print('PART 4: OUT-OF-SAMPLE PORTFOLIO SORTS (TEMPORAL SPLIT)')
+_print('=' * 70)
+
+# Split observations by event year
+pre2020_obs = [o for o in all_obs if o.get('event_date', '')[:4].isdigit()
+               and int(o['event_date'][:4]) < 2020]
+post2020_obs = [o for o in all_obs if o.get('event_date', '')[:4].isdigit()
+                and int(o['event_date'][:4]) >= 2020]
+
+# Fallback: for obs without parseable event_date, check event year via all_events
+if not pre2020_obs and not post2020_obs:
+    event_year_map = {eid: ev['year'] for eid, ev in enumerate(all_events)
+                      if ev.get('year') is not None}
+    pre2020_obs = [o for o in all_obs
+                   if event_year_map.get(o['event_id'], 9999) < 2020]
+    post2020_obs = [o for o in all_obs
+                    if event_year_map.get(o['event_id'], 9999) >= 2020]
+
+n_pre_events = len(set(o['event_id'] for o in pre2020_obs))
+n_post_events = len(set(o['event_id'] for o in post2020_obs))
+_print(f'  Pre-2020:  N = {len(pre2020_obs)}, events = {n_pre_events}')
+_print(f'  Post-2020: N = {len(post2020_obs)}, events = {n_post_events}')
+
+
+def portfolio_sort_quintiles(obs_list, sort_var, label):
+    """Sort obs into 5 quintiles by sort_var, compute mean CAR per quintile.
+    Returns (quintile_results_list, spread, t_spread, p_spread)."""
+    if len(obs_list) < 10:
+        _print(f'  {label}: too few observations ({len(obs_list)})')
+        return None, None, None, None
+    sorted_obs = sorted(obs_list, key=lambda o: o[sort_var])
+    n_per = len(sorted_obs) // 5
+    q_results = []
+    q_cars = {}
+    for q in range(5):
+        start = q * n_per
+        end = start + n_per if q < 4 else len(sorted_obs)
+        q_obs = sorted_obs[start:end]
+        cars = [o['car'] for o in q_obs]
+        mean_car = sum(cars) / len(cars)
+        mean_sort = sum(o[sort_var] for o in q_obs) / len(q_obs)
+        q_results.append({
+            'quintile': q + 1,
+            'n': len(q_obs),
+            'mean_car': mean_car,
+            'mean_sort': mean_sort,
+        })
+        q_cars[q + 1] = cars
+    # Q5-Q1 spread
+    c1 = q_cars[1]
+    c5 = q_cars[5]
+    m1 = sum(c1) / len(c1)
+    m5 = sum(c5) / len(c5)
+    spr = m5 - m1
+    v1 = sum((c - m1) ** 2 for c in c1) / (len(c1) - 1) if len(c1) > 1 else 0
+    v5 = sum((c - m5) ** 2 for c in c5) / (len(c5) - 1) if len(c5) > 1 else 0
+    se_spr = math.sqrt(v1 / len(c1) + v5 / len(c5)) if (v1 + v5) > 0 else 0
+    t_spr = spr / se_spr if se_spr > 1e-15 else 0
+    p_spr = p_from_t(t_spr)
+    return q_results, spr, t_spr, p_spr
+
+
+# STS portfolio sorts for each period
+_print('\nPre-2020 STS quintile sorts...')
+pre_sts_qr, pre_sts_spr, pre_sts_t, pre_sts_p = portfolio_sort_quintiles(
+    pre2020_obs, 'sts', 'Pre-2020 STS')
+if pre_sts_qr:
+    for qr in pre_sts_qr:
+        _print(f'  Q{qr["quintile"]}: N={qr["n"]}, mean_CAR={qr["mean_car"]:.4f}')
+    _print(f'  Q5-Q1 spread: {pre_sts_spr:+.4f} (t = {pre_sts_t:.3f})')
+
+_print('\nPost-2020 STS quintile sorts...')
+post_sts_qr, post_sts_spr, post_sts_t, post_sts_p = portfolio_sort_quintiles(
+    post2020_obs, 'sts', 'Post-2020 STS')
+if post_sts_qr:
+    for qr in post_sts_qr:
+        _print(f'  Q{qr["quintile"]}: N={qr["n"]}, mean_CAR={qr["mean_car"]:.4f}')
+    _print(f'  Q5-Q1 spread: {post_sts_spr:+.4f} (t = {post_sts_t:.3f})')
+
+# Fuel-similarity portfolio sorts for each period (comparison)
+_print('\nPre-2020 fuel-similarity quintile sorts...')
+pre_fuel_qr, pre_fuel_spr, pre_fuel_t, pre_fuel_p = portfolio_sort_quintiles(
+    pre2020_obs, 'w_fuel', 'Pre-2020 Fuel')
+if pre_fuel_qr:
+    _print(f'  Fuel Q5-Q1 spread: {pre_fuel_spr:+.4f} (t = {pre_fuel_t:.3f})')
+
+_print('\nPost-2020 fuel-similarity quintile sorts...')
+post_fuel_qr, post_fuel_spr, post_fuel_t, post_fuel_p = portfolio_sort_quintiles(
+    post2020_obs, 'w_fuel', 'Post-2020 Fuel')
+if post_fuel_qr:
+    _print(f'  Fuel Q5-Q1 spread: {post_fuel_spr:+.4f} (t = {post_fuel_t:.3f})')
+
+# Summary
+_print('\n  Signal persistence comparison:')
+_print(f'  {"Period":<15s} {"STS Q5-Q1":>10s} {"t":>8s} '
+       f'{"Fuel Q5-Q1":>12s} {"t":>8s} {"N events":>10s}')
+if pre_sts_spr is not None:
+    _print(f'  {"Pre-2020":<15s} {pre_sts_spr:>+10.4f} {pre_sts_t:>8.3f} '
+           f'{pre_fuel_spr:>+12.4f} {pre_fuel_t:>8.3f} '
+           f'{n_pre_events:>10d}')
+if post_sts_spr is not None:
+    _print(f'  {"Post-2020":<15s} {post_sts_spr:>+10.4f} {post_sts_t:>8.3f} '
+           f'{post_fuel_spr:>+12.4f} {post_fuel_t:>8.3f} '
+           f'{n_post_events:>10d}')
+
+
+# ══════════════════════════════════════════════════════════════════════
 # Write output
 # ══════════════════════════════════════════════════════════════════════
 
@@ -955,6 +1067,55 @@ lines.append('|---|---|---|---:|---:|')
 for i, f in enumerate(least_exposed):
     lines.append(f'| {i+1} | {f["name"]} | {f["country"]} | '
                  f'{f["avg_sts"]:+.4f} | {f["n_events"]} |')
+lines.append('')
+
+# ── Part 4 ──
+
+lines.append('## Part 4: Out-of-Sample Portfolio Sorts (Temporal Split)')
+lines.append('')
+
+lines.append('### Pre-2020 (training)')
+lines.append('')
+if pre_sts_qr:
+    lines.append('| Quintile | Mean CAR |')
+    lines.append('|---|---:|')
+    for qr in pre_sts_qr:
+        lines.append(f'| Q{qr["quintile"]} | {qr["mean_car"]:+.4f} |')
+    lines.append('')
+    lines.append(f'Q5-Q1 spread: {pre_sts_spr:+.4f} '
+                 f'(t = {pre_sts_t:.3f}{sig_stars(pre_sts_p)})')
+    lines.append(f'Events: {n_pre_events}')
+else:
+    lines.append('Insufficient data for pre-2020 portfolio sorts.')
+lines.append('')
+
+lines.append('### Post-2020 (test)')
+lines.append('')
+if post_sts_qr:
+    lines.append('| Quintile | Mean CAR |')
+    lines.append('|---|---:|')
+    for qr in post_sts_qr:
+        lines.append(f'| Q{qr["quintile"]} | {qr["mean_car"]:+.4f} |')
+    lines.append('')
+    lines.append(f'Q5-Q1 spread: {post_sts_spr:+.4f} '
+                 f'(t = {post_sts_t:.3f}{sig_stars(post_sts_p)})')
+    lines.append(f'Events: {n_post_events}')
+else:
+    lines.append('Insufficient data for post-2020 portfolio sorts.')
+lines.append('')
+
+lines.append('### Comparison: does the signal persist?')
+lines.append('')
+lines.append('| Period | STS Q5-Q1 | t-stat | Fuel Q5-Q1 | t-stat | N events |')
+lines.append('|---|---:|---:|---:|---:|---:|')
+if pre_sts_spr is not None and pre_fuel_spr is not None:
+    lines.append(f'| Pre-2020 | {pre_sts_spr:+.4f} | {pre_sts_t:.3f}{sig_stars(pre_sts_p)} '
+                 f'| {pre_fuel_spr:+.4f} | {pre_fuel_t:.3f}{sig_stars(pre_fuel_p)} '
+                 f'| {n_pre_events} |')
+if post_sts_spr is not None and post_fuel_spr is not None:
+    lines.append(f'| Post-2020 | {post_sts_spr:+.4f} | {post_sts_t:.3f}{sig_stars(post_sts_p)} '
+                 f'| {post_fuel_spr:+.4f} | {post_fuel_t:.3f}{sig_stars(post_fuel_p)} '
+                 f'| {n_post_events} |')
 lines.append('')
 
 # ── Key Finding ──
