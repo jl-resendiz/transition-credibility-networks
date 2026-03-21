@@ -1,0 +1,93 @@
+event_id,announcement_date,announcement_source,event_date,ret_year,matched_gvkeys,is_first_mover
+G100000100377,2012-01-26,FirstEnergy press release 2012-01-26; MATS compliance,2015-04-15,2015,008099,True
+G100000100644,2014-08-01,Alabama Power MATS compliance announcement 2014-08-01,2015-04-15,2015,009850,True
+G100000100645,2014-08-01,Alabama Power MATS compliance announcement 2014-08-01,2015-04-15,2015,009850,True
+G100000100646,2014-08-01,Alabama Power MATS compliance announcement 2014-08-01,2015-04-15,2015,009850,True
+G100000100860,2013-02-25,AEP/EPA/Earthjustice settlement 2013-02-25; coal stop by 2015,2016-05-30,2015,001440,True
+G100000100949,2011-03-15,Xcel Energy MN PUC certificate of need filing 2011-03-15,2015-04-15,2015,007977,True
+G100000100950,2011-03-15,Xcel Energy MN PUC certificate of need filing 2011-03-15,2015-04-15,2015,007977,True
+G100000101187,2011-04-15,LG&E/KU PSC filing mid-April 2011; 800 MW retirement plan,2015-06-15,2015,008455,True
+G100000101188,2011-04-15,LG&E/KU PSC filing mid-April 2011; 800 MW retirement plan,2015-06-15,2015,008455,True
+G100000101189,2011-04-15,LG&E/KU PSC filing mid-April 2011; 800 MW retirement plan,2015-06-15,2015,008455,True
+G100000101435,2010-11-15,Xcel Energy announcement Nov 2010; CO Clean Air Clean Jobs Act,2015-12-31,2015,007977,True
+G100000101437,2012-06-15,Dominion IRP ~2012; MATS compliance retirement,2014-07-15,2015,004029,True
+G100000101438,2012-06-15,Dominion IRP ~2012; MATS compliance retirement,2014-07-15,2015,004029,True
+G100000101439,2012-06-15,Dominion IRP ~2012; MATS compliance retirement,2014-07-15,2015,004029,True
+G100000101440,2012-06-15,Dominion IRP ~2012; MATS compliance retirement,2014-07-15,2015,004029,True
+G100000101522,2014-09-11,APS announcement 2014-09-11; Unit 2 closure plan,2016-06-01,2015,001075,True
+G100000101618,2011-06-09,AEP press release 2011-06-09; EPA compliance plan,2015-05-15,2015,001440,True
+G100000101655,2013-11-14,TVA Board resolution 2013-11-14; retirement of coal units,2016-03-23,2015,010447,True
+G100000101705,2012-06-15,PPL Montana mothball decision 2012; permanent Feb 2015,2015-08-15,2015,008455,True
+G100000102566,2012-01-26,FirstEnergy press release 2012-01-26; MATS compliance,2015-04-06,2015,008099,True
+G100000102567,2012-01-26,FirstEnergy press release 2012-01-26; MATS compliance,2015-04-06,2015,008099,True
+G100000102568,2012-01-26,FirstEnergy press release 2012-01-26; MATS compliance,2015-04-06,2015,008099,True
+G100000102586,2013-04-22,WPL/EPA/Sierra Club settlement 2013-04-22,2015-12-31,2015,011554,True
+G100000102590,2013-06-15,Dynegy acquisition from Ameren 2013; fleet restructuring,2015-12-31,2015,157373,True
+G100000103054,2011-06-09,AEP press release 2011-06-09; EPA compliance plan,2015-05-15,2015,001440,True
+G100000103055,2011-06-09,AEP press release 2011-06-09; EPA compliance plan,2015-05-15,2015,001440,True
+G100000103097,2014-08-01,Alabama Power MATS compliance announcement 2014-08-01,2015-08-15,2015,009850,True
+G100000103098,2014-08-01,Alabama Power MATS compliance announcement 2014-08-01,2015-08-15,2015,009850,True
+G100000103124,2011-04-15,LG&E/KU PSC filing mid-April 2011; 800 MW retirement plan,2015-09-15,2015,008455,True
+G100000103125,2011-04-15,LG&E/KU PSC filing mid-April 2011; 800 MW retirement plan,2015-09-15,2015,008455,True
+G100000103658,2011-03-15,Georgia Power PSC decertification filing March 2011,2015-04-16,2015,009850,True
+G100000103660,2011-03-15,Georgia Power PSC decertification filing March 2011,2015-04-16,2015,009850,True
+G100000103661,2011-03-15,Georgia Power PSC decertification filing March 2011,2015-04-16,2015,009850,True
+G100000104938,2014-08-04,Mississippi Power/Sierra Club settlement 2014-08-04,2015-04-15,2015,009850,True
+G100000104939,2014-08-04,Mississippi Power/Sierra Club settlement 2014-08-04,2015-04-15,2015,009850,True
+G100000105324,2013-11-14,TVA Board resolution 2013-11-14; retirement of coal units,2015-12-31,2015,010447,True
+G100000105328,2013-11-14,TVA Board resolution 2013-11-14; retirement of coal units,2015-12-31,2015,010447,True
+G100000105329,2013-11-14,TVA Board resolution 2013-11-14; retirement of coal units,2015-12-31,2015,010447,True
+G100000105330,2013-11-14,TVA Board resolution 2013-11-14; retirement of coal units,2015-12-31,2015,010447,True
+G100000105331,2013-11-14,TVA Board resolution 2013-11-14; retirement of coal units,2015-12-31,2015,010447,True
+G100000105332,2013-11-14,TVA Board resolution 2013-11-14; retirement of coal units,2015-12-31,2015,010447,True
+G100000105523,2011-06-09,AEP press release 2011-06-09; EPA compliance plan,2015-05-29,2015,001440,True
+G100000105524,2011-06-09,AEP press release 2011-06-09; EPA compliance plan,2015-05-29,2015,001440,True
+G100000105525,2011-06-09,AEP press release 2011-06-09; EPA compliance plan,2015-05-29,2015,001440,True
+G100000105533,2011-06-09,AEP press release 2011-06-09; EPA compliance plan,2015-05-29,2015,001440,True
+G100000105534,2011-06-09,AEP press release 2011-06-09; EPA compliance plan,2015-05-29,2015,001440,True
+G100000105930,2013-01-07,Georgia Power PSC filing 2013-01-07,2015-04-16,2015,009850,True
+G100000105931,2013-01-07,Georgia Power PSC filing 2013-01-07,2015-04-16,2015,009850,True
+G100000105932,2013-01-07,Georgia Power PSC filing 2013-01-07,2015-04-16,2015,009850,True
+G100000106117,2012-01-26,FirstEnergy press release 2012-01-26; MATS compliance,2015-04-13,2015,008099,True
+G100000106194,2013-06-15,Westar Energy fleet plan ~2013; coal unit retirement,2015-12-31,2015,006338,True
+G100000106902,2011-08-15,Duke Energy announcement Aug 2011; Unit 6 retirement by 2015,2015-01-01,2015,004093,True
+G100000106928,2013-04-22,Alliant Energy EPA settlement 2013-04-22; Iowa operations,2015-06-15,2015,011554,True
+G100000106958,2013-01-07,Georgia Power PSC filing 2013-01-07,2015-04-16,2015,009850,True
+G100000107123,2011-06-09,AEP press release 2011-06-09; EPA compliance plan,2015-05-15,2015,001440,True
+G100000107124,2011-06-09,AEP press release 2011-06-09; EPA compliance plan,2015-05-15,2015,001440,True
+G100000107125,2011-06-09,AEP press release 2011-06-09; EPA compliance plan,2015-05-15,2015,001440,True
+G100000107126,2011-06-09,AEP press release 2011-06-09; EPA compliance plan,2015-05-15,2015,001440,True
+G100000107127,2011-06-09,AEP press release 2011-06-09; EPA compliance plan,2015-05-15,2015,001440,True
+G100000107354,2013-04-22,WPL/EPA/Sierra Club settlement 2013-04-22,2015-12-31,2015,011554,True
+G100000107355,2013-04-22,WPL/EPA/Sierra Club settlement 2013-04-22,2015-12-31,2015,011554,True
+G100000107965,2011-06-09,AEP press release 2011-06-09; EPA compliance plan,2015-05-29,2015,001440,True
+G100000107966,2011-06-09,AEP press release 2011-06-09; EPA compliance plan,2015-05-29,2015,001440,True
+G100000107967,2011-06-09,AEP press release 2011-06-09; EPA compliance plan,2015-05-29,2015,001440,True
+G100000107968,2011-06-09,AEP press release 2011-06-09; EPA compliance plan,2015-05-29,2015,001440,True
+G100000107977,2011-06-09,AEP press release 2011-06-09; EPA compliance plan,2015-05-15,2015,001440,True
+G100000108230,2013-01-04,WPS/EPA Clean Air Act settlement 2013-01-04,2015-06-15,2015,011550,True
+G100000108231,2013-01-04,WPS/EPA Clean Air Act settlement 2013-01-04,2015-06-15,2015,011550,True
+G100000108588,2014-06-15,DTE Energy fleet planning ~2014,2016-06-08,2015,003897,True
+G100000108883,2013-03-15,Gulf Power announcement March 2013; EPA MATS compliance,2015-04-30,2015,004517,True
+G100000108884,2013-03-15,Gulf Power announcement March 2013; EPA MATS compliance,2015-04-30,2015,004517,True
+G100000113001,2013-06-15,Dairyland Power PPA termination planning ~2013,2015-12-31,2015,003897,True
+G100000109786,2013-01-30,Minnesota Power/ALLETE EnergyForward announcement 2013-01-30,2015-03-15,2015,007437,True
+G100000109787,2013-01-30,Minnesota Power/ALLETE EnergyForward announcement 2013-01-30,2015-03-15,2015,007437,True
+G100000109799,2013-01-30,Minnesota Power/ALLETE EnergyForward announcement 2013-01-30,2015-05-15,2015,007437,True
+G100000109993,2013-06-15,Westar Energy fleet plan ~2013; coal unit retirement,2015-06-15,2015,006338,True
+G100000110314,2013-06-15,DTE Energy fleet planning ~2013; MATS compliance,2014-07-24,2015,003897,True
+G100000110543,2013-06-15,We Energies coal-to-gas conversion plan ~2013,2015-12-31,2015,011550,True
+G100000110911,2013-01-04,WPS/EPA Clean Air Act settlement 2013-01-04,2015-08-15,2015,011550,True
+G100000110912,2013-01-04,WPS/EPA Clean Air Act settlement 2013-01-04,2015-08-15,2015,011550,True
+G100000110936,2013-11-14,TVA Board resolution 2013-11-14; retirement of coal units,2015-10-15,2015,010447,True
+G100000110937,2013-11-14,TVA Board resolution 2013-11-14; retirement of coal units,2015-10-15,2015,010447,True
+G100000110943,2014-08-07,NRG environmental action plan 2014-08-07; Unit 3 retirement,2015-04-15,2015,135990,True
+G100000110677,2012-06-15,Duke/Progress Energy IRP ~2012; coal retirement plan,2014-11-06,2015,004093,True
+G100000111336,2013-01-07,Georgia Power PSC filing 2013-01-07; 15 plant retirements,2015-04-16,2015,009850,True
+G100000111337,2013-01-07,Georgia Power PSC filing 2013-01-07; 15 plant retirements,2015-04-16,2015,009850,True
+G100000111338,2013-01-07,Georgia Power PSC filing 2013-01-07; 15 plant retirements,2015-04-16,2015,009850,True
+G100000111339,2013-01-07,Georgia Power PSC filing 2013-01-07; 15 plant retirements,2015-04-16,2015,009850,True
+G100000111340,2013-01-07,Georgia Power PSC filing 2013-01-07; 15 plant retirements,2015-04-16,2015,009850,True
+G100000111341,2013-01-07,Georgia Power PSC filing 2013-01-07; 15 plant retirements,2015-04-16,2015,009850,True
+G100000111342,2013-01-07,Georgia Power PSC filing 2013-01-07; 15 plant retirements,2015-04-16,2015,009850,True
+G100000100970,2010-01-14,PGE announcement 2010-01-14; 20-year early closure,2020-10-15,2020,005870;012428,True

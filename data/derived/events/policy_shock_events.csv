@@ -1,0 +1,20 @@
+event_id,event_date,event_month,country_iso3,announcement,target_year,type,precision,notes
+uk_2015_11_18,2015-11-18,2015-11,GBR,UK phase-out by 2025 (Amber Rudd speech),2025,Ministerial speech,Day-exact,
+can_2016_11_21,2016-11-21,2016-11,CAN,Canada phase-out by 2030 (McKenna),2030,Federal regulation,Day-exact,
+ppca_2017_11_16,2017-11-16,2017-11,AGO;AUT;BEL;CAN;CRI;DNK;FIN;FJI;FRA;ITA;LUX;MEX;MHL;NIU;NLD;NZL;PRT;CHE;GBR,PPCA launch (COP23 Bonn),2030,International coalition,Day-exact,Founding national government signatories
+fra_2018_01_24,2018-01-24,2018-01,FRA,France coal exit by 2021 (Macron Davos),2021,Presidential speech,Day-exact,
+nld_2018_05_22,2018-05-22,2018-05,NLD,Netherlands coal ban older by 2024 newer by 2030,2030,Ministerial announcement,Day-exact,
+deu_2019_01_26,2019-01-26,2019-01,DEU,Germany Coal Commission report (2038/2035),2038,Expert commission,Day-exact,
+fin_2019_03_06,2019-03-06,2019-03,FIN,Finland coal ban from May 2029,2029,Legislation,Day-exact,
+chl_2019_06_04,2019-06-04,2019-06,CHL,Chile coal phase-out by 2040,2040,Presidential announcement,Day-exact,
+grc_2019_09_23,2019-09-23,2019-09,GRC,Greece lignite exit by 2028,2028,PM speech at UN,Day-exact,
+hun_2019_09_23,2019-09-23,2019-09,HUN,Hungary coal phase-out by 2030,2030,Presidential speech at UN,Day-exact,
+prt_2019_10_15,,2019-10,PRT,Portugal last coal plant by 2023,2023,PM speech,Month-level,Approximate mid-month placeholder
+nld_2019_12_11,2019-12-11,2019-12,NLD,Netherlands coal ban law passed,2030,Legislation,Day-exact,
+esp_2020_01_20,2020-01-20,2020-01,ESP,Spain NECP implies coal phase-out by 2030,2030,National plan,Day-approx,
+deu_2020_07_03,2020-07-03,2020-07,DEU,Germany coal exit law passed,2038,Legislation,Day-exact,
+kor_2020_10_28,2020-10-28,2020-10,KOR,South Korea net-zero 2050 (implies coal exit),2050,Presidential address,Day-exact,
+zaf_2021_11_02,2021-11-02,2021-11,ZAF,South Africa JETP declaration,2050,International partnership,Day-approx,
+cop26_2021_11_04,2021-11-04,2021-11,ALB;AZE;BEL;BWA;BRN;CAN;CHL;CIV;HRV;CYP;DNK;ECU;EGY;FIN;FRA;DEU;HUN;IDN;IRL;ISR;ITA;KAZ;LIE;MDV;MRT;MUS;MAR;NPL;NLD;NZL;MKD;PHL;POL;PRT;SEN;SGP;SVK;SOM;KOR;ESP;LKA;UKR;GBR;VNM;ZMB,COP26 Global Coal to Clean Power Statement,Varies,International pledge,Day-exact,45 sovereign signatories (EU entity excluded)
+idn_2022_11_15,2022-11-15,2022-11,IDN,Indonesia JETP (coal exit by 2050),2050,International partnership,Day-exact,
+vnm_2022_12_14,2022-12-14,2022-12,VNM,Vietnam JETP (accelerate coal phase-out),2050,International partnership,Day-exact,

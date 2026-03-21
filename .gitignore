@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# LaTeX build artifacts
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+*.fdb_latexmk
+*.fls
+*.synctex.gz
+*.toc
+*.lof
+*.lot
+
+# Pipeline logs
+results/logs/
+
+# Licensed data — not redistributed (Compustat, CRSP, Refinitiv)
+data/raw/compustat/
+data/raw/crsp_compustat/
+data/raw/refinitiv/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Compiled manuscript (generate locally)
+manuscript/*.pdf
+
+# Prior working paper versions
+manuscript/jlr_manuscript.pdf
+manuscript/nber_manuscript.pdf

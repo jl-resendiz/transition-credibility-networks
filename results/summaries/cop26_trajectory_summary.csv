@@ -1,0 +1,249 @@
+spec,variable,beta,se,t
+,intercept,-0.445751,0.383343,-1.16
+,exposure,1.787665,1.342258,1.33
+,treated,0.431488,1.208175,0.36
+,intercept,-0.016676,0.186771,-0.09
+,exposure,-0.079665,0.183743,-0.43
+,treated,-0.468932,0.352182,-1.33
+,intercept,-0.442351,0.382851,-1.16
+,exposure,1.948507,1.497086,1.3
+,treated,0.432211,1.210332,0.36
+,conditional,-0.193812,0.379947,-0.51
+,exp_x_cond,-1.093881,1.745729,-0.63
+,intercept,-0.025993,0.193826,-0.13
+,exposure,-0.10853,0.191196,-0.57
+,treated,-0.464851,0.354513,-1.31
+,conditional,0.267071,0.220411,1.21
+,exp_x_cond,-0.008676,0.316786,-0.03
+,intercept,-0.019656,0.188351,-0.1
+,exposure,0.063949,0.28316,0.23
+,treated,-0.465952,0.354839,-1.31
+,exp_x_cond,0.211244,0.327261,0.65
+,exp_x_always,-0.386979,0.342044,-1.13
+,exp_x_never,0.252727,0.175408,1.44
+,intercept,-0.445751,0.383343,-1.16
+,exposure,1.787665,1.342258,1.33
+,treated,0.431488,1.208175,0.36
+,intercept,-0.016676,0.186771,-0.09
+,exposure,-0.079665,0.183743,-0.43
+,treated,-0.468932,0.352182,-1.33
+,intercept,-0.368825,0.33024,-1.12
+,exposure,2.093466,1.746051,1.2
+,treated,0.422147,1.19502,0.35
+,conditional,-0.794132,0.713446,-1.11
+,exp_x_cond,-0.466046,2.310741,-0.2
+,intercept,-0.044902,0.209186,-0.21
+,exposure,-0.099368,0.210805,-0.47
+,treated,-0.460331,0.354751,-1.3
+,conditional,0.250216,0.211891,1.18
+,exp_x_cond,-0.061388,0.250369,-0.25
+,intercept,-0.019639,0.188318,-0.1
+,exposure,-0.350023,25188656.718966,-0.0
+,treated,-0.465969,0.354822,-1.31
+,exp_x_cond,0.526215,24944100.86255,0.0
+,exp_x_always,0.026967,16608908.391556,0.0
+,exp_x_never,0.666667,26435483.530595,0.0
+SPEC T1: Exposure x alpha_slope_z (daily),intercept,-0.004664,0.357771,-0.01
+SPEC T1: Exposure x alpha_slope_z (daily),exposure,3.563182,3.499041,1.02
+SPEC T1: Exposure x alpha_slope_z (daily),alpha_slope_z,1.135395,1.003723,1.13
+SPEC T1: Exposure x alpha_slope_z (daily),exp_x_slope_z,-3.987436,4.430378,-0.9
+SPEC T1: Exposure x alpha_slope_z (monthly),intercept,-0.413111,0.551373,-0.75
+SPEC T1: Exposure x alpha_slope_z (monthly),exposure,0.29904,0.526657,0.57
+SPEC T1: Exposure x alpha_slope_z (monthly),alpha_slope_z,1.051175,0.60425,1.74
+SPEC T1: Exposure x alpha_slope_z (monthly),exp_x_slope_z,-1.125345,0.677094,-1.66
+SPEC T2: Exposure x alpha_slope_z x free_float (daily),intercept,-0.303055,0.30541,-0.99
+SPEC T2: Exposure x alpha_slope_z x free_float (daily),exposure,5.47234,4.904411,1.12
+SPEC T2: Exposure x alpha_slope_z x free_float (daily),alpha_slope_z,-0.884815,0.261298,-3.39
+SPEC T2: Exposure x alpha_slope_z x free_float (daily),free_float,0.572512,0.896487,0.64
+SPEC T2: Exposure x alpha_slope_z x free_float (daily),exp_x_slope_z,-7.379127,3.812154,-1.94
+SPEC T2: Exposure x alpha_slope_z x free_float (daily),exp_x_ff,-3.926286,6.057931,-0.65
+SPEC T2: Exposure x alpha_slope_z x free_float (daily),slope_x_ff,8.280807,1.879197,4.41
+SPEC T2: Exposure x alpha_slope_z x free_float (daily),exp_x_slope_x_ff,21.215019,14.066658,1.51
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),intercept,0.574951,0.639209,0.9
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),exposure,-0.652516,0.701057,-0.93
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),alpha_slope_z,-0.561973,0.269141,-2.09
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),free_float,-1.805992,1.247438,-1.45
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),exp_x_slope_z,-0.056894,0.670662,-0.08
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),exp_x_ff,2.873417,1.82146,1.58
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),slope_x_ff,6.992531,1.103077,6.34
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),exp_x_slope_x_ff,-2.144946,6.332159,-0.34
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),intercept,-0.287934,0.370742,-0.78
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),exposure,-1.029642,1.455469,-0.71
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),treated,0.31143,0.370742,0.84
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),intercept,-0.308671,0.118681,-2.6
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),exposure,0.180112,0.738488,0.24
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),treated,0.017537,0.118681,0.15
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),intercept,-0.284137,0.37565,-0.76
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),exposure,-1.205562,1.619432,-0.74
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),treated,0.307634,0.37565,0.82
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),conditional,-0.212507,0.444807,-0.48
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),exp_x_cond,4.506443,4.461423,1.01
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),intercept,-0.320046,0.123717,-2.59
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),exposure,0.162365,0.804103,0.2
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),treated,0.028913,0.123717,0.23
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),conditional,0.327789,0.181427,1.81
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),exp_x_cond,-1.234789,1.193525,-1.03
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),intercept,-0.3076,0.122711,-2.51
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),exposure,-5.262146,3.086004,-1.71
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),treated,0.016466,0.122711,0.13
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),exp_x_cond,6.295515,2.854167,2.21
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),exp_x_always,5.413081,3.338353,1.62
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),exp_x_never,5.92087,2.808741,2.11
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),intercept,-0.287934,0.370742,-0.78
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),exposure,-1.029642,1.455469,-0.71
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),treated,0.31143,0.370742,0.84
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),intercept,-0.308671,0.118681,-2.6
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),exposure,0.180112,0.738488,0.24
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),treated,0.017537,0.118681,0.15
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),intercept,-0.203888,0.359222,-0.57
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),exposure,-1.204951,1.618938,-0.74
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),treated,0.227385,0.359222,0.63
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),conditional,-0.809189,0.722851,-1.12
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),exp_x_cond,5.173391,4.797387,1.08
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),intercept,-0.331533,0.134463,-2.47
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),exposure,0.237605,0.770861,0.31
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),treated,0.0404,0.134463,0.3
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),conditional,0.21538,0.159475,1.35
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),exp_x_cond,-1.558258,1.398224,-1.11
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),intercept,-0.309367,0.122449,-2.53
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),exposure,0.305886,0.0,0.0
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),treated,0.018234,0.122449,0.15
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),exp_x_cond,-0.079449,0.0,0.0
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),exp_x_always,-0.150928,0.0,0.0
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),exp_x_never,0.37037,0.0,0.0
+SPEC T1: Exposure x alpha_slope_z (daily),intercept,0.463044,1.049614,0.44
+SPEC T1: Exposure x alpha_slope_z (daily),exposure,-8.66367,22.864492,-0.38
+SPEC T1: Exposure x alpha_slope_z (daily),alpha_slope_z,-0.889896,1.565345,-0.57
+SPEC T1: Exposure x alpha_slope_z (daily),exp_x_slope_z,40.713588,72.111922,0.56
+SPEC T1: Exposure x alpha_slope_z (monthly),intercept,-0.14969,0.213887,-0.7
+SPEC T1: Exposure x alpha_slope_z (monthly),exposure,-79.946064,12.006738,-6.66
+SPEC T1: Exposure x alpha_slope_z (monthly),alpha_slope_z,-1.643572,0.657845,-2.5
+SPEC T1: Exposure x alpha_slope_z (monthly),exp_x_slope_z,72.940157,38.432927,1.9
+SPEC T2: Exposure x alpha_slope_z x free_float (daily),intercept,3.052641,2.279639,1.34
+SPEC T2: Exposure x alpha_slope_z x free_float (daily),exposure,425.138649,508.700465,0.84
+SPEC T2: Exposure x alpha_slope_z x free_float (daily),alpha_slope_z,-2.868971,3.5536,-0.81
+SPEC T2: Exposure x alpha_slope_z x free_float (daily),free_float,-4.107544,2.552685,-1.61
+SPEC T2: Exposure x alpha_slope_z x free_float (daily),exp_x_slope_z,44.556492,176.795312,0.25
+SPEC T2: Exposure x alpha_slope_z x free_float (daily),exp_x_ff,-436.493799,519.29295,-0.84
+SPEC T2: Exposure x alpha_slope_z x free_float (daily),slope_x_ff,6.987221,8.634356,0.81
+SPEC T2: Exposure x alpha_slope_z x free_float (daily),exp_x_slope_x_ff,-162.404513,351.337796,-0.46
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),intercept,-0.318166,0.524722,-0.61
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),exposure,-1249.83468,254.661957,-4.91
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),alpha_slope_z,-0.786571,1.32778,-0.59
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),free_float,0.092099,0.853537,0.11
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),exp_x_slope_z,323.571157,58.528216,5.53
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),exp_x_ff,1174.140266,263.517207,4.46
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),slope_x_ff,-3.228394,4.325968,-0.75
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),exp_x_slope_x_ff,-601.698894,151.191414,-3.98
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),intercept,-0.064773,0.086631,-0.75
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),exposure,0.083064,0.160679,0.52
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),treated,-0.244622,0.272716,-0.9
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),conditional,0.129521,0.099243,1.31
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),exp_x_cond,0.016999,0.225896,0.08
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),shock_1,-0.097169,0.049531,-1.96
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),shock_2,-0.100554,0.049595,-2.03
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),shock_3,-0.27352,0.090442,-3.02
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),shock_4,-0.026766,0.148297,-0.18
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),shock_5,-0.241098,0.100443,-2.4
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),intercept,-0.199916,0.086433,-2.31
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),exposure,0.204488,0.149776,1.37
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),treated,-0.182271,0.24091,-0.76
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),conditional,0.129978,0.100018,1.3
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),exp_x_cond,0.022902,0.222322,0.1
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),intercept,-0.195092,0.082757,-2.36
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),exposure,0.222838,0.140079,1.59
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),treated,-0.185566,0.240646,-0.77
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),intercept,-0.15526,81037822.59317,-0.0
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),exposure,-0.118758,0.349877,-0.34
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),treated,0.014417,0.490379,0.03
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),alpha_slope_z,0.042498,0.076249,0.56
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),exp_x_slope_z,-0.14259,0.356175,-0.4
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),shock_1,-0.087011,81271193.335763,-0.0
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),shock_2,0.124539,75659363.492277,0.0
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),shock_3,-0.336509,73048531.705938,-0.0
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),shock_4,-0.121355,65387300.511955,-0.0
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),shock_5,-0.21875,81445782.566697,-0.0
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),intercept,-0.33646,0.22564,-1.49
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),exposure,-0.038328,0.235765,-0.16
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),treated,0.131067,0.303098,0.43
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),alpha_slope_z,0.064282,0.069669,0.92
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),exp_x_slope_z,-0.16925,0.283733,-0.6
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),intercept,0.101858,0.0,0.0
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),exposure,0.545772,0.465506,1.17
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),treated,-0.032526,0.466259,-0.07
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),alpha_slope_z,-0.110066,0.186776,-0.59
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),free_float,-0.259186,0.730273,-0.35
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),exp_x_slope_z,-0.351772,0.665649,-0.53
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),exp_x_ff,-1.847664,1.248079,-1.48
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),slope_x_ff,0.556526,0.687007,0.81
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),exp_x_slope_x_ff,0.320697,3.724512,0.09
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),shock_1,-0.187844,36424144.619736,-0.0
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),shock_2,0.049393,0.0,0.0
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),shock_3,-0.512579,18034965.292117,-0.0
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),shock_4,-0.201989,19842775.937248,-0.0
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),shock_5,-0.320055,0.0,0.0
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),intercept,-0.185385,0.318427,-0.58
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),exposure,0.513573,0.425879,1.21
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),treated,0.10185,0.296048,0.34
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),alpha_slope_z,-0.113778,0.167276,-0.68
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),free_float,-0.240947,0.660601,-0.36
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),exp_x_slope_z,-0.559711,0.686722,-0.82
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),exp_x_ff,-1.541107,1.223501,-1.26
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),slope_x_ff,0.667268,0.636177,1.05
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),exp_x_slope_x_ff,1.073069,3.89345,0.28
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),intercept,-0.063768,0.093568,-0.68
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),exposure,0.075053,0.171094,0.44
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),treated,-0.245998,0.272278,-0.9
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),conditional,0.032914,0.118646,0.28
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),exp_x_cond,0.14192,0.240396,0.59
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),shock_1,-0.096747,0.049798,-1.94
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),shock_2,-0.100435,0.049489,-2.03
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),shock_3,-0.273767,0.090547,-3.02
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),shock_4,-0.027536,0.148624,-0.19
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),shock_5,-0.24086,0.100335,-2.4
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),intercept,-0.199019,0.092941,-2.14
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),exposure,0.193704,0.163427,1.19
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),treated,-0.184042,0.240193,-0.77
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),conditional,0.034042,0.118639,0.29
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),exp_x_cond,0.157842,0.232794,0.68
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),intercept,-0.195092,0.082757,-2.36
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),exposure,0.222838,0.140079,1.59
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),treated,-0.185566,0.240646,-0.77
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),intercept,-0.15526,81037822.59317,-0.0
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),exposure,-0.118758,0.349877,-0.34
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),treated,0.014417,0.490379,0.03
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),alpha_slope_z,0.042498,0.076249,0.56
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),exp_x_slope_z,-0.14259,0.356175,-0.4
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),shock_1,-0.087011,81271193.335763,-0.0
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),shock_2,0.124539,75659363.492277,0.0
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),shock_3,-0.336509,73048531.705938,-0.0
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),shock_4,-0.121355,65387300.511955,-0.0
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),shock_5,-0.21875,81445782.566697,-0.0
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),intercept,-0.33646,0.22564,-1.49
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),exposure,-0.038328,0.235765,-0.16
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),treated,0.131067,0.303098,0.43
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),alpha_slope_z,0.064282,0.069669,0.92
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),exp_x_slope_z,-0.16925,0.283733,-0.6
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),intercept,0.101858,0.0,0.0
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),exposure,0.545772,0.465506,1.17
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),treated,-0.032526,0.466259,-0.07
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),alpha_slope_z,-0.110066,0.186776,-0.59
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),free_float,-0.259186,0.730273,-0.35
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),exp_x_slope_z,-0.351772,0.665649,-0.53
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),exp_x_ff,-1.847664,1.248079,-1.48
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),slope_x_ff,0.556526,0.687007,0.81
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),exp_x_slope_x_ff,0.320697,3.724512,0.09
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),shock_1,-0.187844,36424144.619736,-0.0
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),shock_2,0.049393,0.0,0.0
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),shock_3,-0.512579,18034965.292117,-0.0
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),shock_4,-0.201989,19842775.937248,-0.0
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),shock_5,-0.320055,0.0,0.0
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),intercept,-0.185385,0.318427,-0.58
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),exposure,0.513573,0.425879,1.21
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),treated,0.10185,0.296048,0.34
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),alpha_slope_z,-0.113778,0.167276,-0.68
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),free_float,-0.240947,0.660601,-0.36
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),exp_x_slope_z,-0.559711,0.686722,-0.82
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),exp_x_ff,-1.541107,1.223501,-1.26
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),slope_x_ff,0.667268,0.636177,1.05
+SPEC T2: Exposure x alpha_slope_z x free_float (monthly),exp_x_slope_x_ff,1.073069,3.89345,0.28

@@ -1,0 +1,5 @@
+metric,n,corr
+alpha_slope_vs_env_score_slope,714,-0.047123487959255535
+alpha_slope_vs_emissions_score,133,-0.18184197087631837
+alpha_slope_vs_env_innovation_score,133,-0.17836728204490798
+alpha_slope_vs_resource_use_score,133,-0.0937327861106723
