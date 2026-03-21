@@ -1,6 +1,8 @@
 # Source Code
 
-All scripts use Python 3.8+ standard library only (no pandas, numpy, or scipy).
+The main pipeline uses Python 3.8+ standard library only (no pandas, numpy, or scipy).
+
+Econometric robustness checks use **R** where the R ecosystem is decisively stronger (Conley SEs, wild cluster bootstrap, CR2 few-cluster inference). See the R Scripts section below.
 
 ## Entry Point
 
@@ -115,3 +117,35 @@ Five research strategies corresponding to the empirical framework.
 | `scrape_gem_wiki_dates.py` | Scrape GEM wiki announcement dates |
 | `update_event_dates.py` | Update event dates from external sources |
 | `update_announcement_dates.py` | Update announcement dates |
+
+## R Scripts (Econometric Robustness)
+
+These scripts use R where the package ecosystem is stronger than Python. Requires R 4.5+ with `fixest`, `clubSandwich`, and `data.table`.
+
+```bash
+Rscript src/robustness_conley_se.R
+Rscript src/robustness_wild_bootstrap.R
+Rscript src/robustness_volatility_measures.R
+```
+
+| Script | Purpose | Key R Packages |
+|---|---|---|
+| `robustness_conley_se.R` | Conley (1999) SEs for Table 2 channel decomposition at 250/500/1000 km | `fixest::conley()` |
+| `robustness_wild_bootstrap.R` | Wild cluster bootstrap + CR2 SEs for phase-out DiD (G=14) | `fixest`, `clubSandwich` |
+| `robustness_volatility_measures.R` | Beaver (1968) \|AR\|-based and squared-return volatility measures | `fixest` |
+
+### Why R?
+
+The econometrics skill identifies clear cross-language gaps:
+
+| Capability | R | Python | Used In |
+|---|---|---|---|
+| Conley SEs (integrated with FE) | `fixest::conley()` | No polished package | `robustness_conley_se.R` |
+| Few-cluster inference (CR2) | `clubSandwich` | Not available | `robustness_wild_bootstrap.R` |
+| Wild cluster bootstrap | Manual (fixest + base R) | No equivalent | `robustness_wild_bootstrap.R` |
+
+### R Package Installation
+
+```r
+install.packages(c("fixest", "clubSandwich", "data.table"))
+```
