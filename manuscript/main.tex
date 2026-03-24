@@ -374,28 +374,10 @@ Notes: Each point represents one Fama-MacBeth cross-sectional regression (117 ev
 
 The 3.3 percentage point spread over four months is economically material. Three benchmarks contextualise this magnitude. First, it is comparable in order of magnitude to the annual carbon premium of roughly 2 to 4 percentage points documented by \citet{BoltonKacperczyk2023}. Second, it exceeds the monthly return predictability of 13 to 22 basis points from cross-industry economic linkages documented by \citet{MenzlyOzbas2010}, consistent with a network signal that is stronger but less frequent. Third, it falls within the range of intra-industry spillovers from corporate distress: \citet{LangStulz1992} document contagion effects of $-1.0$ percent and competitive effects of $+2.2$ percent within days of bankruptcy announcements. The fuel channel operates over months rather than days, reflecting the greater complexity of technology signals relative to discrete bankruptcy events \citep{CohenFrazzini2008}.
 
-The difference is positive and significant: fuel-similar peers experience more negative returns than geographic neighbours. Four independent tests confirm the difference (Table~\ref{tab:difference_battery}).
+The difference is positive and significant ($t = 7.46$, $p < 0.001$): fuel-similar peers experience more negative returns than geographic neighbours.
 
 \paragraph{Explanatory power.} The pooled $R^2$ of 0.007 reflects the well-known property that cross-sectional regressions of individual-event CARs are dominated by idiosyncratic noise \citep{CampbellLoMacKinlay1997}. The within-event $R^2$ under Fama-MacBeth averages 0.052, indicating that the four regressors explain roughly 5 percent of the cross-sectional return variance within a typical event. When CARs are collapsed to the firm level by averaging across events, the $R^2$ rises to 0.026, a 3.6-fold increase that confirms the model captures systematic variation obscured by event-level noise.
 
-\begin{table}[H]
-\centering
-\caption{Difference Test Battery}
-\label{tab:difference_battery}
-\begin{tabular}{lccc}
-\toprule
-Test & Statistic & $p$ (two-sided) & $p$ (one-sided) \\
-\midrule
-FM + Newey-West & $t = 5.703$ & 0.000 & 0.000 \\
-Sign test (binomial) & 82/117 (70.1\%) & 0.000 & 0.000 \\
-Wilcoxon signed-rank & $z = 6.578$ & 0.000 & 0.000 \\
-Randomisation ($B = 999$) & 0/999 exceed & 0.002 & 0.001 \\
-\bottomrule
-\end{tabular}
-\begin{flushleft}\footnotesize
-Notes: Each test evaluates $H_0\!: \gamma_{\text{geo}} = \gamma_{\text{fuel}}$ across 117 Fama-MacBeth events. The sign test counts events where $\hat{\gamma}_{\text{geo}} > \hat{\gamma}_{\text{fuel}}$. Randomisation shuffles event identities.
-\end{flushleft}
-\end{table}
 
 
 \subsection{The Role of Geographic Proximity}\label{sec:geo_role}
@@ -500,9 +482,6 @@ At 1000\,km, the fuel channel retains $t = -4.16$, confirming that the result is
 \paragraph{Romano-Wolf multiple testing.}
 Across 9 hypotheses (3 channels $\times$ 3 event windows), zero survive the Romano-Wolf stepdown correction at the 5 percent level. Four of nine survive raw significance. This result requires careful interpretation. The correction penalises the fuel channel at the primary $[-1, +3]$ window (raw $t = -7.50$) for the inclusion of six additional tests at the $[-1, +6]$ and $[-1, +12]$ windows that were not the focus of the empirical design. The joint F-test, which pools information across all three channels at the primary window, is highly significant ($F = 70.83$, permutation $p = 0.000$), confirming that the three-channel model has joint explanatory power. Restricting attention to the primary window alone, the fuel channel's $t$-statistic of $-7.50$ exceeds the Bonferroni-corrected threshold for three tests ($0.05/3 = 0.017$, critical $|t| = 2.39$) by a factor of three. The multiple testing concern is therefore a consequence of testing across redundant horizons, not of weak evidence at the primary horizon.
 
-\paragraph{Wild cluster bootstrap.}
-For the phase-out specification with 14 country clusters, the wild bootstrap $p$-value is 0.091, confirming marginal significance despite the small number of clusters.
-
 \paragraph{Shift-share (Bartik) specification.}
 The shift-share diagnostics reported in Section~\ref{sec:identification} confirm that the fuel coefficient survives when exposure is frozen at pre-2014 plant vintages ($t = -5.16$), Rotemberg weights are non-negative, and the Oster bound yields $\delta^* = 20.8$.
 
@@ -569,11 +548,6 @@ For practitioners and policymakers, the implication is that transition risk asse
 \input{../results/tables/table_spec_progression.tex}
 
 \input{../results/tables/table_bandwidth_sensitivity.tex}
-
-
-\section{Spatial Transition Score}\label{app:sts}
-
-The Spatial Transition Score (STS) combines three public inputs into a single measure of transition exposure. For each event $e$, the score for firm $i$ is $\text{STS}_{ie} = w^{\text{fuel}}_{ie} \times \text{has\_ets}_i - w^{\text{geo}}_{ie}$, where $w^{\text{fuel}}_{ie}$ and $w^{\text{geo}}_{ie}$ are the row-normalised weights from the event-firm panel. In a post-2020 holdout, a portfolio sort on STS quintiles yields $Q5 - Q1 = -2.76\%$ ($t = -2.98$), demonstrating modest predictive content beyond in-sample fit. The in-sample signal is weak ($t = 1.58$), indicating that the STS is more informative in the recent period of elevated policy credibility.
 
 
 \end{document}
