@@ -12,10 +12,10 @@ AR_{j,t} = firm_FE + month_FE + beta * (coal_share_j * Post_t) + eps
 
 ## Observed estimates
 
-- beta(exp_post): -0.027594
-- se(cluster): 0.012678
-- t-stat: -2.176
-- N: 3411
+- beta(exp_post): -0.018143
+- se(cluster): 0.008651
+- t-stat: -2.097
+- N: 3568
 - Clusters (G): 14
 
 ## Wild cluster bootstrap
@@ -23,13 +23,13 @@ AR_{j,t} = firm_FE + month_FE + beta * (coal_share_j * Post_t) + eps
 - B: 999
 - Weight distribution: Webb 6-point
 - Seed: 42
-- Bootstrap p-value: 0.0930
-- |t*| >= |t_obs|: 92 / 999
+- Bootstrap p-value: 0.0910
+- |t*| >= |t_obs|: 90 / 999
 
 ### Bootstrap t-stat distribution
 
-- 2.5th percentile: -2.5571
-- 5.0th percentile: -2.1346
-- 50.0th percentile: +0.0134
-- 95.0th percentile: +2.0939
-- 97.5th percentile: +2.4975
+- 2.5th percentile: -2.1759
+- 5.0th percentile: -2.0591
+- 50.0th percentile: -0.0024
+- 95.0th percentile: +2.0828
+- 97.5th percentile: +2.2146

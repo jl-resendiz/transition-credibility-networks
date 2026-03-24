@@ -9,8 +9,8 @@ No corporate disclosure required.
 
 ## Part 1: In-Sample Validation
 
-Full sample: N = 72398, events = 175, firms = 528.
-ESG subsample: N = 24351, events = 175, firms = 151.
+Full sample: N = 55580, events = 175, firms = 565.
+ESG subsample: N = 14731, events = 165, firms = 153.
 Standard errors: event-clustered.
 Window: [-1, +3] months.
 
@@ -18,41 +18,41 @@ Window: [-1, +3] months.
 
 | Predictor | Beta | SE | t-stat | R-squared | N |
 |---|---:|---:|---:|---:|---:|
-| STS (full sample) | -0.516762 | 0.131075 | -3.942 | 0.000229 | 72398 |
-| STS (ESG subsample) | -0.629413 | 0.171437 | -3.671 | 0.000443 | 24351 |
-| ESG score | -0.004395 | 0.007445 | -0.590 | 0.000009 | 24351 |
+| STS (full sample) | -0.075190 | 0.058801 | -1.279 | 0.000020 | 55580 |
+| STS (ESG subsample) | -0.097330 | 0.162414 | -0.599 | 0.000030 | 14731 |
+| ESG score | -0.114409 | 0.013942 | -8.206 | 0.011874 | 14731 |
 
 ### STS Portfolio Sorts
 
 | Quintile | Mean STS | Mean CAR | N_firms |
 |---|---:|---:|---:|
-| Q1 | -0.0054 | +0.0317 | 14479 |
-| Q2 | +0.0000 | +0.0061 | 14479 |
-| Q3 | +0.0000 | +0.0278 | 14479 |
-| Q4 | +0.0000 | +0.0149 | 14479 |
-| Q5 | +0.0035 | +0.0214 | 14482 |
-| Q5-Q1 | | -0.0103 (t = -3.005***) | |
+| Q1 | -0.0073 | +0.0459 | 11116 |
+| Q2 | +0.0000 | +0.0879 | 11116 |
+| Q3 | +0.0000 | +0.0535 | 11116 |
+| Q4 | +0.0000 | +0.0323 | 11116 |
+| Q5 | +0.0034 | +0.0510 | 11116 |
+| Q5-Q1 | | +0.0051 (t = 1.584) | |
 
 ## Part 2: Out-of-Sample Validation
 
-Training: events before 2020 (N = 65368, events = 160)
-Test: events 2020+ (N = 7030, events = 15)
+Training: events before 2020 (N = 47777, events = 160)
+Test: events 2020+ (N = 7803, events = 15)
 
 ### Full sample comparison (STS vs Naive)
 
 | Metric | STS | Naive (mean) |
 |---|---:|---:|
-| MSPE | 0.15656319 | 0.15670896 |
-| Correlation (pred, actual) | 0.0486 | -- |
-| Directional accuracy | 0.6145 | 0.6145 |
+| MSPE | 0.08232732 | 0.08230575 |
+| Correlation (pred, actual) | -0.0224 | -- |
+| Directional accuracy | 0.5961 | 0.5961 |
 
 ### ESG subsample comparison (STS vs ESG vs Naive)
 
 | Metric | STS | ESG | Naive (mean) |
 |---|---:|---:|---:|
-| MSPE | 0.13281319 | 0.13304872 | 0.13298199 |
-| Correlation (pred, actual) | 0.0371 | -0.0612 | -- |
-| Directional accuracy | 0.6347 | 0.6347 | 0.6347 |
+| MSPE | 0.06923478 | 0.06894252 | 0.06923863 |
+| Correlation (pred, actual) | 0.0134 | 0.0617 | -- |
+| Directional accuracy | 0.6115 | 0.6182 | 0.6115 |
 
 ## Part 3: Firm-Level Exposure Ranking
 
@@ -60,16 +60,16 @@ Test: events 2020+ (N = 7030, events = 15)
 
 | Rank | Firm | Country | Avg STS | N events |
 |---|---|---|---:|---:|
-| 1 | ALPHA NAMIBIA INDUSTRIES | NAM | -0.0784 | 13 |
-| 2 | ABU DHABI NATIONAL ENERGY CO | ARE | -0.0520 | 13 |
+| 1 | CEC AFRICA INVESTMENTS LTD | MUS | -0.2629 | 25 |
+| 2 | OGK-2 JSC | RUS | -0.0431 | 103 |
 | 3 | REPOWER | CHE | -0.0313 | 158 |
-| 4 | INTER RAO UES OJSC | RUS | -0.0274 | 35 |
-| 5 | TALEN ENERGY CORP -OLD | USA | -0.0116 | 9 |
-| 6 | ALPIQ HOLDING AG | CHE | -0.0114 | 180 |
-| 7 | T PLUS PJSC | RUS | -0.0095 | 138 |
-| 8 | DUKE ENERGY CORP | USA | -0.0089 | 185 |
-| 9 | SAUDI ELECTRICITY CO | SAU | -0.0087 | 197 |
-| 10 | ACEA SPA | ITA | -0.0085 | 197 |
+| 4 | INTER RAO UES OJSC | RUS | -0.0217 | 100 |
+| 5 | ABU DHABI NATIONAL ENERGY CO | ARE | -0.0203 | 105 |
+| 6 | SAUDI ELECTRICITY CO | SAU | -0.0162 | 105 |
+| 7 | QATAR ELECT & WATER | QAT | -0.0151 | 105 |
+| 8 | TALEN ENERGY CORP -OLD | USA | -0.0116 | 9 |
+| 9 | ALPIQ HOLDING AG | CHE | -0.0114 | 180 |
+| 10 | COPPERBELT ENERGY CORP | ZMB | -0.0108 | 105 |
 
 ### Least Exposed (most positive average STS)
 
@@ -82,9 +82,9 @@ Test: events 2020+ (N = 7030, events = 15)
 | 5 | AVANGRID INC | USA | +0.0045 | 30 |
 | 6 | AVISTA CORP | USA | +0.0042 | 187 |
 | 7 | IDACORP INC | USA | +0.0040 | 187 |
-| 8 | AGL ENERGY | AUS | +0.0036 | 196 |
-| 9 | NORTHWESTERN ENRGY GROUP INC | USA | +0.0035 | 187 |
-| 10 | GENESIS ENERGY LTD | NZL | +0.0035 | 55 |
+| 8 | NORTHWESTERN ENRGY GROUP INC | USA | +0.0035 | 187 |
+| 9 | GENESIS ENERGY LTD | NZL | +0.0035 | 55 |
+| 10 | HAWAIIAN ELECTRIC INDS | USA | +0.0034 | 187 |
 
 ## Part 4: Out-of-Sample Portfolio Sorts (Temporal Split)
 
@@ -92,35 +92,35 @@ Test: events 2020+ (N = 7030, events = 15)
 
 | Quintile | Mean CAR |
 |---|---:|
-| Q1 | +0.0267 |
-| Q2 | +0.0009 |
-| Q3 | +0.0387 |
-| Q4 | +0.0076 |
-| Q5 | +0.0237 |
+| Q1 | +0.0409 |
+| Q2 | +0.0978 |
+| Q3 | +0.0419 |
+| Q4 | +0.0409 |
+| Q5 | +0.0385 |
 
-Q5-Q1 spread: -0.0030 (t = -0.853)
+Q5-Q1 spread: -0.0024 (t = -0.726)
 Events: 160
 
 ### Post-2020 (test)
 
 | Quintile | Mean CAR |
 |---|---:|
-| Q1 | +0.0752 |
-| Q2 | -0.0097 |
-| Q3 | +0.0144 |
-| Q4 | +0.0645 |
-| Q5 | -0.0023 |
+| Q1 | +0.0797 |
+| Q2 | +0.0126 |
+| Q3 | +0.0634 |
+| Q4 | +0.1293 |
+| Q5 | +0.0521 |
 
-Q5-Q1 spread: -0.0775 (t = -6.104***)
+Q5-Q1 spread: -0.0276 (t = -2.976***)
 Events: 15
 
 ### Comparison: does the signal persist?
 
 | Period | STS Q5-Q1 | t-stat | Fuel Q5-Q1 | t-stat | N events |
 |---|---:|---:|---:|---:|---:|
-| Pre-2020 | -0.0030 | -0.853 | -0.0017 | -0.400 | 160 |
-| Post-2020 | -0.0775 | -6.104*** | +0.0246 | 1.758* | 15 |
+| Pre-2020 | -0.0024 | -0.726 | -0.0941 | -25.078*** | 160 |
+| Post-2020 | -0.0276 | -2.976*** | +0.0305 | 3.123*** | 15 |
 
 ## Key Finding
 
-The Spatial Transition Score is a freely computable measure, constructed entirely from publicly available plant-level data (GEM trackers, ETS membership records, GPS coordinates), that outperforms Refinitiv ESG environmental scores in predicting transition-related repricing around coal retirement events. In-sample, STS predicts CARs with a t-statistic of -3.94 (R-squared = 0.0002), while the ESG score is not significant (t = -0.59, R-squared = 0.0000). Out-of-sample, STS achieves lower MSPE (0.132813) than ESG (0.133049). Investors can construct this score without purchasing proprietary ESG ratings, using only publicly observable information about power plant locations, fuel mix, and carbon pricing jurisdiction.
+The Spatial Transition Score is a freely computable spatial measure constructed from publicly available plant-level data. In-sample, STS has t = -1.28 (R-squared = 0.0000), while ESG has t = -8.21 (R-squared = 0.0119). Out-of-sample MSPE: STS = 0.06923478, ESG = 0.06894252, Naive = 0.06923863. The score can be constructed using only GEM plant trackers, ETS membership records, and GPS coordinates, without purchasing proprietary ESG ratings.
