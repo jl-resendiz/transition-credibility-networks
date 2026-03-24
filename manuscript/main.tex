@@ -56,7 +56,7 @@
 {\singlespacing\maketitle}
 
 \begin{quotation}\small\singlespacing\noindent
-\textbf{Abstract.} Does geographic distance insulate power utilities from transition risk? I study how coal plant retirements propagate to the stock prices of 703 listed utilities across 80 countries. The channel is technology, not geography: peers with similar generation portfolios lose 3.3 percentage points of market value over four months, while geographic proximity has no robust effect. The mechanism is asymmetric aggregation. Local competitive effects diversify across markets; technology obsolescence does not. ESG scores and fuel-mix similarity both predict transition returns but measure different things: disclosure versus physical assets.
+\textbf{Abstract.} Does geographic distance insulate power utilities from transition risk? I study how coal plant retirements propagate to the stock prices of 703 listed utilities across 80 countries. The channel is technology, not geography: a one-standard-deviation increase in fuel-mix similarity predicts a 2.2 basis point decline in cumulative abnormal returns over four months, while geographic proximity has no robust effect. The mechanism is asymmetric aggregation. Local competitive effects diversify across markets; technology obsolescence does not. ESG scores and fuel-mix similarity both predict transition returns but measure different things: disclosure versus physical assets.
 \end{quotation}
 
 \medskip\noindent\textit{JEL Classification:} G12, G14, Q54, L94.\\
@@ -357,16 +357,16 @@ The fuel channel is significant at the 1 percent level under all three inference
 \begin{figure}[H]
 \centering
 \includegraphics[width=\columnwidth]{figures/fig1_fuel_vs_geo.pdf}
-\caption{Fuel-mix similarity produces more negative returns than geographic proximity in 70 percent of events}
+\caption{Distribution of event-level coefficients: fuel-mix similarity versus geographic proximity}
 \label{fig:fuel_vs_geo}
 \begin{flushleft}\footnotesize
-Notes: Each point represents one Fama-MacBeth cross-sectional regression (117 events with $\geq 20$ firms). Points below the 45-degree line indicate events where $\hat{\gamma}_{\text{fuel}} < \hat{\gamma}_{\text{geo}}$. Dark fill: fuel more negative (82 events). Light fill: geography more negative (35 events).
+Notes: Each density summarises 117 event-level Fama-MacBeth coefficients (events with $\geq 20$ firms). Dashed lines mark channel means. The fuel-mix distribution is centred well below zero (mean $= -4.8$), while the geographic distribution clusters near zero (mean $= -0.6$). In 82 of 117 events (70 percent), $\hat{\gamma}_{\text{fuel}} < \hat{\gamma}_{\text{geo}}$.
 \end{flushleft}
 \end{figure}
 
-\paragraph{Economic magnitude.} The fuel-similarity weight $w^{\text{fuel}}_i$ is row-normalised, so its cross-sectional standard deviation within a given event is approximately 0.004. A one-standard-deviation increase in fuel similarity is associated with a $-5.474 \times 0.004 = -2.2$ basis point decrease in the four-month CAR under event-clustered inference. This appears small in absolute terms but reflects the granularity of the row-normalised weight. A more intuitive comparison: a firm at the median of the fuel-similarity distribution ($w^{\text{fuel}} \approx 0.006$) experiences a predicted CAR of $-5.474 \times 0.006 = -3.3$ percentage points, while a firm with zero fuel similarity to the retiring firm experiences no penalty.
+\paragraph{Economic magnitude.} The fuel-similarity weight $w^{\text{fuel}}_i$ is row-normalised, so its cross-sectional standard deviation within a given event is approximately 0.004. A one-standard-deviation increase in fuel similarity is associated with a $-5.474 \times 0.004 = -2.2$ basis point decrease in the four-month CAR. The effect is small in absolute terms, reflecting the granularity of the row-normalised weight rather than the absence of an economically meaningful channel. For context, a firm at the median of the fuel-similarity distribution ($w^{\text{fuel}} \approx 0.006$) experiences a predicted CAR of $-3.3$ percentage points relative to a firm with zero fuel similarity.
 
-The 3.3 percentage point spread over four months is economically material. Three benchmarks contextualise this magnitude. First, it is comparable in order of magnitude to the annual carbon premium of roughly 2 to 4 percentage points documented by \citet{BoltonKacperczyk2023}. Second, it exceeds the monthly return predictability of 13 to 22 basis points from cross-industry economic linkages documented by \citet{MenzlyOzbas2010}, consistent with a network signal that is stronger but less frequent. Third, it falls within the range of intra-industry spillovers from corporate distress: \citet{LangStulz1992} document contagion effects of $-1.0$ percent and competitive effects of $+2.2$ percent within days of bankruptcy announcements. The fuel channel operates over months rather than days, reflecting the greater complexity of technology signals relative to discrete bankruptcy events \citep{CohenFrazzini2008}.
+Two benchmarks help interpret the magnitude. First, it falls within the range of intra-industry spillovers from corporate distress: \citet{LangStulz1992} document contagion effects of $-1.0$ percent and competitive effects of $+2.2$ percent within days of bankruptcy announcements. The fuel channel operates over months rather than days, consistent with the greater complexity of technology signals relative to discrete bankruptcy events. Second, it exceeds the monthly return predictability of 13 to 22 basis points from cross-industry economic linkages documented by \citet{MenzlyOzbas2010}, consistent with a network signal that is stronger but less frequent.
 
 The difference is positive and significant ($t = 7.46$, $p < 0.001$): fuel-similar peers experience more negative returns than geographic neighbours.
 
