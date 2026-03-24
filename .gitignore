@@ -39,3 +39,4 @@ manuscript/nber_manuscript.pdf
 
 # Licensed data (not for distribution)
 data/raw/eikon/
+src/_explore_sustainable_finance.py
