@@ -22,9 +22,9 @@ def run(script_name):
     if not os.path.exists(path):
         print(f'  SKIP (not found): {script_name}')
         return
-    print(f'\n{"=" * 60}')
-    print(f'>>> {script_name}')
-    print('=' * 60)
+    print(f'\n{"=" * 60}', flush=True)
+    print(f'>>> {script_name}', flush=True)
+    print('=' * 60, flush=True)
     result = subprocess.run(
         [sys.executable, path],
         cwd=SRC,
@@ -60,42 +60,33 @@ def main():
         # ── Stage 5: Summary statistics ──
         run('summary_statistics.py')
 
-    # ── Stage 6: Analysis scripts ──
+    # ── Stage 6: Analysis scripts (9 scripts, consolidated) ──
+    #
+    # Each script addresses a specific identification threat:
+    #   robust_inference       → Main results table (channel decomposition)
+    #   joint_tests            → Joint significance + fuel ≠ geo difference
+    #   credibility_interaction → ETS amplification + carbon price channel
+    #   esg_horse_race         → ESG complementarity (coverage argument)
+    #   bartik_shiftshare      → Causal identification (GPS 2020 diagnostics)
+    #   romano_wolf            → Multiple testing correction (9 hypotheses)
+    #   geo_diversification    → Aggregation lemma test (theory validation)
+    #   learning_alternatives  → Calendar-time learning (market efficiency)
+    #   referee_tables         → LaTeX output + appendix robustness tables
+    #
     analysis_scripts = [
-        # T1/T8: Fuel channel dominance and difference tests
+        # Main results
         'strategy2_robust_inference.py',
-        'strategy2_difference_test_summary.py',
-        'strategy2_bandwidth_fmb.py',
         'strategy2_joint_tests.py',
-        'strategy2_firm_level_test.py',
-
-        # T2: Geography null result
-        'strategy2_event_specific_geo.py',
-        'strategy2_geo_diversification.py',
-
-        # T3/T4: ETS and carbon pricing
         'strategy2_credibility_interaction.py',
-        'strategy2_esg_ets_fmb.py',
-
-        # T5: ESG complementarity
         'strategy2_esg_horse_race.py',
 
-        # T6: Cascading revelation
+        # Identification and robustness
+        'strategy2_bartik_shiftshare.py',
+        'strategy2_romano_wolf.py',
+        'strategy2_geo_diversification.py',
         'strategy2_learning_alternatives.py',
 
-        # T7: Spatial Transition Score
-        'strategy2_spatial_score.py',
-
-        # T9: Phase-out wild bootstrap
-        'strategy3_phaseout_wild_bootstrap.py',
-
-        # T10: Multiple testing correction
-        'strategy2_romano_wolf.py',
-
-        # Shift-share (Bartik) causal diagnostics
-        'strategy2_bartik_shiftshare.py',
-
-        # Appendix robustness tables
+        # Output generation
         'strategy2_referee_tables.py',
     ]
 
