@@ -263,11 +263,31 @@ for gvkey, country_mw in gvkey_country_mw.items():
     max_country_mw = max(country_mw.values())
     firm_is_single[gvkey] = (max_country_mw / total >= 0.90) if total > 0 else True
 
+# Compute HHI (Herfindahl-Hirschman Index) of geographic concentration per firm
+# HHI = sum(share_k^2) where share_k = MW_in_country_k / total_MW
+# HHI = 1 means all capacity in one country; HHI close to 0 means diversified
+firm_hhi = {}  # gvkey -> float
+for gvkey, country_mw in gvkey_country_mw.items():
+    total = firm_total_mw.get(gvkey, 0.0)
+    if total > 0:
+        firm_hhi[gvkey] = sum((mw / total) ** 2 for mw in country_mw.values())
+    else:
+        firm_hhi[gvkey] = 1.0  # default: fully concentrated
+
 n_single = sum(1 for v in firm_is_single.values() if v)
 n_multi = sum(1 for v in firm_is_single.values() if not v)
 _print(f'\n  Firms with plant data: {len(gvkey_country_mw)}')
 _print(f'  Single-country (>=90% MW in one country): {n_single}')
 _print(f'  Multi-country: {n_multi}')
+
+# HHI summary stats
+hhi_vals = list(firm_hhi.values())
+if hhi_vals:
+    mean_hhi = sum(hhi_vals) / len(hhi_vals)
+    hhi_sorted = sorted(hhi_vals)
+    median_hhi = hhi_sorted[len(hhi_sorted) // 2]
+    _print(f'  HHI: mean = {mean_hhi:.4f}, median = {median_hhi:.4f}, '
+           f'min = {min(hhi_vals):.4f}, max = {max(hhi_vals):.4f}')
 
 # Distribution of n_countries
 from collections import Counter
@@ -500,6 +520,7 @@ for event_id, event in enumerate(all_events):
             if car is None:
                 continue
             nc = firm_n_countries.get(gk, 1)
+            hhi = firm_hhi.get(gk, 1.0)
             obs.append({
                 'car': car,
                 'w_fuel': w_fuel,
@@ -508,6 +529,7 @@ for event_id, event in enumerate(all_events):
                 'same_sector': same_sector,
                 'gvkey': gk,
                 'n_countries': nc,
+                'hhi': hhi,
                 'is_single': firm_is_single.get(gk, True),
                 'event_id': event_id,
             })
@@ -751,6 +773,7 @@ for eid, obs in event_datasets.items():
         nc = o['n_countries']
         o['w_geo_x_nc'] = o['w_geo'] * nc
         o['w_geo_x_log_nc'] = o['w_geo'] * math.log(max(nc, 1))
+        o['w_geo_x_hhi'] = o['w_geo'] * o['hhi']
 
 # Spec 3a: w_geo x n_countries
 SPEC_3A_VARS = ['w_fuel', 'w_geo', 'w_reg', 'same_sector', 'w_geo_x_nc']
@@ -768,6 +791,17 @@ pooled_3b = run_pooled_ols(all_obs, SPEC_3B_VARS,
                             'Interaction: log(n_countries)')
 fm_3b = run_fama_macbeth(event_datasets, SPEC_3B_VARS,
                           'Interaction: log(n_countries)')
+
+# Spec 3c: w_geo x HHI (continuous concentration measure)
+SPEC_3C_VARS = ['w_fuel', 'w_geo', 'w_reg', 'same_sector', 'w_geo_x_hhi']
+
+_print('\n--- Spec 3c: w_geo x HHI ---')
+_print('HHI = sum(share_k^2); HHI=1 = single country, HHI~0 = diversified')
+_print('Prediction (Lemma 2): coefficient on w_geo x HHI should be POSITIVE')
+_print('(higher concentration = less diversification = stronger geo effect)')
+pooled_3c = run_pooled_ols(all_obs, SPEC_3C_VARS, 'Interaction: HHI')
+fm_3c = run_fama_macbeth(event_datasets, SPEC_3C_VARS,
+                          'Interaction: HHI')
 
 
 # ══════════════════════════════════════════════════════════════════════
@@ -811,6 +845,26 @@ if all_nc:
     if var_nc > 0 and var_wg > 0:
         corr = cov_nc_wg / math.sqrt(var_nc * var_wg)
         _print(f'\n  Correlation(n_countries, w_geo): {corr:.4f}')
+
+# HHI diagnostics across event observations
+all_hhi = [o['hhi'] for o in all_obs]
+if all_hhi:
+    mean_hhi_obs = sum(all_hhi) / len(all_hhi)
+    _print(f'\n  HHI distribution across event observations:')
+    _print(f'    Mean: {mean_hhi_obs:.4f}')
+    _print(f'    Min: {min(all_hhi):.4f}, Max: {max(all_hhi):.4f}')
+    n_hhi_1 = sum(1 for h in all_hhi if h >= 0.999)
+    _print(f'    HHI = 1 (single-country): {n_hhi_1} obs ({100*n_hhi_1/len(all_hhi):.1f}%)')
+    # Correlation between HHI and w_geo
+    mean_hhi_o = sum(all_hhi) / len(all_hhi)
+    mean_wg_o = sum(o['w_geo'] for o in all_obs) / len(all_obs)
+    cov_hhi_wg = sum((o['hhi'] - mean_hhi_o) * (o['w_geo'] - mean_wg_o)
+                      for o in all_obs) / len(all_obs)
+    var_hhi_o = sum((h - mean_hhi_o) ** 2 for h in all_hhi) / len(all_hhi)
+    var_wg_o = sum((o['w_geo'] - mean_wg_o) ** 2 for o in all_obs) / len(all_obs)
+    if var_hhi_o > 0 and var_wg_o > 0:
+        corr_hhi_wg = cov_hhi_wg / math.sqrt(var_hhi_o * var_wg_o)
+        _print(f'    Correlation(HHI, w_geo): {corr_hhi_wg:.4f}')
 
 
 # ══════════════════════════════════════════════════════════════════════
@@ -866,6 +920,8 @@ lines = [
     f'- Firms with plant data: {len(gvkey_country_mw)}',
     f'- Single-country firms: {n_single}',
     f'- Multi-country firms: {n_multi}',
+    f'- HHI (geographic concentration): mean = {mean_hhi:.4f}, '
+    f'median = {median_hhi:.4f}' if hhi_vals else '',
     '',
     '| n_countries | Firms |',
     '|---:|---:|',
@@ -981,6 +1037,32 @@ if pooled_3b and fm_3b:
     for v in SPEC_3B_VARS:
         lines.append(fmt_row(v, pooled_3b, fm_3b))
 
+lines += [
+    '',
+    '## Specification 3c: Diversification Interaction (HHI)',
+    '',
+    'CAR = b1 w_fuel + b2 w_geo + b3 w_reg + b4 same_sector '
+    '+ b5 (w_geo x HHI) + e',
+    '',
+    'HHI = sum(share_k^2) where share_k = MW_in_country_k / total_MW.',
+    'HHI = 1 for single-country firms; HHI close to 0 for diversified firms.',
+    '',
+    'Prediction (Lemma 2): b5 > 0 (higher concentration = stronger geo effect).',
+    'Equivalently: b_coeff on w_geo x (1 - HHI) should be negative.',
+    '',
+]
+
+if pooled_3c and fm_3c:
+    lines.append(f'N = {pooled_3c["n"]}, Events = {fm_3c["T"]}, '
+                 f'R2(pooled) = {pooled_3c["r2"]:.4f}, '
+                 f'R2(FM avg) = {fm_3c["avg_r2"]:.4f}')
+    lines.append('')
+    lines.append('| Variable | beta(OLS) | SE(cl) | t | p '
+                 '| beta(FM) | SE(NW) | t | p |')
+    lines.append('|---|---:|---:|---:|---:|---:|---:|---:|---:|')
+    for v in SPEC_3C_VARS:
+        lines.append(fmt_row(v, pooled_3c, fm_3c))
+
 # Interpretation
 lines += [
     '',
@@ -1021,6 +1103,20 @@ if fm_3b:
                      f'beta = {ib.get("beta", 0):+.6f}, '
                      f't = {ib.get("t", 0):.3f}, p = {ib.get("p", 1):.4f}')
 
+if fm_3c:
+    ic = fm_3c['vars'].get('w_geo_x_hhi', {})
+    gc = fm_3c['vars'].get('w_geo', {})
+    if ic:
+        lines.append(f'- Interaction (w_geo x HHI): '
+                     f'beta = {ic.get("beta", 0):+.6f}, '
+                     f't = {ic.get("t", 0):.3f}, p = {ic.get("p", 1):.4f}')
+        if ic.get('beta', 0) > 0:
+            lines.append('  Pattern: positive HHI interaction -> geo effect strengthens '
+                         'with geographic concentration (consistent with Lemma 2).')
+        else:
+            lines.append('  Pattern: negative HHI interaction -> geo effect does NOT '
+                         'strengthen with concentration (inconsistent with Lemma 2).')
+
 # Diagnostics section
 lines += [
     '',
@@ -1043,6 +1139,12 @@ if single_car and multi_car:
 if all_nc:
     mean_nc_val = sum(all_nc) / len(all_nc)
     lines.append(f'- Mean n_countries across obs: {mean_nc_val:.2f}')
+
+if all_hhi:
+    lines.append(f'- Mean HHI across obs: {mean_hhi_obs:.4f}')
+    lines.append(f'- HHI range: [{min(all_hhi):.4f}, {max(all_hhi):.4f}]')
+    lines.append(f'- HHI = 1 (single-country): {n_hhi_1} obs '
+                 f'({100*n_hhi_1/len(all_hhi):.1f}%)')
 
 lines.append('')
 

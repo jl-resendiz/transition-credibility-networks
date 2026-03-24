@@ -95,7 +95,6 @@ def main():
     # Each script addresses a specific identification threat:
     #   robust_inference       → Main results table (channel decomposition)
     #   joint_tests            → Joint significance + fuel ≠ geo difference
-    #   credibility_interaction → ETS amplification + carbon price channel
     #   esg_horse_race         → ESG complementarity (coverage argument)
     #   bartik_shiftshare      → Causal identification (GPS 2020 diagnostics)
     #   romano_wolf            → Multiple testing correction (9 hypotheses)
@@ -107,7 +106,6 @@ def main():
         # Main results
         'strategy2_robust_inference.py',
         'strategy2_joint_tests.jl',        # ~42s Julia vs ~268s Python
-        'strategy2_credibility_interaction.py',
         'strategy2_esg_horse_race.py',
 
         # Identification and robustness

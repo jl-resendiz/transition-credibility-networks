@@ -258,6 +258,7 @@ def safe_int(x):
 
 
 PRE_CUTOFF = 2014  # Plants commissioned before this year are "pre-determined"
+PRE_CUTOFF_SENSITIVITY = 2010  # Sensitivity check: even more pre-determined shares
 
 _print(f'\nBuilding pre-period fuel vectors (plants with Start year < {PRE_CUTOFF})...')
 
@@ -265,6 +266,9 @@ _print(f'\nBuilding pre-period fuel vectors (plants with Start year < {PRE_CUTOF
 # using only plants commissioned before PRE_CUTOFF
 pre_mw = defaultdict(lambda: {'coal': 0.0, 'gas': 0.0, 'solar': 0.0, 'wind': 0.0})
 current_mw = defaultdict(lambda: {'coal': 0.0, 'gas': 0.0, 'solar': 0.0, 'wind': 0.0})
+
+# Also store raw plant records to rebuild pre_mw for sensitivity cutoff
+_all_plant_records = []  # list of (gvkey_set, fuel, cap, start_year, ret_year)
 
 # --- Coal ---
 _print('  Reading GEM Coal Plant Tracker...')
@@ -292,6 +296,7 @@ with open(fpath, newline='', encoding='utf-8') as f:
             continue
 
         n_coal_total += 1
+        _all_plant_records.append((matched_gvkeys, 'coal', cap, start_year, ret_year))
 
         # Current portfolio: include if operating or retired after study start
         for gk in matched_gvkeys:
@@ -338,6 +343,7 @@ with open(fpath, newline='', encoding='utf-8') as f:
             continue
 
         n_gas_total += 1
+        _all_plant_records.append((matched_gvkeys, 'gas', cap, start_year, ret_year))
         for gk in matched_gvkeys:
             current_mw[gk]['gas'] += cap
 
@@ -378,6 +384,7 @@ with open(fpath, newline='', encoding='utf-8') as f:
             continue
 
         n_solar_total += 1
+        _all_plant_records.append((matched_gvkeys, 'solar', cap, start_year, ret_year))
         for gk in matched_gvkeys:
             current_mw[gk]['solar'] += cap
 
@@ -417,6 +424,7 @@ with open(fpath, newline='', encoding='utf-8') as f:
             continue
 
         n_wind_total += 1
+        _all_plant_records.append((matched_gvkeys, 'wind', cap, start_year, ret_year))
         for gk in matched_gvkeys:
             current_mw[gk]['wind'] += cap
 
@@ -443,6 +451,24 @@ def compute_shares(mw_dict):
     if total <= 0:
         return None
     return [coal / total, gas / total, solar / total, wind / total]
+
+
+def build_pre_mw_for_cutoff(plant_records, cutoff):
+    """Rebuild pre-period MW from stored plant records for a given cutoff year."""
+    result = defaultdict(lambda: {'coal': 0.0, 'gas': 0.0, 'solar': 0.0, 'wind': 0.0})
+    n_included = 0
+    for gvkeys, fuel, cap, start_year, ret_year in plant_records:
+        if start_year is not None and start_year < cutoff:
+            if ret_year is None or ret_year >= cutoff:
+                for gk in gvkeys:
+                    result[gk][fuel] += cap
+                n_included += 1
+        elif start_year is None:
+            if ret_year is None or ret_year >= cutoff:
+                for gk in gvkeys:
+                    result[gk][fuel] += cap
+                n_included += 1
+    return result, n_included
 
 
 pre_shares = {}
@@ -1194,6 +1220,115 @@ if len(pooled_pre) > 50:
         else:
             _print('  FAIL: Bartik predicts pre-event CARs (pre-trend concern)')
 
+# ── Diagnostic 3b: Pre-Balance Sensitivity (cutoff = 2010) ───────────
+_print(f'\n  Diagnostic 3b: Pre-Balance Sensitivity (cutoff = {PRE_CUTOFF_SENSITIVITY})')
+
+# Rebuild pre-period shares with stricter cutoff
+pre_mw_2010, n_plants_2010 = build_pre_mw_for_cutoff(_all_plant_records, PRE_CUTOFF_SENSITIVITY)
+pre_shares_2010 = {}
+for gk in pre_mw_2010:
+    s = compute_shares(pre_mw_2010[gk])
+    if s is not None:
+        pre_shares_2010[gk] = s
+_print(f'  Firms with pre-{PRE_CUTOFF_SENSITIVITY} fuel shares: {len(pre_shares_2010)} '
+       f'(vs {len(pre_shares)} at pre-{PRE_CUTOFF})')
+_print(f'  Plants included (pre-{PRE_CUTOFF_SENSITIVITY}): {n_plants_2010}')
+
+# Build W_fuel_pre_2010 matrix (same sparsity as W_geo neighbors)
+W_fuel_pre_2010 = defaultdict(dict)
+for gi in neighbors:
+    s_i = pre_shares_2010.get(gi)
+    row_sum = 0.0
+    row_raw = {}
+    for gj in neighbors[gi]:
+        sim = fuel_similarity(s_i, pre_shares_2010.get(gj))
+        if sim <= 0:
+            continue
+        row_raw[gj] = sim
+        row_sum += sim
+    if row_sum > 0:
+        for gj, sim in row_raw.items():
+            W_fuel_pre_2010[gi][gj] = sim / row_sum
+
+n_pre_edges_2010 = sum(len(v) for v in W_fuel_pre_2010.values())
+_print(f'  Pre-{PRE_CUTOFF_SENSITIVITY} fuel matrix: {len(W_fuel_pre_2010)} firms, '
+       f'{n_pre_edges_2010} edges')
+
+# Rebuild Bartik with 2010 shares and run pre-balance test
+pooled_pre_2010 = []
+for o in pooled:
+    event_id = o['event_id']
+    ev = all_events[event_id] if event_id < len(all_events) else {}
+    event_date = ev.get('event_date', '')
+    yr = ev.get('year', 0)
+    if event_date and len(event_date) >= 7:
+        em = event_date[:7]
+    else:
+        em = f'{yr}-07' if yr else None
+    if not em:
+        continue
+
+    # Get the first-mover gvkey for this event to look up fuel similarity
+    fm_gk = None
+    for gk_cand in ev.get('gvkeys', []):
+        if gk_cand in W_fuel_pre_2010:
+            fm_gk = gk_cand
+            break
+    if fm_gk is None:
+        # Try from the original event structure
+        for gk_cand in ev.get('gvkeys', []):
+            fm_gk = gk_cand
+            break
+
+    w_fuel_pre_2010_val = W_fuel_pre_2010.get(fm_gk, {}).get(o['gvkey'], 0.0) if fm_gk else 0.0
+    agg_shock = retirement_mw_by_year.get(yr, 0.0)
+    bartik_2010 = w_fuel_pre_2010_val * (agg_shock / 10000.0)
+
+    car_pre = compute_monthly_car_pre(o['gvkey'], em)
+    if car_pre is not None:
+        pooled_pre_2010.append({**o, 'car_pre': car_pre, 'bartik_2010': bartik_2010})
+
+_print(f'  Observations with pre-event CARs (2010 cutoff): {len(pooled_pre_2010)}')
+
+pre_results_2010 = {}
+bartik_pre_t_2010 = 0
+bartik_pre_p_2010 = 1
+if len(pooled_pre_2010) > 50:
+    y_pre_2010 = [o['car_pre'] for o in pooled_pre_2010]
+    use_vars_2010 = ['bartik_2010', 'w_geo', 'w_reg']
+    # Check same_sector variation
+    ss_vals_2010 = set(o['same_sector'] for o in pooled_pre_2010)
+    if len(ss_vals_2010) > 1:
+        use_vars_2010.append('same_sector')
+    X_pre_2010 = [[1.0] + [o[v] for v in use_vars_2010] for o in pooled_pre_2010]
+    cl_pre_2010 = [o['event_id'] for o in pooled_pre_2010]
+
+    res_pre_2010 = ols_simple(y_pre_2010, X_pre_2010)
+    if res_pre_2010:
+        se_pre_2010 = clustered_se(X_pre_2010, res_pre_2010['resid'],
+                                    cl_pre_2010, res_pre_2010['inv_XtX'])
+        _print(f'  R2 = {res_pre_2010["r2"]:.6f}, N = {res_pre_2010["n"]}')
+        _print(f'  {"Variable":<15} {"beta":>12} {"SE(cl)":>10} {"t":>8} {"p":>8}')
+        _print('  ' + '-' * 55)
+        names_2010 = ['intercept'] + use_vars_2010
+        for i, name in enumerate(names_2010):
+            t_val = res_pre_2010['beta'][i] / se_pre_2010[i] if se_pre_2010[i] > 1e-15 else 0.0
+            p_val = p_from_t(t_val)
+            stars = '***' if p_val < 0.01 else '**' if p_val < 0.05 else '*' if p_val < 0.10 else ''
+            _print(f'  {name:<15} {res_pre_2010["beta"][i]:+12.6f} {se_pre_2010[i]:10.6f} '
+                   f'{t_val:8.3f} {p_val:8.4f}{stars}')
+            display_name = name.replace('bartik_2010', 'bartik')
+            pre_results_2010[display_name] = {'beta': res_pre_2010['beta'][i],
+                                               'se': se_pre_2010[i], 't': t_val, 'p': p_val}
+        bartik_pre_t_2010 = pre_results_2010.get('bartik', {}).get('t', 0)
+        bartik_pre_p_2010 = pre_results_2010.get('bartik', {}).get('p', 1)
+        _print(f'\n  Pre-event balance (cutoff {PRE_CUTOFF_SENSITIVITY}): '
+               f'bartik t = {bartik_pre_t_2010:.3f}, p = {bartik_pre_p_2010:.4f}')
+        if abs(bartik_pre_t_2010) < 1.96:
+            _print(f'  PASS: Bartik ({PRE_CUTOFF_SENSITIVITY}) does not predict pre-event CARs')
+        else:
+            _print(f'  FAIL: Bartik ({PRE_CUTOFF_SENSITIVITY}) predicts pre-event CARs')
+
 # ── Diagnostic 4: Top-Share Correlates ───────────────────────────────
 _print('\n  Diagnostic 4: Top-Share Correlates')
 
@@ -1551,6 +1686,55 @@ if 'pre_results' in dir() and pre_results:
     lines.append(f'\n**{verdict}**: Bartik t = {bartik_pre_t:.3f}, p = {bartik_pre_p:.4f}')
 else:
     lines.append('Insufficient pre-event return data.')
+
+# Pre-balance sensitivity (2010 cutoff)
+lines += [
+    '',
+    f'### Pre-Balance Sensitivity (cutoff = {PRE_CUTOFF_SENSITIVITY})',
+    '',
+    f'Repeats the pre-event balance test using only plants commissioned before '
+    f'{PRE_CUTOFF_SENSITIVITY}.',
+    f'More pre-determined shares strengthen the causal claim if the test still passes.',
+    '',
+    f'Firms with pre-{PRE_CUTOFF_SENSITIVITY} fuel shares: {len(pre_shares_2010)} '
+    f'(vs {len(pre_shares)} at pre-{PRE_CUTOFF})',
+    f'Pre-{PRE_CUTOFF_SENSITIVITY} fuel matrix: {len(W_fuel_pre_2010)} firms, '
+    f'{n_pre_edges_2010} edges',
+    '',
+]
+if pre_results_2010:
+    lines += [
+        f'N = {len(pooled_pre_2010)}',
+        '',
+        '| Variable | beta | SE(cl) | t | p |',
+        '|---|---:|---:|---:|---:|',
+    ]
+    for name in ['intercept', 'bartik', 'w_geo', 'w_reg', 'same_sector']:
+        if name in pre_results_2010:
+            r = pre_results_2010[name]
+            stars = '***' if r['p'] < 0.01 else '**' if r['p'] < 0.05 else '*' if r['p'] < 0.10 else ''
+            lines.append(f'| {name} | {r["beta"]:+.6f} | {r["se"]:.6f} | {r["t"]:.3f} | {r["p"]:.4f}{stars} |')
+    verdict_2010 = 'PASS' if abs(bartik_pre_t_2010) < 1.96 else 'FAIL'
+    lines.append(f'\n**{verdict_2010}**: Bartik (pre-{PRE_CUTOFF_SENSITIVITY}) '
+                 f't = {bartik_pre_t_2010:.3f}, p = {bartik_pre_p_2010:.4f}')
+
+    # Summary comparison of both cutoffs
+    lines += [
+        '',
+        '#### Pre-Balance Comparison',
+        '',
+        '| Cutoff | Bartik t | Bartik p | Verdict |',
+        '|---:|---:|---:|---|',
+    ]
+    if 'pre_results' in dir() and pre_results:
+        t_2014 = pre_results.get('bartik', {}).get('t', 0)
+        p_2014 = pre_results.get('bartik', {}).get('p', 1)
+        v_2014 = 'PASS' if abs(t_2014) < 1.96 else 'FAIL'
+        lines.append(f'| {PRE_CUTOFF} | {t_2014:.3f} | {p_2014:.4f} | {v_2014} |')
+    lines.append(f'| {PRE_CUTOFF_SENSITIVITY} | {bartik_pre_t_2010:.3f} | '
+                 f'{bartik_pre_p_2010:.4f} | {verdict_2010} |')
+else:
+    lines.append('Insufficient data for 2010 sensitivity test.')
 
 # Oster bounds
 lines += [

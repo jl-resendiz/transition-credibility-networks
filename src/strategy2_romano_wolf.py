@@ -1,13 +1,14 @@
 """Romano-Wolf (2005, 2016) stepdown correction for multiple hypothesis testing.
 
-Tests 9 hypotheses simultaneously (3 spatial channels x 3 horizons) from Table 2:
+Tests 3 hypotheses simultaneously (3 spatial channels at the primary [-1,+3]
+window) from Table 2:
   CAR_j = alpha + beta_geo * w^geo_ij + beta_fuel * w^fuel_ij
         + beta_reg * w^reg_ij + beta_s * SameSector_j + eps_j
 
-for windows [-1,+3], [-1,+6], [-1,+12] months.
+for window [-1,+3] months.
 
 Implements:
-  1. Bonferroni correction: p_adj = min(p_raw * 9, 1)
+  1. Bonferroni correction: p_adj = min(p_raw * 3, 1)
   2. Bootstrap max-t (Westfall-Young): adjusted p = P(max|t*| >= |t_j|)
   3. Romano-Wolf stepdown: after rejecting most significant, recompute max
      over remaining hypotheses and enforce monotonicity
@@ -32,7 +33,7 @@ from _paths import derived_path, raw_path, results_path
 
 B = 999           # bootstrap replications
 SEED = 42         # reproducibility
-MONTH_POSTS = [3, 6, 12]
+MONTH_POSTS = [3]
 PRE_MONTHS = 24   # pre-event months for AR demeaning
 
 # Regression variables: 3 spatial channels + same_sector control
@@ -492,7 +493,7 @@ _print()
 _print('=' * 70)
 _print('ROMANO-WOLF MULTIPLE HYPOTHESIS TESTING CORRECTION')
 _print(f'B = {B} bootstrap replications, seed = {SEED}')
-_print(f'9 hypotheses: 3 channels x 3 windows')
+_print(f'3 hypotheses: 3 channels x 1 window [-1,+3]')
 _print('=' * 70)
 
 # Step 1: Build datasets and estimate all 9 regressions
@@ -827,9 +828,9 @@ os.makedirs(os.path.dirname(out_path), exist_ok=True)
 lines = [
     '# Multiple Hypothesis Testing Correction',
     '',
-    'Romano-Wolf (2005, 2016) stepdown correction for the 9 coefficients',
-    'in Table 2: 3 spatial channels (w_geo, w_fuel, w_reg) x 3 horizons',
-    '([-1,+3], [-1,+6], [-1,+12] months).',
+    'Romano-Wolf (2005, 2016) stepdown correction for the 3 coefficients',
+    'in Table 2: 3 spatial channels (w_geo, w_fuel, w_reg) at the primary',
+    '[-1,+3] month window.',
     '',
     'Specification for each window:',
     '  CAR_j = alpha + beta_geo * w^geo_ij + beta_fuel * w^fuel_ij',
@@ -842,7 +843,7 @@ lines = [
     '',
     'Methods:',
     '- Raw p: two-sided p-value from asymptotic normal',
-    '- Bonferroni: p_adj = min(p_raw x 9, 1)',
+    '- Bonferroni: p_adj = min(p_raw x 3, 1)',
     '- Max-t (Westfall-Young): P(max|t*| >= |t_j|) using Rademacher',
     '  cluster bootstrap under H0',
     '- Romano-Wolf: stepdown refinement of max-t; after rejecting the',
@@ -889,8 +890,8 @@ lines.append(f'- Romano-Wolf stepdown: {rej_rw}/{n_hyp}')
 lines.append('')
 
 # Note on FWER
-lines.append('Without correction, testing 9 hypotheses at 5% yields a')
-lines.append(f'family-wise error rate of 1 - (1-0.05)^9 = {1 - 0.95**9:.1%}.')
+lines.append(f'Without correction, testing {n_hyp} hypotheses at 5% yields a')
+lines.append(f'family-wise error rate of 1 - (1-0.05)^{n_hyp} = {1 - 0.95**n_hyp:.1%}.')
 lines.append('The corrections above control the FWER at the nominal level.')
 lines.append('')
 

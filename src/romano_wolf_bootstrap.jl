@@ -17,7 +17,7 @@ using Statistics
 
 const B = 999
 const SEED = 42
-const MONTH_POSTS = [3, 6, 12]
+const MONTH_POSTS = [3]
 const CHANNEL_VARS = ["w_geo", "w_fuel", "w_reg"]
 const DATA_DIR = length(ARGS) >= 1 ? ARGS[1] : joinpath(@__DIR__, "data")
 
@@ -167,7 +167,7 @@ function main()
     all_cids = sort(collect(union([Set(keys(wd.cluster_map)) for wd in values(windows)]...)))
     println("  Total unique clusters: $(length(all_cids))")
 
-    # Hypothesis labels: 3 channels x 3 windows = 9
+    # Hypothesis labels: 3 channels x 1 window = 3
     hyp_labels = Tuple{String, Int}[]
     for post in MONTH_POSTS
         for ch in CHANNEL_VARS
