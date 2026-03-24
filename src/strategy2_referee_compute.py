@@ -311,31 +311,35 @@ def corr(x, y):
 
 
 def compute_vif(data, x_vars):
-    """Return dict var -> VIF using auxiliary regressions."""
+    """Return dict var -> VIF from the diagonal of (X'X)^{-1} * diag(X'X).
+
+    VIF_j = [(X'X)^{-1}]_jj * (X'X)_jj, which avoids running k separate
+    auxiliary regressions and is O(nk^2 + k^3) instead of O(nk^3).
+    """
     vifs = {}
     if not data:
         return vifs
-    for target in x_vars:
-        y = [d[target] for d in data]
-        others = [v for v in x_vars if v != target]
-        if not others:
-            vifs[target] = 1.0
-            continue
-        X = [[1.0] + [d[v] for v in others] for d in data]
-        n = len(y)
-        k = len(others) + 1
-        XtX = [[sum(X[i][a] * X[i][b] for i in range(n)) for b in range(k)] for a in range(k)]
-        Xty = [sum(X[i][a] * y[i] for i in range(n)) for a in range(k)]
-        inv = invert_matrix(XtX)
-        if inv is None:
-            vifs[target] = None
-            continue
-        beta = [sum(inv[a][b] * Xty[b] for b in range(k)) for a in range(k)]
-        yhat = [sum(beta[j] * X[i][j] for j in range(k)) for i in range(n)]
-        ss_tot = sum((yi - sum(y) / n) ** 2 for yi in y)
-        ss_res = sum((yi - yhi) ** 2 for yi, yhi in zip(y, yhat))
-        r2 = 1 - ss_res / ss_tot if ss_tot > 0 else 0.0
-        vifs[target] = 1.0 / max(1e-8, (1 - r2))
+    n = len(data)
+    k = len(x_vars)
+    if k == 0:
+        return vifs
+    # Build X'X and invert once (k x k, no intercept needed for VIF)
+    # Center variables for numerical stability
+    means = {v: sum(d[v] for d in data) / n for v in x_vars}
+    XtX = [[0.0] * k for _ in range(k)]
+    for d in data:
+        row = [d[v] - means[v] for v in x_vars]
+        for a in range(k):
+            for b in range(a, k):
+                XtX[a][b] += row[a] * row[b]
+    for a in range(k):
+        for b in range(a + 1, k):
+            XtX[b][a] = XtX[a][b]
+    inv = invert_matrix(XtX)
+    if inv is None:
+        return {v: None for v in x_vars}
+    for j, v in enumerate(x_vars):
+        vifs[v] = inv[j][j] * XtX[j][j] if XtX[j][j] > 0 else 1.0
     return vifs
 
 
@@ -479,61 +483,42 @@ def main():
     print(f'Running placebo test ({N_PLACEBO} permutations)...', flush=True)
     placebo_betas = []
     gvkeys_all = sorted({o['gvkey'] for o in obs} | {o['fm_gk'] for o in obs})
-    gk_to_idx = {g: i for i, g in enumerate(gvkeys_all)}
-    n_gk = len(gvkeys_all)
-
-    W_geo_t = {}
-    W_fuel_t = {}
-    W_reg_t = {}
-    for gi in gvkeys_all:
-        ii = gk_to_idx[gi]
-        for gj, w in W_geo.get(gi, {}).items():
-            if gj in gk_to_idx:
-                W_geo_t[(ii, gk_to_idx[gj])] = w
-        for gj, w in W_fuel.get(gi, {}).items():
-            if gj in gk_to_idx:
-                W_fuel_t[(ii, gk_to_idx[gj])] = w
-        for gj, w in W_reg.get(gi, {}).items():
-            if gj in gk_to_idx:
-                W_reg_t[(ii, gk_to_idx[gj])] = w
-
     cars = [o['car'] for o in obs]
+    w_reg_list = [o['w_reg'] for o in obs]
     same_list = [o['same_sector'] for o in obs]
-    fm_idx_list = [gk_to_idx[o['fm_gk']] for o in obs]
-    gv_idx_list = [gk_to_idx[o['gvkey']] for o in obs]
-    n = len(obs)
-
-    sum_same = sum(same_list)
-    sum_same2 = sum(s * s for s in same_list)
-    sum_y = sum(cars)
-    sum_y_same = sum(cars[i] * same_list[i] for i in range(n))
-
-    perm_indices = list(range(n_gk))
-    _wg = W_geo_t.get
-    _wf = W_fuel_t.get
-    _wr = W_reg_t.get
+    fm_list = [o['fm_gk'] for o in obs]
+    gv_list = [o['gvkey'] for o in obs]
 
     for _ in range(N_PLACEBO):
-        perm = perm_indices[:]
+        perm = gvkeys_all[:]
         random.shuffle(perm)
+        perm_map = {g: p for g, p in zip(gvkeys_all, perm)}
 
-        s01 = s02 = s03 = 0.0
+        # accumulate XtX and Xty for regressors: [1, w_geo, w_fuel, w_reg, same]
+        n = len(obs)
+        s00 = n
+        s01 = s02 = s03 = s04 = 0.0
         s11 = s12 = s13 = s14 = 0.0
         s22 = s23 = s24 = 0.0
         s33 = s34 = 0.0
-        t1 = t2 = t3 = 0.0
+        s44 = 0.0
+        t0 = t1 = t2 = t3 = t4 = 0.0
 
         for i in range(n):
-            key = (perm[fm_idx_list[i]], perm[gv_idx_list[i]])
-            w_geo_p = _wg(key, 0.0)
-            w_fuel_p = _wf(key, 0.0)
-            w_reg = _wr(key, 0.0)
+            fm = fm_list[i]
+            gk = gv_list[i]
+            fm_p = perm_map.get(fm, fm)
+            gk_p = perm_map.get(gk, gk)
+            w_geo_p = W_geo.get(fm_p, {}).get(gk_p, 0.0)
+            w_fuel_p = W_fuel.get(fm_p, {}).get(gk_p, 0.0)
+            w_reg = W_reg.get(fm_p, {}).get(gk_p, 0.0)
             same = same_list[i]
             y = cars[i]
 
             s01 += w_geo_p
             s02 += w_fuel_p
             s03 += w_reg
+            s04 += same
 
             s11 += w_geo_p * w_geo_p
             s12 += w_geo_p * w_fuel_p
@@ -547,18 +532,22 @@ def main():
             s33 += w_reg * w_reg
             s34 += w_reg * same
 
+            s44 += same * same
+
+            t0 += y
             t1 += y * w_geo_p
             t2 += y * w_fuel_p
             t3 += y * w_reg
+            t4 += y * same
 
         XtX = [
-            [n, s01, s02, s03, sum_same],
+            [s00, s01, s02, s03, s04],
             [s01, s11, s12, s13, s14],
             [s02, s12, s22, s23, s24],
             [s03, s13, s23, s33, s34],
-            [sum_same, s14, s24, s34, sum_same2],
+            [s04, s14, s24, s34, s44],
         ]
-        Xty = [sum_y, t1, t2, t3, sum_y_same]
+        Xty = [t0, t1, t2, t3, t4]
         inv = invert_matrix(XtX)
         if inv is None:
             continue
