@@ -980,6 +980,101 @@ window_sensitivity.sort(key=lambda r: window_order.get(r['window'], 99))
 
 
 # ══════════════════════════════════════════════════════════════════════
+# APPROACH 5: OUTLIER DIAGNOSTICS (Cook's Distance)
+# ══════════════════════════════════════════════════════════════════════
+
+_print('\n' + '=' * 70)
+_print('APPROACH 5: OUTLIER DIAGNOSTICS (Cook\'s Distance)')
+_print('Pooled OLS on baseline window, flag obs with Cook\'s D > 4/N')
+_print('=' * 70)
+
+# Build pooled dataset from the baseline event_datasets
+pooled_obs = []
+for event_id in sorted(event_datasets.keys()):
+    for o in event_datasets[event_id]:
+        pooled_obs.append({
+            'car': o['car'],
+            'w_fuel': o['w_fuel'],
+            'w_geo': o['w_geo'],
+            'event_id': event_id,
+        })
+
+y_pool = [o['car'] for o in pooled_obs]
+X_pool = [[1.0, o['w_fuel'], o['w_geo']] for o in pooled_obs]
+n_pool = len(y_pool)
+k_pool = 3
+
+result_pool = ols_simple(y_pool, X_pool)
+cook_results = None
+
+if result_pool is not None:
+    beta_pool = result_pool['beta']
+    resid_pool = result_pool['resid']
+
+    # Compute (X'X)^{-1}
+    XtX_pool = [[sum(X_pool[i][a] * X_pool[i][b] for i in range(n_pool))
+                  for b in range(k_pool)] for a in range(k_pool)]
+    inv_XtX_pool = invert_matrix(XtX_pool)
+
+    if inv_XtX_pool is not None:
+        # MSE = sum(e^2) / (N - k)
+        ss_res_pool = sum(r ** 2 for r in resid_pool)
+        mse_pool = ss_res_pool / (n_pool - k_pool)
+
+        # Leverage h_ii = X_i' (X'X)^{-1} X_i
+        # Cook's D_i = (e_i^2 / (k * MSE)) * (h_ii / (1 - h_ii)^2)
+        cook_d = []
+        for i in range(n_pool):
+            h_ii = 0.0
+            for a in range(k_pool):
+                for b in range(k_pool):
+                    h_ii += X_pool[i][a] * inv_XtX_pool[a][b] * X_pool[i][b]
+            denom = (1.0 - h_ii) ** 2
+            if denom < 1e-15:
+                cook_d.append(float('inf'))
+            else:
+                d_i = (resid_pool[i] ** 2 / (k_pool * mse_pool)) * (h_ii / denom)
+                cook_d.append(d_i)
+
+        threshold = 4.0 / n_pool
+        max_cook = max(cook_d)
+        n_high = sum(1 for d in cook_d if d > threshold)
+
+        _print(f'\n  Pooled N: {n_pool}, k: {k_pool}')
+        _print(f'  MSE: {mse_pool:.8f}')
+        _print(f'  Max Cook\'s D: {max_cook:.6f}')
+        _print(f'  Threshold (4/N): {threshold:.6f}')
+        _print(f'  Obs with Cook\'s D > 4/N: {n_high} ({100.0 * n_high / n_pool:.1f}%)')
+        _print(f'  Fuel beta (full sample): {beta_pool[1]:+.6f}')
+
+        # Re-run dropping high-Cook's-D observations
+        y_trim = [y_pool[i] for i in range(n_pool) if cook_d[i] <= threshold]
+        X_trim = [X_pool[i] for i in range(n_pool) if cook_d[i] <= threshold]
+        n_trim = len(y_trim)
+
+        result_trim = ols_simple(y_trim, X_trim) if n_trim > k_pool else None
+        if result_trim is not None:
+            _print(f'\n  After dropping {n_high} high-influence obs (N={n_trim}):')
+            _print(f'  Fuel beta (trimmed): {result_trim["beta"][1]:+.6f}')
+            _print(f'  Geo beta (trimmed):  {result_trim["beta"][2]:+.6f}')
+            _print(f'  R2 (trimmed): {result_trim["r2"]:.4f}')
+
+            cook_results = {
+                'n_pool': n_pool,
+                'max_cook': max_cook,
+                'threshold': threshold,
+                'n_high': n_high,
+                'fuel_beta_full': beta_pool[1],
+                'geo_beta_full': beta_pool[2],
+                'r2_full': result_pool['r2'],
+                'fuel_beta_trim': result_trim['beta'][1],
+                'geo_beta_trim': result_trim['beta'][2],
+                'r2_trim': result_trim['r2'],
+                'n_trim': n_trim,
+            }
+
+
+# ══════════════════════════════════════════════════════════════════════
 # WRITE OUTPUT
 # ══════════════════════════════════════════════════════════════════════
 
@@ -1045,9 +1140,10 @@ lines += [
     '|---|---:|---:|---:|---|',
 ]
 
-# Pooled event-clustered (computed above)
-geo_t_ec = pooled_results.get('w_geo', {}).get('t', 0)
-fuel_t_ec = pooled_results.get('w_fuel', {}).get('t', 0)
+# Pooled event-clustered (from Approach 4, baseline [-1, +3] window)
+_baseline_ws = [r for r in window_sensitivity if r['window'] == '[-1, +3]']
+geo_t_ec = _baseline_ws[0]['geo_t'] if _baseline_ws else 0.0
+fuel_t_ec = _baseline_ws[0]['fuel_t'] if _baseline_ws else 0.0
 lines.append(f'| Pooled, event-clustered | {geo_t_ec:.3f} | {fuel_t_ec:.3f} | -- | Primary |')
 # Fama-MacBeth
 geo_t_fm = fm_results.get('w_geo', {}).get('t', 0)
@@ -1085,6 +1181,30 @@ if window_sensitivity:
             f'| {r["geo_beta"]:+.6f} | {r["geo_se"]:.6f} | {r["geo_t"]:.3f} '
             f'| {r["r2"]:.4f} |'
         )
+
+# Cook's distance section
+if cook_results is not None:
+    cr = cook_results
+    lines += [
+        '',
+        '## Approach 5: Outlier Diagnostics',
+        '',
+        'Cook\'s distance on the pooled OLS baseline specification.',
+        f'Threshold: 4/N = {cr["threshold"]:.6f}',
+        '',
+        '| Metric | Value |',
+        '|---|---:|',
+        f'| N (full sample) | {cr["n_pool"]} |',
+        f'| Max Cook\'s D | {cr["max_cook"]:.6f} |',
+        f'| Obs with D > 4/N | {cr["n_high"]} ({100.0 * cr["n_high"] / cr["n_pool"]:.1f}%) |',
+        f'| Fuel beta (full) | {cr["fuel_beta_full"]:+.6f} |',
+        f'| Geo beta (full) | {cr["geo_beta_full"]:+.6f} |',
+        f'| R2 (full) | {cr["r2_full"]:.4f} |',
+        f'| N (trimmed) | {cr["n_trim"]} |',
+        f'| Fuel beta (trimmed) | {cr["fuel_beta_trim"]:+.6f} |',
+        f'| Geo beta (trimmed) | {cr["geo_beta_trim"]:+.6f} |',
+        f'| R2 (trimmed) | {cr["r2_trim"]:.4f} |',
+    ]
 
 with open(out_path, 'w', encoding='utf-8') as f:
     f.write('\n'.join(lines))

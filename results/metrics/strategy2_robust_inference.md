@@ -31,25 +31,24 @@ Valid events: 175 (min 25 firms per event for quintile formation)
 
 | Spread | Mean | NW SE | t(NW) | p | t(simple) |
 |---|---:|---:|---:|---:|---:|
-| Fuel Q5-Q1 | -0.0081 | 0.0092 | -0.880 | 0.3789 | -1.369 |
-| Geo Q5-Q1 | -0.0082 | 0.0116 | -0.709 | 0.4786 | -1.191 |
-| Channel split (G-F) | -0.0001 | 0.0141 | -0.010 | 0.9922 | -0.017 |
+| Fuel Q5-Q1 | -0.0060 | 0.0094 | -0.643 | 0.5205 | -1.021 |
+| Geo Q5-Q1 | -0.0057 | 0.0113 | -0.505 | 0.6133 | -0.848 |
+| Channel split (G-F) | +0.0003 | 0.0145 | 0.021 | 0.9834 | 0.037 |
 
 ## Approach 3: Long-Short Portfolio (Newey-West)
 
 Events: 175
-Mean L/S return: -0.0030 (-0.30%)
-NW SE: 0.0061, t(NW) = -0.483, p = 0.6292
-t(simple) = -0.838 (for comparison)
+Mean L/S return: -0.0006 (-0.06%)
+NW SE: 0.0058, t(NW) = -0.095, p = 0.9246
+t(simple) = -0.164 (for comparison)
 
 ## Summary: Inference Comparison
 
 | Method | geo t | fuel t | diff t | Note |
 |---|---:|---:|---:|---|
-| Pooled, event-clustered | 2.972 | -3.160 | 3.646 | Original (inflated) |
-| Pooled, two-way clustered | 1.080 | -0.917 | 1.128 | Conservative |
+| Pooled, event-clustered | 0.173 | -7.861 | -- | Primary |
 | Fama-MacBeth + NW | -1.297 | -7.362 | 5.703 | Gold standard |
-| Portfolio sorts + NW | -0.709 | -0.880 | -0.010 | Non-parametric |
+| Portfolio sorts + NW | -0.505 | -0.643 | 0.021 | Non-parametric |
 
 ## Interpretation
 
@@ -69,3 +68,21 @@ Referee-requested robustness check for the baseline [-1, +3] window.
 | [-1, +2] | 55580 | 175 | -4.329217 | 0.549330 | -7.881 | -0.083944 | 0.045519 | -1.844 | 0.0030 |
 | [-1, +3] | 55580 | 175 | -5.512305 | 0.701191 | -7.861 | +0.010104 | 0.058372 | 0.173 | 0.0035 |
 | [0, +1] | 55580 | 175 | -3.143866 | 0.423279 | -7.427 | -0.012597 | 0.027353 | -0.461 | 0.0028 |
+
+## Approach 5: Outlier Diagnostics
+
+Cook's distance on the pooled OLS baseline specification.
+Threshold: 4/N = 0.000072
+
+| Metric | Value |
+|---|---:|
+| N (full sample) | 55580 |
+| Max Cook's D | 0.005855 |
+| Obs with D > 4/N | 1688 (3.0%) |
+| Fuel beta (full) | -5.512305 |
+| Geo beta (full) | +0.010104 |
+| R2 (full) | 0.0035 |
+| N (trimmed) | 53892 |
+| Fuel beta (trimmed) | -6.351748 |
+| Geo beta (trimmed) | +0.011634 |
+| R2 (trimmed) | 0.0058 |
