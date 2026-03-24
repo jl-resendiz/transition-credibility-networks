@@ -23,6 +23,9 @@ data/raw/compustat/
 data/raw/crsp_compustat/
 data/raw/refinitiv/
 
+# IDE
+.vscode/
+
 # OS
 .DS_Store
 Thumbs.db
@@ -33,3 +36,6 @@ manuscript/*.pdf
 # Prior working paper versions
 manuscript/jlr_manuscript.pdf
 manuscript/nber_manuscript.pdf
+
+# Licensed data (not for distribution)
+data/raw/eikon/
