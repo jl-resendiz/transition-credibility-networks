@@ -17,7 +17,7 @@ df: (3, 55575)
 p-value (permutation, B=999): 0.0000***
 N: 55580
 
-Interpretation: Reject H0 at 5%. The spatial network channels jointly predict CARs around coal retirement events.
+Reject H0 at 5%. The spatial network channels jointly predict CARs around coal retirement events.
 
 ## Test 2: Difference test (H0: beta_geo = beta_fuel)
 
