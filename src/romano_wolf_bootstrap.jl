@@ -19,7 +19,7 @@ const B = 999
 const SEED = 42
 const MONTH_POSTS = [3, 6, 12]
 const CHANNEL_VARS = ["w_geo", "w_fuel", "w_reg"]
-const DATA_DIR = joinpath(@__DIR__, "data")
+const DATA_DIR = length(ARGS) >= 1 ? ARGS[1] : joinpath(@__DIR__, "data")
 
 # ── Load matrices for each window ──
 
@@ -328,7 +328,7 @@ function main()
     end
 
     # ── Write comparison output ──
-    out_path = joinpath(@__DIR__, "julia_rw_results.csv")
+    out_path = length(ARGS) >= 2 ? ARGS[2] : joinpath(@__DIR__, "julia_rw_results.csv")
     open(out_path, "w") do io
         println(io, "channel,window,obs_t,maxt_p,rw_p")
         for (j, (ch, post)) in enumerate(hyp_labels)

@@ -47,6 +47,9 @@ data/derived/gem/
 # Experiments (not part of the reproducible pipeline)
 experiments/
 
+# Literature review (internal working notes, not for public repo)
+literature/
+
 # Audit reports (development artifacts)
 prompts/audit_*.md
 prompts/pipeline_optimization_report.md

@@ -21,6 +21,9 @@ import sys
 import math
 import random
 import hashlib
+import shutil
+import subprocess
+import tempfile
 from collections import defaultdict
 
 from _paths import derived_path, raw_path, results_path
@@ -538,8 +541,6 @@ raw_p = [p_from_t(t) for t in obs_t]
 bonf_p = [min(p * n_hyp, 1.0) for p in raw_p]
 
 # Step 3: Bootstrap max-t (Westfall-Young) and Romano-Wolf stepdown
-_print(f'\nRunning {B} bootstrap replications...')
-random.seed(SEED)
 
 # Pre-compute per-window structures (X, inv_XtX, cluster_map, etc.)
 window_cache = {}
@@ -571,106 +572,242 @@ for post in MONTH_POSTS:
         'k': len(spec_vars) + 1,
     }
 
-# Get all unique cluster IDs across windows for consistent Rademacher draws
-all_cluster_ids = set()
-for post in MONTH_POSTS:
-    if post in window_cache:
-        all_cluster_ids.update(window_cache[post]['cluster_map'].keys())
-all_cluster_ids = sorted(all_cluster_ids)
 
-# Bootstrap loop — memory-efficient: store only max-t and per-hypothesis counts
-import gc
-gc.collect()
+# ── Julia hybrid bootstrap ──────────────────────────────────────────
 
-# Pre-allocate y_star buffers per window to avoid repeated allocation
-y_star_buf = {}
-for post in MONTH_POSTS:
-    if post in window_cache:
-        y_star_buf[post] = [0.0] * window_cache[post]['n']
+def _find_julia():
+    """Locate Julia executable. Returns path or None."""
+    jl = shutil.which('julia')
+    if jl:
+        return jl
+    fallback = os.path.expanduser(r'~\AppData\Local\Microsoft\WindowsApps\julia.exe')
+    if os.path.isfile(fallback):
+        return fallback
+    return None
 
-# Instead of storing full B x n_hyp matrix, accumulate counts directly
-boot_max_t = [0.0] * B
-boot_t_all = [[0.0] * n_hyp for _ in range(B)]
 
-for b_iter in range(B):
-    if (b_iter + 1) % 100 == 0:
-        _print(f'  bootstrap {b_iter + 1}/{B}')
+def _export_for_julia(tmpdir):
+    """Export OLS matrices to CSV files that romano_wolf_bootstrap.jl expects."""
+    data_dir = os.path.join(tmpdir, 'data')
+    os.makedirs(data_dir, exist_ok=True)
 
-    # Draw Rademacher weights: +1 or -1 for each event cluster
-    rademacher = {cid: (1 if random.random() < 0.5 else -1)
-                  for cid in all_cluster_ids}
-
-    # For each window, construct y* under H0 and compute t-stats
-    col = 0
     for post in MONTH_POSTS:
         if post not in window_cache:
-            col += len(CHANNEL_VARS)
             continue
-
         wc = window_cache[post]
-        y_hat = wc['y_hat']
-        resid = wc['resid']
-        cids = wc['cluster_ids']
-        n = wc['n']
 
-        # y* = y_hat + w_g * resid_i (reuse buffer)
-        buf = y_star_buf[post]
-        for i in range(n):
-            buf[i] = y_hat[i] + rademacher.get(cids[i], 1) * resid[i]
+        # X matrix with header
+        k = wc['k']
+        sv = wc['spec_vars']
+        x_header = ['intercept'] + sv
+        with open(os.path.join(data_dir, f'X_{post}.csv'), 'w', newline='') as f:
+            w = csv.writer(f)
+            w.writerow(x_header)
+            for row in wc['X']:
+                w.writerow(row)
 
-        t_dict = bootstrap_t_stats(
-            buf, wc['X'], wc['inv_XtX'], wc['cluster_map'],
-            wc['spec_vars'], wc['k'], n
+        # vectors: obs_idx, y_hat, resid, cluster_id
+        with open(os.path.join(data_dir, f'vectors_{post}.csv'), 'w', newline='') as f:
+            w = csv.writer(f)
+            w.writerow(['obs_idx', 'y_hat', 'resid', 'cluster_id'])
+            for i in range(wc['n']):
+                w.writerow([i + 1, wc['y_hat'][i], wc['resid'][i],
+                            wc['cluster_ids'][i]])
+
+        # inv_XtX with header
+        inv_header = [f'c{j}' for j in range(k)]
+        with open(os.path.join(data_dir, f'inv_XtX_{post}.csv'), 'w', newline='') as f:
+            w = csv.writer(f)
+            w.writerow(inv_header)
+            for row in wc['inv_XtX']:
+                w.writerow(row)
+
+        # spec_vars (one per line, no header)
+        with open(os.path.join(data_dir, f'spec_vars_{post}.txt'), 'w') as f:
+            for v in sv:
+                f.write(v + '\n')
+
+    return data_dir
+
+
+def _run_julia_bootstrap():
+    """Try to run bootstrap via Julia. Returns (maxt_p, rw_p) or None."""
+    julia_exe = _find_julia()
+    if julia_exe is None:
+        _print('  Julia not found, falling back to Python bootstrap.')
+        return None
+
+    jl_script = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                             'romano_wolf_bootstrap.jl')
+    if not os.path.isfile(jl_script):
+        _print(f'  Julia script not found at {jl_script}, falling back.')
+        return None
+
+    tmpdir = tempfile.mkdtemp(prefix='rw_bootstrap_')
+    try:
+        _print(f'  Exporting matrices to {tmpdir}...')
+        data_dir = _export_for_julia(tmpdir)
+        out_csv = os.path.join(tmpdir, 'julia_rw_results.csv')
+
+        _print(f'  Calling Julia: {julia_exe}')
+        proc = subprocess.run(
+            [julia_exe, jl_script, data_dir, out_csv],
+            capture_output=True, text=True, timeout=600,
         )
-        if t_dict is None:
-            col += len(CHANNEL_VARS)
-            continue
+        if proc.returncode != 0:
+            _print(f'  Julia failed (rc={proc.returncode}):')
+            for line in (proc.stderr or '').strip().split('\n')[:10]:
+                _print(f'    {line}')
+            return None
 
-        for ch in CHANNEL_VARS:
-            boot_t_all[b_iter][col] = abs(t_dict.get(ch, 0.0))
-            col += 1
+        # Print Julia stdout for diagnostics
+        for line in (proc.stdout or '').strip().split('\n'):
+            _print(f'  [julia] {line}')
 
-    boot_max_t[b_iter] = max(boot_t_all[b_iter])
+        # Read results CSV: channel,window,obs_t,maxt_p,rw_p
+        if not os.path.isfile(out_csv):
+            _print('  Julia output CSV not found.')
+            return None
 
-boot_t_matrix = boot_t_all
+        julia_maxt = {}
+        julia_rw = {}
+        with open(out_csv, 'r', encoding='utf-8') as f:
+            for row in csv.DictReader(f):
+                key = (row['channel'], int(row['window']))
+                julia_maxt[key] = float(row['maxt_p'])
+                julia_rw[key] = float(row['rw_p'])
 
-_print('  Bootstrap complete.')
+        # Build p-value lists in hypothesis_labels order
+        maxt_p = []
+        rw_p = []
+        for ch, post in hypothesis_labels:
+            key = (ch, post)
+            if key not in julia_maxt:
+                _print(f'  WARNING: Julia missing result for {key}')
+                return None
+            maxt_p.append(julia_maxt[key])
+            rw_p.append(julia_rw[key])
 
-# Step 4: Westfall-Young max-t adjusted p-values
-# p_adj_j = fraction of bootstrap draws where max|t*| >= |t_j|
-# boot_max_t already computed inline above
-maxt_p = []
-for j in range(n_hyp):
-    abs_t_j = abs(obs_t[j])
-    count = sum(1 for mt in boot_max_t if mt >= abs_t_j)
-    maxt_p.append(count / B)
+        return maxt_p, rw_p
 
-# Step 5: Romano-Wolf stepdown p-values
-# Sort hypotheses by |t| descending (most significant first)
-order = sorted(range(n_hyp), key=lambda j: abs(obs_t[j]), reverse=True)
+    except subprocess.TimeoutExpired:
+        _print('  Julia timed out after 600s, falling back.')
+        return None
+    except Exception as e:
+        _print(f'  Julia error: {e}')
+        return None
+    finally:
+        # Clean up temp directory
+        try:
+            shutil.rmtree(tmpdir, ignore_errors=True)
+        except Exception:
+            pass
 
-rw_p = [0.0] * n_hyp
-remaining = list(range(n_hyp))
 
-for step_idx, j in enumerate(order):
-    abs_t_j = abs(obs_t[j])
-    # Compute stepdown max over remaining hypotheses for each bootstrap draw
-    count = 0
+def _python_bootstrap():
+    """Pure-Python fallback bootstrap. Returns (maxt_p, rw_p)."""
+    _print(f'\nRunning {B} Python bootstrap replications...')
+    random.seed(SEED)
+
+    # Get all unique cluster IDs across windows for consistent Rademacher draws
+    all_cluster_ids = set()
+    for post in MONTH_POSTS:
+        if post in window_cache:
+            all_cluster_ids.update(window_cache[post]['cluster_map'].keys())
+    all_cluster_ids = sorted(all_cluster_ids)
+
+    import gc
+    gc.collect()
+
+    # Pre-allocate y_star buffers per window
+    y_star_buf = {}
+    for post in MONTH_POSTS:
+        if post in window_cache:
+            y_star_buf[post] = [0.0] * window_cache[post]['n']
+
+    boot_max_t = [0.0] * B
+    boot_t_all = [[0.0] * n_hyp for _ in range(B)]
+
     for b_iter in range(B):
-        step_max = max(boot_t_matrix[b_iter][h] for h in remaining)
-        if step_max >= abs_t_j:
-            count += 1
-    p_step = count / B
+        if (b_iter + 1) % 100 == 0:
+            _print(f'  bootstrap {b_iter + 1}/{B}')
 
-    # Enforce monotonicity: adjusted p cannot decrease along the stepdown
-    if step_idx > 0:
-        p_step = max(p_step, rw_p[order[step_idx - 1]])
-    rw_p[j] = p_step
+        rademacher = {cid: (1 if random.random() < 0.5 else -1)
+                      for cid in all_cluster_ids}
 
-    # Remove this hypothesis from the remaining set
-    remaining.remove(j)
-    if not remaining:
-        break
+        col = 0
+        for post in MONTH_POSTS:
+            if post not in window_cache:
+                col += len(CHANNEL_VARS)
+                continue
+
+            wc = window_cache[post]
+            y_hat = wc['y_hat']
+            resid = wc['resid']
+            cids = wc['cluster_ids']
+            n = wc['n']
+
+            buf = y_star_buf[post]
+            for i in range(n):
+                buf[i] = y_hat[i] + rademacher.get(cids[i], 1) * resid[i]
+
+            t_dict = bootstrap_t_stats(
+                buf, wc['X'], wc['inv_XtX'], wc['cluster_map'],
+                wc['spec_vars'], wc['k'], n
+            )
+            if t_dict is None:
+                col += len(CHANNEL_VARS)
+                continue
+
+            for ch in CHANNEL_VARS:
+                boot_t_all[b_iter][col] = abs(t_dict.get(ch, 0.0))
+                col += 1
+
+        boot_max_t[b_iter] = max(boot_t_all[b_iter])
+
+    _print('  Bootstrap complete.')
+
+    # Westfall-Young max-t adjusted p-values
+    maxt_p = []
+    for j in range(n_hyp):
+        abs_t_j = abs(obs_t[j])
+        count = sum(1 for mt in boot_max_t if mt >= abs_t_j)
+        maxt_p.append(count / B)
+
+    # Romano-Wolf stepdown p-values
+    order = sorted(range(n_hyp), key=lambda j: abs(obs_t[j]), reverse=True)
+    rw_p = [0.0] * n_hyp
+    remaining = list(range(n_hyp))
+
+    for step_idx, j in enumerate(order):
+        abs_t_j = abs(obs_t[j])
+        count = 0
+        for b_iter in range(B):
+            step_max = max(boot_t_all[b_iter][h] for h in remaining)
+            if step_max >= abs_t_j:
+                count += 1
+        p_step = count / B
+
+        if step_idx > 0:
+            p_step = max(p_step, rw_p[order[step_idx - 1]])
+        rw_p[j] = p_step
+
+        remaining.remove(j)
+        if not remaining:
+            break
+
+    return maxt_p, rw_p
+
+
+# Try Julia first, fall back to Python
+_print(f'\nRunning {B} bootstrap replications...')
+julia_result = _run_julia_bootstrap()
+
+if julia_result is not None:
+    maxt_p, rw_p = julia_result
+    _print('  Using Julia bootstrap p-values (max-t and Romano-Wolf).')
+else:
+    maxt_p, rw_p = _python_bootstrap()
 
 # Step 6: Output results
 _print()
