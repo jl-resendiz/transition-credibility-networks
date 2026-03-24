@@ -97,7 +97,7 @@ def main():
     #   joint_tests            → Joint significance + fuel ≠ geo difference
     #   esg_horse_race         → ESG complementarity (coverage argument)
     #   bartik_shiftshare      → Causal identification (GPS 2020 diagnostics)
-    #   romano_wolf            → Multiple testing correction (9 hypotheses)
+    #   romano_wolf            → Multiple testing correction (3 hypotheses, primary window)
     #   geo_diversification    → Aggregation lemma test (theory validation)
     #   learning_alternatives  → Calendar-time learning (market efficiency)
     #   referee_tables         → LaTeX output + appendix robustness tables
