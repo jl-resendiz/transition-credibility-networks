@@ -71,7 +71,7 @@ if os.path.exists(panel_path):
     if _panel_raw:
         all_vals = sorted(_panel_raw.values())
         n = len(all_vals)
-        p05 = all_vals[int(0.05 * (n - 1))]
+        p05 = all_vals[int(0.05 * (n - 1))]  # 5th/95th for CO2-to-revenue scaling (not Fama-French)
         p95 = all_vals[int(0.95 * (n - 1))]
         denom = (p95 - p05) if p95 > p05 else None
         if denom:
@@ -113,7 +113,7 @@ if os.path.exists(ref_path):
     vals = sorted(v['co2_to_revenue'] for v in latest.values())
     if vals:
         n = len(vals)
-        p05 = vals[int(0.05 * (n - 1))]
+        p05 = vals[int(0.05 * (n - 1))]  # 5th/95th for CO2-to-revenue scaling (not Fama-French)
         p95 = vals[int(0.95 * (n - 1))]
         denom = (p95 - p05) if p95 > p05 else None
         if denom:

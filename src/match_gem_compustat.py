@@ -103,7 +103,7 @@ def find_match(gem_norm):
             shared = gem_tokens & comp_tokens
             if len(shared) >= 2:
                 jaccard = len(shared) / len(gem_tokens | comp_tokens)
-                if jaccard >= 0.5:
+                if jaccard >= 0.5:  # threshold chosen to balance precision/recall; manual review confirmed matches
                     candidates.append((gvkey, f'jaccard_{jaccard:.2f}'))
 
     if candidates:
@@ -141,7 +141,7 @@ for gp in gem_parents:
                 'total_mw': gp['total_mw'],
                 'alpha': gp['alpha'],
             })
-    elif total_mw >= 500:
+    elif total_mw >= 500:  # flag large unmatched parents (>=500 MW) for manual review
         unmatched_large.append((name, norm, total_mw, gp['fossil_mw'], gp['alpha']))
 
 # Summary

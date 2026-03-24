@@ -7,7 +7,7 @@ Tasks:
 4) Specification progression (w_geo only, w_fuel only, both, full + controls).
 5) Bandwidth sensitivity: w_geo with half-life 250km and 1000km.
 
-Outputs LaTeX tables under JEEM_outputs/tables/.
+Outputs LaTeX tables under results/tables/.
 """
 import csv
 import os
@@ -824,7 +824,7 @@ def main():
         'Bandwidth Sensitivity (3-Month CARs)', 'tab:bandwidth_sensitivity',
         col_labels=['Half-life 250 km', 'Half-life 1000 km'])
 
-    print('Reviewer tables written to JEEM_outputs/tables/')
+    print('Reviewer tables written to results/tables/')
 
 
 if __name__ == '__main__':
