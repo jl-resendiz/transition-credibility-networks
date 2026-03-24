@@ -310,7 +310,7 @@ The difference is positive and significant ($t = 7.46$, $p < 0.001$): fuel-simil
 
 \subsection{The Role of Geographic Proximity}\label{sec:geo_role}
 
-The geographic proximity channel is not robust. The sign and significance of $\gamma_{\text{geo}}$ vary across specifications: insignificant and negative in the baseline ($t = -0.41$ pooled; $t = -1.30$ Fama-MacBeth), marginally positive under alternative bandwidths ($t = 1.68$ to $1.80$ Fama-MacBeth), and insignificant under event-specific distance measures ($t = 1.32$ pooled; $t = 0.69$ Fama-MacBeth). Restricting the sample to single-country utilities, where geographic variation is most plausibly local, the coefficient remains insignificant ($t = 0.58$ pooled; $t = -1.04$ Fama-MacBeth).
+The geographic proximity channel is not robust. The coefficient is insignificant and negative in the baseline ($t = -0.41$ pooled; $t = -1.30$ Fama-MacBeth). Restricting the sample to single-country utilities, where geographic variation is most plausibly local, the coefficient remains insignificant ($t = 0.58$ pooled; $t = -1.04$ Fama-MacBeth).
 
 This instability is consistent with the aggregation framework in Lemma~\ref{lem:aggregation}. Local competitive benefits documented at the plant level by \citet{DavisHausman2016} are attenuated in the portfolios of listed utilities operating across multiple markets. The aggregate prediction is supported: the geographic coefficient is indistinguishable from zero while the fuel coefficient is robustly negative. An interaction between returns and the Herfindahl index of market concentration $H_i$ is directionally consistent with the attenuation mechanism ($t = 1.31$) but insignificant, so I cannot confirm the specific cross-sectional prediction that attenuation scales with $K_i$. The data are consistent with the lemma in that geographic exposure is attenuated to zero in aggregate, but the particular diversification channel remains an interpretation rather than an identified finding. That the sign is unstable, rather than stably zero, suggests the competitive and contagion components of geographic proximity \citep{LangStulz1992} partially offset, with neither dominating in the cross-section.
 
@@ -339,7 +339,7 @@ $N$ & 14{,}731 & 14{,}731 & 14{,}731 \\
 \bottomrule
 \end{tabular}
 \begin{flushleft}\footnotesize
-Notes: Pooled OLS with event-clustered standard errors in parentheses. Sample restricted to 153 firms with LSEG Environmental Score (165 events). ESG score normalised to $[0,1]$. Under Fama-MacBeth + Newey-West, both ESG ($t = -5.72$) and fuel ($t = -2.17$) survive the horse race. * $p<0.10$, ** $p<0.05$, *** $p<0.01$.
+Notes: Pooled OLS with event-clustered standard errors in parentheses. Sample restricted to 153 firms with LSEG Environmental Score (165 events). ESG score normalised to $[0,1]$. * $p<0.10$, ** $p<0.05$, *** $p<0.01$.
 \end{flushleft}
 \end{table}
 
@@ -368,9 +368,6 @@ The interpretation is market saturation rather than gradual learning. In the Uni
 
 
 \subsection{Robustness}\label{sec:robustness}
-
-\paragraph{Bandwidth sensitivity.}
-At each of the five bandwidth specifications ($h = 250, 500, 750, 1000, 1500$\,km), the fuel channel is significant at the 5 percent level, with Fama-MacBeth $t$-statistics ranging from $-2.28$ to $-2.65$. At each bandwidth, the geographic channel is marginally significant at the 10 percent level ($t$ from $1.68$ to $1.80$) but does not reach 5 percent at any bandwidth.
 
 \paragraph{Conley spatial standard errors.}
 At 1000\,km, the fuel channel retains $t = -4.16$, confirming that the result is not driven by residual spatial correlation.
