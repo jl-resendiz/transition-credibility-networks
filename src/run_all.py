@@ -65,6 +65,9 @@ def main():
     analysis_only = '--analysis' in sys.argv
 
     if not analysis_only:
+        # ── Stage 0: Convert GEM xlsx to CSV (one-time, fast reads downstream) ──
+        run('build_gem_csv.py')
+
         # ── Stage 1: Parse raw data ──
         run('parse_gem.py')
 

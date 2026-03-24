@@ -25,7 +25,6 @@ import sys
 import math
 import random
 import hashlib
-import openpyxl
 from collections import defaultdict
 
 from _paths import derived_path, raw_path, results_path
@@ -269,185 +268,169 @@ current_mw = defaultdict(lambda: {'coal': 0.0, 'gas': 0.0, 'solar': 0.0, 'wind':
 
 # --- Coal ---
 _print('  Reading GEM Coal Plant Tracker...')
-fpath = raw_path('gem', 'Global-Coal-Plant-Tracker-January-2026.xlsx')
-wb = openpyxl.load_workbook(fpath, read_only=True)
-ws = wb['Units']
-headers = [cell.value for cell in next(ws.iter_rows(min_row=1, max_row=1))]
-col = {h: i for i, h in enumerate(headers)}
+fpath = derived_path('gem', 'gem_coal.csv')
 n_coal_pre = 0
 n_coal_total = 0
-for row in ws.iter_rows(min_row=2, values_only=True):
-    status = str(row[col['Status']]) if row[col['Status']] else ''
-    # Include operating, mothballed, and retired plants (all existed at some point)
-    cap = safe_float(row[col['Capacity (MW)']])
-    if cap is None or cap <= 0:
-        continue
-    parent_raw = row[col['Parent']]
-    parents = parse_parents(parent_raw)
-    start_year = safe_int(row[col['Start year']])
-    ret_year = safe_int(row[col['Retired year']])
+with open(fpath, newline='', encoding='utf-8') as f:
+    for row in csv.DictReader(f):
+        status = str(row['Status']) if row['Status'] else ''
+        # Include operating, mothballed, and retired plants (all existed at some point)
+        cap = safe_float(row['Capacity (MW)'])
+        if cap is None or cap <= 0:
+            continue
+        parent_raw = row['Parent']
+        parents = parse_parents(parent_raw)
+        start_year = safe_int(row['Start year'])
+        ret_year = safe_int(row['Retired year'])
 
-    # Map to gvkeys
-    matched_gvkeys = set()
-    for name in parents:
-        if name in parent_to_gvkeys:
-            matched_gvkeys.update(parent_to_gvkeys[name])
-    if not matched_gvkeys:
-        continue
+        # Map to gvkeys
+        matched_gvkeys = set()
+        for name in parents:
+            if name in parent_to_gvkeys:
+                matched_gvkeys.update(parent_to_gvkeys[name])
+        if not matched_gvkeys:
+            continue
 
-    n_coal_total += 1
+        n_coal_total += 1
 
-    # Current portfolio: include if operating or retired after study start
-    for gk in matched_gvkeys:
-        current_mw[gk]['coal'] += cap
+        # Current portfolio: include if operating or retired after study start
+        for gk in matched_gvkeys:
+            current_mw[gk]['coal'] += cap
 
-    # Pre-period: commissioned before cutoff AND not retired before cutoff
-    if start_year is not None and start_year < PRE_CUTOFF:
-        if ret_year is None or ret_year >= PRE_CUTOFF:
-            for gk in matched_gvkeys:
-                pre_mw[gk]['coal'] += cap
-            n_coal_pre += 1
-    elif start_year is None:
-        # No start year: include if not retired before cutoff (proxy)
-        if ret_year is None or ret_year >= PRE_CUTOFF:
-            for gk in matched_gvkeys:
-                pre_mw[gk]['coal'] += cap
-            n_coal_pre += 1
+        # Pre-period: commissioned before cutoff AND not retired before cutoff
+        if start_year is not None and start_year < PRE_CUTOFF:
+            if ret_year is None or ret_year >= PRE_CUTOFF:
+                for gk in matched_gvkeys:
+                    pre_mw[gk]['coal'] += cap
+                n_coal_pre += 1
+        elif start_year is None:
+            # No start year: include if not retired before cutoff (proxy)
+            if ret_year is None or ret_year >= PRE_CUTOFF:
+                for gk in matched_gvkeys:
+                    pre_mw[gk]['coal'] += cap
+                n_coal_pre += 1
 
-wb.close()
 _print(f'    Coal units mapped: {n_coal_total} total, {n_coal_pre} pre-{PRE_CUTOFF}')
 
 # --- Gas ---
 _print('  Reading GEM Gas Plant Tracker...')
-fpath = raw_path('gem', 'Global-Oil-and-Gas-Plant-Tracker-GOGPT-January-2026.xlsx')
-wb = openpyxl.load_workbook(fpath, read_only=True)
-ws = wb['Gas & Oil Units']
-headers = [cell.value for cell in next(ws.iter_rows(min_row=1, max_row=1))]
-col_g = {h: i for i, h in enumerate(headers)}
+fpath = derived_path('gem', 'gem_gas.csv')
 n_gas_pre = 0
 n_gas_total = 0
-for row in ws.iter_rows(min_row=2, values_only=True):
-    fuel = str(row[col_g.get('Fuel', 6)] or '').lower()
-    if 'gas' not in fuel:
-        continue
-    cap = safe_float(row[col_g['Capacity (MW)']])
-    if cap is None or cap <= 0:
-        continue
-    parent_raw = row[col_g['Parent(s)']]
-    parents = parse_parents(parent_raw)
-    start_year = safe_int(row[col_g['Start year']])
-    ret_year = safe_int(row[col_g['Retired year']])
+with open(fpath, newline='', encoding='utf-8') as f:
+    for row in csv.DictReader(f):
+        fuel = str(row.get('Fuel', '') or '').lower()
+        if 'gas' not in fuel:
+            continue
+        cap = safe_float(row['Capacity (MW)'])
+        if cap is None or cap <= 0:
+            continue
+        parent_raw = row['Parent(s)']
+        parents = parse_parents(parent_raw)
+        start_year = safe_int(row['Start year'])
+        ret_year = safe_int(row['Retired year'])
 
-    matched_gvkeys = set()
-    for name in parents:
-        if name in parent_to_gvkeys:
-            matched_gvkeys.update(parent_to_gvkeys[name])
-    if not matched_gvkeys:
-        continue
+        matched_gvkeys = set()
+        for name in parents:
+            if name in parent_to_gvkeys:
+                matched_gvkeys.update(parent_to_gvkeys[name])
+        if not matched_gvkeys:
+            continue
 
-    n_gas_total += 1
-    for gk in matched_gvkeys:
-        current_mw[gk]['gas'] += cap
+        n_gas_total += 1
+        for gk in matched_gvkeys:
+            current_mw[gk]['gas'] += cap
 
-    if start_year is not None and start_year < PRE_CUTOFF:
-        if ret_year is None or ret_year >= PRE_CUTOFF:
-            for gk in matched_gvkeys:
-                pre_mw[gk]['gas'] += cap
-            n_gas_pre += 1
-    elif start_year is None:
-        if ret_year is None or ret_year >= PRE_CUTOFF:
-            for gk in matched_gvkeys:
-                pre_mw[gk]['gas'] += cap
-            n_gas_pre += 1
+        if start_year is not None and start_year < PRE_CUTOFF:
+            if ret_year is None or ret_year >= PRE_CUTOFF:
+                for gk in matched_gvkeys:
+                    pre_mw[gk]['gas'] += cap
+                n_gas_pre += 1
+        elif start_year is None:
+            if ret_year is None or ret_year >= PRE_CUTOFF:
+                for gk in matched_gvkeys:
+                    pre_mw[gk]['gas'] += cap
+                n_gas_pre += 1
 
-wb.close()
 _print(f'    Gas units mapped: {n_gas_total} total, {n_gas_pre} pre-{PRE_CUTOFF}')
 
 # --- Solar ---
 _print('  Reading GEM Solar Power Tracker...')
-fpath = raw_path('gem', 'Global-Solar-Power-Tracker-February-2026.xlsx')
-wb = openpyxl.load_workbook(fpath, read_only=True)
-ws = wb['Utility-Scale (1 MW+)']
-headers = [cell.value for cell in next(ws.iter_rows(min_row=1, max_row=1))]
-col_s = {h: i for i, h in enumerate(headers)}
+fpath = derived_path('gem', 'gem_solar.csv')
 n_solar_pre = 0
 n_solar_total = 0
-for row in ws.iter_rows(min_row=2, values_only=True):
-    cap = safe_float(row[col_s['Capacity (MW)']])
-    if cap is None or cap <= 0:
-        continue
-    status = str(row[col_s['Status']] or '').lower()
-    owner_raw = row[col_s['Owner']]
-    parents = parse_parents(owner_raw)
-    start_year = safe_int(row[col_s['Start year']])
-    ret_year = safe_int(row[col_s['Retired year']])
+with open(fpath, newline='', encoding='utf-8') as f:
+    for row in csv.DictReader(f):
+        cap = safe_float(row['Capacity (MW)'])
+        if cap is None or cap <= 0:
+            continue
+        status = str(row['Status'] or '').lower()
+        owner_raw = row['Owner']
+        parents = parse_parents(owner_raw)
+        start_year = safe_int(row['Start year'])
+        ret_year = safe_int(row['Retired year'])
 
-    matched_gvkeys = set()
-    for name in parents:
-        if name in parent_to_gvkeys:
-            matched_gvkeys.update(parent_to_gvkeys[name])
-    if not matched_gvkeys:
-        continue
+        matched_gvkeys = set()
+        for name in parents:
+            if name in parent_to_gvkeys:
+                matched_gvkeys.update(parent_to_gvkeys[name])
+        if not matched_gvkeys:
+            continue
 
-    n_solar_total += 1
-    for gk in matched_gvkeys:
-        current_mw[gk]['solar'] += cap
+        n_solar_total += 1
+        for gk in matched_gvkeys:
+            current_mw[gk]['solar'] += cap
 
-    if start_year is not None and start_year < PRE_CUTOFF:
-        if ret_year is None or ret_year >= PRE_CUTOFF:
-            for gk in matched_gvkeys:
-                pre_mw[gk]['solar'] += cap
-            n_solar_pre += 1
-    elif start_year is None:
-        if ret_year is None or ret_year >= PRE_CUTOFF:
-            for gk in matched_gvkeys:
-                pre_mw[gk]['solar'] += cap
-            n_solar_pre += 1
+        if start_year is not None and start_year < PRE_CUTOFF:
+            if ret_year is None or ret_year >= PRE_CUTOFF:
+                for gk in matched_gvkeys:
+                    pre_mw[gk]['solar'] += cap
+                n_solar_pre += 1
+        elif start_year is None:
+            if ret_year is None or ret_year >= PRE_CUTOFF:
+                for gk in matched_gvkeys:
+                    pre_mw[gk]['solar'] += cap
+                n_solar_pre += 1
 
-wb.close()
 _print(f'    Solar units mapped: {n_solar_total} total, {n_solar_pre} pre-{PRE_CUTOFF}')
 
 # --- Wind ---
 _print('  Reading GEM Wind Power Tracker...')
-fpath = raw_path('gem', 'Global-Wind-Power-Tracker-February-2026.xlsx')
-wb = openpyxl.load_workbook(fpath, read_only=True)
-ws = wb['Data']
-headers = [cell.value for cell in next(ws.iter_rows(min_row=1, max_row=1))]
-col_w = {h: i for i, h in enumerate(headers)}
+fpath = derived_path('gem', 'gem_wind.csv')
 n_wind_pre = 0
 n_wind_total = 0
-for row in ws.iter_rows(min_row=2, values_only=True):
-    cap = safe_float(row[col_w['Capacity (MW)']])
-    if cap is None or cap <= 0:
-        continue
-    owner_raw = row[col_w['Owner']]
-    parents = parse_parents(owner_raw)
-    start_year = safe_int(row[col_w['Start year']])
-    ret_year = safe_int(row[col_w['Retired year']])
+with open(fpath, newline='', encoding='utf-8') as f:
+    for row in csv.DictReader(f):
+        cap = safe_float(row['Capacity (MW)'])
+        if cap is None or cap <= 0:
+            continue
+        owner_raw = row['Owner']
+        parents = parse_parents(owner_raw)
+        start_year = safe_int(row['Start year'])
+        ret_year = safe_int(row['Retired year'])
 
-    matched_gvkeys = set()
-    for name in parents:
-        if name in parent_to_gvkeys:
-            matched_gvkeys.update(parent_to_gvkeys[name])
-    if not matched_gvkeys:
-        continue
+        matched_gvkeys = set()
+        for name in parents:
+            if name in parent_to_gvkeys:
+                matched_gvkeys.update(parent_to_gvkeys[name])
+        if not matched_gvkeys:
+            continue
 
-    n_wind_total += 1
-    for gk in matched_gvkeys:
-        current_mw[gk]['wind'] += cap
+        n_wind_total += 1
+        for gk in matched_gvkeys:
+            current_mw[gk]['wind'] += cap
 
-    if start_year is not None and start_year < PRE_CUTOFF:
-        if ret_year is None or ret_year >= PRE_CUTOFF:
-            for gk in matched_gvkeys:
-                pre_mw[gk]['wind'] += cap
-            n_wind_pre += 1
-    elif start_year is None:
-        if ret_year is None or ret_year >= PRE_CUTOFF:
-            for gk in matched_gvkeys:
-                pre_mw[gk]['wind'] += cap
-            n_wind_pre += 1
+        if start_year is not None and start_year < PRE_CUTOFF:
+            if ret_year is None or ret_year >= PRE_CUTOFF:
+                for gk in matched_gvkeys:
+                    pre_mw[gk]['wind'] += cap
+                n_wind_pre += 1
+        elif start_year is None:
+            if ret_year is None or ret_year >= PRE_CUTOFF:
+                for gk in matched_gvkeys:
+                    pre_mw[gk]['wind'] += cap
+                n_wind_pre += 1
 
-wb.close()
 _print(f'    Wind units mapped: {n_wind_total} total, {n_wind_pre} pre-{PRE_CUTOFF}')
 
 # Compute fuel share vectors

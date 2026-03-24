@@ -8,9 +8,9 @@ Output: firm_alpha_panel.csv with columns:
   gvkey, year, coal_mw, gas_mw, fossil_mw, clean_mw, total_mw,
   alpha (fossil share), coal_share, n_plants
 """
-import openpyxl, csv, os, re
+import csv, re
 from collections import defaultdict
-from _paths import derived_path, raw_path
+from _paths import derived_path
 
 YEAR_RANGE = range(2010, 2027)  # 2010-2026
 
@@ -43,70 +43,68 @@ print(f'Matched parents: {len(parent_to_gvkeys)}')
 FOSSIL_FUELS = {'coal', 'gas', 'oil'}
 
 trackers = [
-    ('Global-Coal-Plant-Tracker-January-2026.xlsx', 'Units', 'Parent', 'coal'),
-    ('Global-Oil-and-Gas-Plant-Tracker-GOGPT-January-2026.xlsx', 'Gas & Oil Units', 'Parent(s)', 'gas'),
-    ('Global-Solar-Power-Tracker-February-2026.xlsx', 'Utility-Scale (1 MW+)', 'Owner', 'solar'),
-    ('Global-Wind-Power-Tracker-February-2026.xlsx', 'Data', 'Owner', 'wind'),
+    ('gem_coal.csv', 'Parent', 'coal'),
+    ('gem_gas.csv', 'Parent(s)', 'gas'),
+    ('gem_solar.csv', 'Owner', 'solar'),
+    ('gem_wind.csv', 'Owner', 'wind'),
 ]
 
 # gvkey -> list of (fuel, capacity_mw, start_year, retired_year_or_None)
 gvkey_plants = defaultdict(list)
 
-for fname, sheet, parent_col, fuel_type in trackers:
-    fpath = raw_path('gem', fname)
+for fname, parent_col, fuel_type in trackers:
+    fpath = derived_path('gem', fname)
     print(f'Reading {fname}...')
-    wb = openpyxl.load_workbook(fpath, read_only=True)
-    ws = wb[sheet]
-    headers = [cell.value for cell in next(ws.iter_rows(min_row=1, max_row=1))]
-    col = {h: i for i, h in enumerate(headers)}
+    with open(fpath, 'r', encoding='utf-8') as f:
+        reader = csv.DictReader(f)
+        headers = reader.fieldnames
 
-    cap_col = 'Capacity (MW)'
-    start_col = 'Start year'
-    # Retired year column name varies
-    ret_col = None
-    for candidate in ['Retired year', 'Retired Year', 'retired year']:
-        if candidate in col:
-            ret_col = candidate
-            break
+        # Retired year column name varies
+        ret_col = None
+        for candidate in ['Retired year', 'Retired Year', 'retired year']:
+            if candidate in headers:
+                ret_col = candidate
+                break
 
-    n_matched = 0
-    for row in ws.iter_rows(min_row=2, values_only=True):
-        # Include all statuses with a start year (operating, retired, mothballed)
-        # We reconstruct the fleet at each point in time
-        try:
-            cap = float(row[col[cap_col]])
-        except (ValueError, TypeError):
-            continue
-
-        # Start year
-        try:
-            start_yr = int(float(row[col[start_col]])) if row[col[start_col]] else None
-        except (ValueError, TypeError):
-            start_yr = None
-
-        # Retired year
-        ret_yr = None
-        if ret_col and ret_col in col:
+        n_matched = 0
+        for row in reader:
+            # Include all statuses with a start year (operating, retired, mothballed)
+            # We reconstruct the fleet at each point in time
             try:
-                ret_yr = int(float(row[col[ret_col]])) if row[col[ret_col]] else None
+                cap = float(row['Capacity (MW)'])
             except (ValueError, TypeError):
-                ret_yr = None
+                continue
 
-        # Parse parents
-        parsed = parse_parents(row[col[parent_col]])
-        for name, pct in parsed:
-            if name in parent_to_gvkeys:
-                share = (pct / 100.0) if pct else 1.0 / len(parsed) if len(parsed) > 1 else 1.0
-                for gvkey in parent_to_gvkeys[name]:
-                    gvkey_plants[gvkey].append({
-                        'fuel': fuel_type,
-                        'mw': cap * share,
-                        'start_year': start_yr,
-                        'retired_year': ret_yr,
-                    })
-                    n_matched += 1
+            # Start year
+            try:
+                sv = row.get('Start year', '')
+                start_yr = int(float(sv)) if sv != '' else None
+            except (ValueError, TypeError):
+                start_yr = None
 
-    wb.close()
+            # Retired year
+            ret_yr = None
+            if ret_col:
+                try:
+                    rv = row.get(ret_col, '')
+                    ret_yr = int(float(rv)) if rv != '' else None
+                except (ValueError, TypeError):
+                    ret_yr = None
+
+            # Parse parents
+            parsed = parse_parents(row.get(parent_col, ''))
+            for name, pct in parsed:
+                if name in parent_to_gvkeys:
+                    share = (pct / 100.0) if pct else 1.0 / len(parsed) if len(parsed) > 1 else 1.0
+                    for gvkey in parent_to_gvkeys[name]:
+                        gvkey_plants[gvkey].append({
+                            'fuel': fuel_type,
+                            'mw': cap * share,
+                            'start_year': start_yr,
+                            'retired_year': ret_yr,
+                        })
+                        n_matched += 1
+
     print(f'  Matched plant records: {n_matched}')
 
 print(f'\nFirms with plant data: {len(gvkey_plants)}')

@@ -7,7 +7,6 @@ Outputs:
 import csv
 import os
 import re
-import openpyxl
 from collections import defaultdict
 
 from _paths import raw_path, derived_path
@@ -16,7 +15,7 @@ RAW_SHOCKS = raw_path('policy', 'coal_phaseout_shocks.csv')
 OUT_EVENTS = derived_path('events', 'coal_phaseout_shocks_events.csv')
 OUT_STATE = derived_path('events', 'coal_phaseout_shocks_state_mapping.csv')
 
-GEM_COAL = raw_path('gem', 'Global-Coal-Plant-Tracker-January-2026.xlsx')
+GEM_COAL = derived_path('gem', 'gem_coal.csv')
 GEM_MATCH = derived_path('mappings', 'gem_compustat_matches.csv')
 
 
@@ -87,37 +86,35 @@ with open(GEM_MATCH, 'r', encoding='utf-8') as f:
 # Build gvkey -> state coal MW (US only)
 gvkey_state_mw = defaultdict(lambda: defaultdict(float))
 if os.path.exists(GEM_COAL):
-    wb = openpyxl.load_workbook(GEM_COAL, read_only=True)
-    ws = wb['Units']
-    headers = [cell.value for cell in next(ws.iter_rows(min_row=1, max_row=1))]
-    col = {h: i for i, h in enumerate(headers)}
-    needed = ['Country/Area', 'Subnational unit (province, state)', 'Parent', 'Capacity (MW)', 'Status']
-    if all(k in col for k in needed):
-        for row in ws.iter_rows(min_row=2, values_only=True):
-            country = row[col['Country/Area']]
-            state = row[col['Subnational unit (province, state)']]
-            parent = row[col['Parent']]
-            status = row[col['Status']]
-            cap = row[col['Capacity (MW)']]
-            if not country or str(country).strip() != 'United States':
-                continue
-            if not state:
-                continue
-            if status and str(status).strip().lower() != 'operating':
-                continue
-            try:
-                cap = float(cap)
-            except (ValueError, TypeError):
-                continue
-            parents = parse_parents(parent)
-            if not parents:
-                continue
-            for name, pct in parents:
-                share = (pct / 100.0) if pct else 1.0 / len(parents)
-                gp = normalize_name(name)
-                for gk in parent_to_gvkeys.get(gp, []):
-                    gvkey_state_mw[gk][str(state).strip()] += cap * share
-    wb.close()
+    with open(GEM_COAL, 'r', encoding='utf-8') as f:
+        reader = csv.DictReader(f)
+        headers = reader.fieldnames
+        needed = ['Country/Area', 'Subnational unit (province, state)', 'Parent', 'Capacity (MW)', 'Status']
+        if all(k in headers for k in needed):
+            for row in reader:
+                country = row['Country/Area']
+                state = row['Subnational unit (province, state)']
+                parent = row['Parent']
+                status = row['Status']
+                cap = row['Capacity (MW)']
+                if not country or country.strip() != 'United States':
+                    continue
+                if not state:
+                    continue
+                if status and status.strip().lower() != 'operating':
+                    continue
+                try:
+                    cap = float(cap)
+                except (ValueError, TypeError):
+                    continue
+                parents = parse_parents(parent)
+                if not parents:
+                    continue
+                for name, pct in parents:
+                    share = (pct / 100.0) if pct else 1.0 / len(parents)
+                    gp = normalize_name(name)
+                    for gk in parent_to_gvkeys.get(gp, []):
+                        gvkey_state_mw[gk][state.strip()] += cap * share
 
 # Write state mapping output
 os.makedirs(os.path.dirname(OUT_STATE), exist_ok=True)

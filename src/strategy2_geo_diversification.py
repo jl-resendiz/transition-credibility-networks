@@ -23,7 +23,6 @@ import math
 import random
 import hashlib
 import re
-import openpyxl
 from collections import defaultdict
 
 from _paths import derived_path, raw_path, results_path
@@ -219,48 +218,36 @@ with open(derived_path('mappings', 'gem_compustat_matches.csv'), 'r',
 gvkey_country_mw = defaultdict(lambda: defaultdict(float))
 
 trackers = [
-    ('Global-Coal-Plant-Tracker-January-2026.xlsx', 'Units',
-     'Parent', 'Capacity (MW)', 'Country/Area'),
-    ('Global-Oil-and-Gas-Plant-Tracker-GOGPT-January-2026.xlsx',
-     'Gas & Oil Units', 'Parent(s)', 'Capacity (MW)', 'Country/Area'),
-    ('Global-Solar-Power-Tracker-February-2026.xlsx',
-     'Utility-Scale (1 MW+)', 'Owner', 'Capacity (MW)', 'Country/Area'),
-    ('Global-Wind-Power-Tracker-February-2026.xlsx', 'Data',
-     'Owner', 'Capacity (MW)', 'Country/Area'),
+    ('gem_coal.csv', 'Parent'),
+    ('gem_gas.csv', 'Parent(s)'),
+    ('gem_solar.csv', 'Owner'),
+    ('gem_wind.csv', 'Owner'),
 ]
 
-for fname, sheet, parent_col, cap_col, country_col in trackers:
-    fpath = raw_path('gem', fname)
+for fname, parent_col in trackers:
+    fpath = derived_path('gem', fname)
     _print(f'  Reading {fname}...')
-    wb = openpyxl.load_workbook(fpath, read_only=True)
-    ws = wb[sheet]
-    headers = [cell.value for cell in next(ws.iter_rows(min_row=1, max_row=1))]
-    parent_idx = headers.index(parent_col)
-    cap_idx = headers.index(cap_col)
-    country_idx = headers.index(country_col)
-    status_idx = headers.index('Status')
+    with open(fpath, 'r', encoding='utf-8') as f:
+        for row in csv.DictReader(f):
+            status = row.get('Status', '')
+            if status != 'operating':
+                continue
+            try:
+                cap = float(row['Capacity (MW)'])
+            except (ValueError, TypeError):
+                continue
+            country = row.get('Country/Area', '').strip()
+            if not country:
+                continue
 
-    for row in ws.iter_rows(min_row=2, values_only=True):
-        status = str(row[status_idx]) if row[status_idx] else ''
-        if status != 'operating':
-            continue
-        try:
-            cap = float(row[cap_idx])
-        except (ValueError, TypeError):
-            continue
-        country = str(row[country_idx]).strip() if row[country_idx] else ''
-        if not country:
-            continue
-
-        parsed = parse_parents(row[parent_idx])
-        for name, pct in parsed:
-            if name in parent_to_gvkeys:
-                share = ((pct / 100.0) if pct
-                         else 1.0 / len(parsed) if len(parsed) > 1
-                         else 1.0)
-                for gvkey in parent_to_gvkeys[name]:
-                    gvkey_country_mw[gvkey][country] += cap * share
-    wb.close()
+            parsed = parse_parents(row.get(parent_col, ''))
+            for name, pct in parsed:
+                if name in parent_to_gvkeys:
+                    share = ((pct / 100.0) if pct
+                             else 1.0 / len(parsed) if len(parsed) > 1
+                             else 1.0)
+                    for gvkey in parent_to_gvkeys[name]:
+                        gvkey_country_mw[gvkey][country] += cap * share
 
 # Compute n_countries and single_country flag per gvkey
 firm_n_countries = {}   # gvkey -> int

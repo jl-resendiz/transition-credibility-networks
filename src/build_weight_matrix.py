@@ -11,9 +11,9 @@ Outputs:
   - weight_matrix_W_geo.csv (geographic only)
   - weight_matrix_W.csv (composite)
 """
-import openpyxl, csv, os, math, re
+import csv, os, math, re
 from collections import defaultdict
-from _paths import raw_path, derived_path
+from _paths import derived_path
 
 def parse_parents(field):
     if not field or str(field).strip() == '':
@@ -49,42 +49,33 @@ print(f'Matched parents: {len(parent_to_gvkeys)}')
 gvkey_plants = defaultdict(list)  # gvkey -> [(lat, lon, mw), ...]
 
 trackers = [
-    ('Global-Coal-Plant-Tracker-January-2026.xlsx', 'Units', 'Parent', 'Capacity (MW)', 'Latitude', 'Longitude'),
-    ('Global-Oil-and-Gas-Plant-Tracker-GOGPT-January-2026.xlsx', 'Gas & Oil Units', 'Parent(s)', 'Capacity (MW)', 'Latitude', 'Longitude'),
-    ('Global-Solar-Power-Tracker-February-2026.xlsx', 'Utility-Scale (1 MW+)', 'Owner', 'Capacity (MW)', 'Latitude', 'Longitude'),
-    ('Global-Wind-Power-Tracker-February-2026.xlsx', 'Data', 'Owner', 'Capacity (MW)', 'Latitude', 'Longitude'),
+    ('gem_coal.csv', 'Parent'),
+    ('gem_gas.csv', 'Parent(s)'),
+    ('gem_solar.csv', 'Owner'),
+    ('gem_wind.csv', 'Owner'),
 ]
 
-for fname, sheet, parent_col, cap_col, lat_col, lon_col in trackers:
-    fpath = raw_path('gem', fname)
+for fname, parent_col in trackers:
+    fpath = derived_path('gem', fname)
     print(f'Reading {fname}...')
-    wb = openpyxl.load_workbook(fpath, read_only=True)
-    ws = wb[sheet]
-    headers = [cell.value for cell in next(ws.iter_rows(min_row=1, max_row=1))]
-    parent_idx = headers.index(parent_col)
-    cap_idx = headers.index(cap_col)
-    lat_idx = headers.index(lat_col)
-    lon_idx = headers.index(lon_col)
-    status_idx = headers.index('Status')
+    with open(fpath, 'r', encoding='utf-8') as f:
+        for row in csv.DictReader(f):
+            status = row.get('Status', '')
+            if status != 'operating':
+                continue
+            try:
+                cap = float(row['Capacity (MW)'])
+                lat = float(row['Latitude'])
+                lon = float(row['Longitude'])
+            except (ValueError, TypeError, KeyError):
+                continue
 
-    for row in ws.iter_rows(min_row=2, values_only=True):
-        status = str(row[status_idx]) if row[status_idx] else ''
-        if status != 'operating':
-            continue
-        try:
-            cap = float(row[cap_idx])
-            lat = float(row[lat_idx])
-            lon = float(row[lon_idx])
-        except (ValueError, TypeError):
-            continue
-
-        parsed = parse_parents(row[parent_idx])
-        for name, pct in parsed:
-            if name in parent_to_gvkeys:
-                share = (pct / 100.0) if pct else 1.0 / len(parsed) if len(parsed) > 1 else 1.0
-                for gvkey in parent_to_gvkeys[name]:
-                    gvkey_plants[gvkey].append((lat, lon, cap * share))
-    wb.close()
+            parsed = parse_parents(row.get(parent_col, ''))
+            for name, pct in parsed:
+                if name in parent_to_gvkeys:
+                    share = (pct / 100.0) if pct else 1.0 / len(parsed) if len(parsed) > 1 else 1.0
+                    for gvkey in parent_to_gvkeys[name]:
+                        gvkey_plants[gvkey].append((lat, lon, cap * share))
 
 print(f'\nFirms with plant GPS data: {len(gvkey_plants)}')
 
