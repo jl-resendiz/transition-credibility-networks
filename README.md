@@ -1,13 +1,13 @@
-# Pricing Transition Credibility on Spatial Networks
+# When Coal Retires: The Propagation of Stranding Risk
 
-**Jose Luis Resendiz**  
-Smith School of Enterprise and the Environment, University of Oxford  
+**Jose Luis Resendiz**
+Smith School of Enterprise and the Environment, University of Oxford
 
 ---
 
 ## Overview
 
-This repository contains the replication package for the paper *"Pricing Transition Credibility on Spatial Networks."* The paper develops a networked asset-pricing framework to show that climate transition risk is fundamentally a spatial network property, not an isolated firm-level attribute. Using a global sample of 389 geolocated power utilities, we document a channel split in how plant retirements transmit through networks: negative contagion for technologically similar peers (stranding risk) and positive competitive benefits for geographically proximate neighbors. We further reveal a credibility gap wherein voluntary retirements transmit as ambiguous signals (volatility without directional repricing), while binding phase-out laws force directional repricing proportional to fossil exposure.
+This repository contains the replication package for the paper. Using plant-level data for 703 listed power utilities across 80 countries, I show that fuel-mix similarity is the dominant channel through which coal plant retirements transmit to stock prices. Geographic proximity, despite its theoretical appeal through local competition, does not transmit to equity valuations. The fuel channel is robust across all inference methods (Fama-MacBeth, event-clustered, two-way clustered, randomization), while emissions trading amplifies the stranding signal. ESG scores and spatial exposure capture complementary dimensions of transition risk.
 
 ---
 
@@ -15,13 +15,16 @@ This repository contains the replication package for the paper *"Pricing Transit
 
 ```
 transition-credibility-networks/
-├── manuscript/          Manuscript source files (LaTeX + figures)
+├── manuscript/          Manuscript source (LaTeX + figures)
 ├── data/
-│   ├── raw/             External input data (Compustat, GEM, Refinitiv, etc.)
+│   ├── raw/             External input data (GEM, Compustat, CRSP, Eikon)
 │   └── derived/         Intermediate datasets produced by the pipeline
-├── src/                 All analysis scripts
-├── results/             Regression output tables, metrics, and summaries
-└── literature/          Thematic literature review notes
+├── src/                 All scripts (build + analysis)
+├── results/
+│   ├── metrics/         Regression output (one MD per analysis)
+│   ├── tables/          LaTeX table fragments (imported by manuscript)
+│   └── summaries/       Descriptive statistics
+└── literature/          Literature review notes
 ```
 
 ---
@@ -30,48 +33,50 @@ transition-credibility-networks/
 
 | Source | Contents | Access |
 |---|---|---|
-| Global Energy Monitor (GEM) | Plant-level capacity, fuel type, coordinates | Public |
-| Compustat Global/NA | Firm financials, equity returns | Licensed |
-| CRSP / Datastream | Daily and monthly equity returns | Licensed |
-| Refinitiv | ESG scores, governance, Scope 1+2 emissions | Licensed |
+| Global Energy Monitor (GEM) | Plant-level capacity, fuel type, GPS coordinates | Public |
+| Compustat Global/NA | Firm financials | Licensed |
+| CRSP/Compustat Merged | US equity total returns (daily + monthly) | Licensed |
+| LSEG Eikon (TR.TotalReturn) | Non-US equity total returns (monthly) | Licensed |
+| LSEG Eikon (ESG) | ESG scores, governance, emissions | Licensed |
 | World Bank Carbon Pricing Dashboard | Carbon prices by country-year | Public |
 | EIA Form 860 | US coal retirement announcements | Public |
 
-Raw licensed data are not redistributed. See `data/raw/` for source documentation.
+Monthly equity returns use total return series only: CRSP `trt1m` (US) and Eikon `TR.TotalReturn` (non-US). Compustat Global Security price returns are not used for monthly data because they exclude dividends (Ince & Porter 2006).
 
 ---
 
 ## Reproduction
 
-**Requirements:** Python 3.8+ (standard library only — no pandas, numpy, or scipy).
-
-### Step 1: Build all derived datasets and run all analyses
+**Requirements:** Python 3.8+ (standard library only). The only non-stdlib dependency is `openpyxl`.
 
 ```bash
-python src/run_pipeline.py
+python src/run_all.py              # full pipeline (build + analysis)
+python src/run_all.py --analysis   # analysis only (skip build)
 ```
 
-This runs all build and strategy scripts in dependency order. Outputs are written to `results/`.
+### Pipeline
 
-### Step 2: Compile the manuscript
-
-```bash
-cd manuscript
-pdflatex main.tex
-bibtex main
-pdflatex main.tex
-pdflatex main.tex
 ```
-
-Requires a LaTeX distribution (MiKTeX or TeX Live).
+Stage 1: parse_gem.py                    (GEM xlsx -> parsed CSV)
+Stage 2: match_gem_compustat.py          (GEM + Compustat -> matched firms)
+Stage 3: build_fundamentals.py           (financials panel)
+         build_weight_matrix.py          (geographic weight matrix)
+         build_fuel_matrix.py            (fuel-similarity weight matrix)
+         build_ets_matrix.py             (regulatory weight matrix)
+         build_time_varying_alpha.py     (fossil intensity panel)
+         compute_returns.py              (CRSP + Eikon -> returns)
+Stage 4: build_retirement_events.py      (coal retirement events)
+         build_coal_phaseout_events.py   (phase-out policy events)
+         build_eia860_announcement_events.py
+Stage 5: summary_statistics.py
+Stage 6: 15 analysis scripts (see src/README.md for mapping to paper)
+```
 
 ---
 
 ## Citation
 
-If you use this code or data, please cite:
-
-> Resendiz, J. L. (2026). Pricing Transition Credibility on Spatial Networks. Working paper, University of Oxford.
+> Resendiz, J. L. (2026). When Coal Retires: The Propagation of Stranding Risk. Working paper, University of Oxford.
 
 ---
 
