@@ -85,144 +85,80 @@ The closest antecedents are the carbon premium literature \citep{Bolton2021, Bol
 \section{A Model of Networked Transition Risk}\label{sec:model}
 %----------------------------------------------------------------------
 
-Power utilities operate physical plants in local electricity markets. Each plant uses a specific generation technology. When a plant retires, two consequences follow. Locally, competitors gain market share as residual demand shifts to remaining generators. Globally, every firm using similar technology faces a question: does the retirement signal that the technology itself is becoming obsolete? These two consequences aggregate to the stock level in fundamentally different ways. The local effect diversifies across markets. The technology effect does not.
+When a power utility retires a fossil plant, two consequences follow. Locally, competitors gain market share as residual demand shifts to remaining generators. Globally, every firm using similar technology faces a repricing of its obsolescence risk. These two consequences aggregate to the stock level in fundamentally different ways. The local effect diversifies across markets. The technology effect does not. This section formalises the asymmetry and derives the estimating equation.
 
 \subsection{Environment}\label{sec:environment}
 
-\paragraph{Agents and timing.}
-Consider an economy with $N$ listed power utilities indexed by $i \in \{1,\ldots,N\}$ and a continuum of identical risk-averse investors. Time is discrete with three dates: $t = 0$ (ex ante), $t = 1$ (signal arrival), and $t = 2$ (terminal payoff).
+Consider $N$ listed power utilities indexed by $i$ and a representative risk-averse investor with a monotone stochastic discount factor $m_{1,2} > 0$. Time has three dates: $t=0$ (ex ante), $t=1$ (signal), $t=2$ (payoff). At $t=1$, a subset of firms retire fossil capacity; the vector $\mathbf{s} \geq 0$ records each retirement.
 
-\paragraph{Investor preferences.}
-The representative investor has CRRA preferences over terminal wealth:
-\begin{equation}\label{eq:utility}
-    U = \E_0\!\left[\frac{W_2^{1-\gamma}}{1-\gamma}\right], \qquad \gamma > 1.
-\end{equation}
+Firm $i$ operates plants in $K_i \geq 1$ local electricity markets, with revenue share $\theta_{ik}$ in market $k$ ($\sum_k \theta_{ik} = 1$). Firms are connected through two row-normalised adjacency matrices. The first, $w^{\text{geo}}_{ij}$, measures geographic proximity between capacity-weighted plant centroids. The second, $w^{\text{fuel}}_{ij}$, measures fuel-mix similarity from the $L_1$ distance between capacity-share vectors. The two matrices differ in a property that proves consequential: geographic proximity varies at the plant level, while fuel-mix similarity is defined over the firm's entire generation portfolio.
 
-\paragraph{Firm structure.}
-Firm $i$ operates plants in $K_i \geq 1$ local electricity markets. Let $\theta_{ik}$ denote the revenue share of market $k$ in firm $i$'s total operations, with $\sum_{k=1}^{K_i} \theta_{ik} = 1$. The quantity $K_i$ varies across firms: some utilities operate in a single market, others span dozens of jurisdictions.
-
-\paragraph{Network structure.}
-Firms are connected through two independently constructed, row-normalised adjacency matrices. The first measures geographic proximity:
-\begin{equation}
-    w^{\text{geo}}_{ij} = \frac{\exp(-d_{ij}/\bar{d})/d_{ij}}{\sum_{k\neq i}\exp(-d_{ik}/\bar{d})/d_{ik}},
-\end{equation}
-where $d_{ij}$ is the great-circle distance between capacity-weighted plant centroids and $\bar{d}$ is a bandwidth parameter. The second measures fuel-mix similarity: $w^{\text{fuel}}_{ij}$ is the $L_1$ similarity of capacity-share vectors, row-normalised.
-
-The two matrices differ in a property that will prove consequential. Geographic proximity varies at the plant level: two firms may be close in one market and distant in another. Fuel-mix similarity is defined at the firm level: it depends on the entire generation portfolio, not on any single plant.
-
-\paragraph{Regulatory environment.}
-The economy operates under one of two regulatory regimes, $\omega \in \{0,1\}$, unobserved by investors at $t = 0$. Under the lax regime ($\omega = 0$), fossil generation faces no technology penalty. Under the strict regime ($\omega = 1$), fossil generation is subject to an obsolescence cost proportional to the firm's fossil intensity $\alpha_i \in [0,1]$. At $t = 0$, investors assign prior probability $p_0 = \Pr(\omega = 1)$ to the strict regime.
-
-\paragraph{Restructuring shocks.}
-At $t=1$, a subset of firms retire fossil capacity. The shock vector $\mathbf{s} \geq 0$ records the magnitude of each retirement. Investors observe $\mathbf{s}$ and update their beliefs about $\omega$ through Bayes' rule:
-\begin{equation}\label{eq:bayes}
-    p_1(\mathbf{s}) = \frac{p_0\, L(\mathbf{s})}{p_0\, L(\mathbf{s}) + (1-p_0)},
-\end{equation}
-where $L(\mathbf{s}) = f_1(\mathbf{s})/f_0(\mathbf{s})$ is the likelihood ratio. Retirements are more likely under the strict regime, so $L$ is increasing in the magnitude and frequency of shocks.
-
-\paragraph{Cash flows.}
 Firm $i$'s terminal cash flow is:
 \begin{equation}\label{eq:cashflows}
-    \Pi_i = \bar{\Pi} + \sum_{k=1}^{K_i} \theta_{ik}\, G_{ik}(\mathbf{s}) - \omega \cdot F_i(\mathbf{s},\alpha_i) + \eta_i,
+    \Pi_i = \bar{\Pi} + \sum_{k=1}^{K_i} \theta_{ik}\, G_{ik}(\mathbf{s}) \;-\; \varphi_i(\alpha_i, \mathbf{s}) + \eta_i,
 \end{equation}
-where $\bar{\Pi} > 0$ is baseline profitability, $G_{ik}$ is the competitive benefit in local market $k$, $F_i$ is the technology penalty, and $\eta_i \sim \mathcal{N}(0,\sigma^2_\eta)$ is idiosyncratic noise. The two middle terms capture the two consequences of a restructuring shock. Their precise form is specified below.
+where $\bar{\Pi} > 0$ is baseline profitability, $G_{ik}$ captures the competitive benefit in local market $k$, $\varphi_i$ is a technology obsolescence penalty, and $\eta_i$ is mean-zero idiosyncratic noise. The two middle terms formalise the two consequences of a restructuring shock.
 
-\subsection{Two Channels}\label{sec:channels}
+\subsection{Two Assumptions}\label{sec:channels}
 
-The cash flow equation~(\ref{eq:cashflows}) contains two opposing effects of a retirement shock. The first operates locally, through the physical electricity grid. The second operates globally, through shared generation technology.
-
-\begin{assumption}[Local Market Competition]\label{ass:competition}
-    When a geographically proximate firm $j$ retires capacity $s_j$, the residual demand for firm $i$'s plant in market $k$ increases by $w^{\mathrm{geo},k}_{ij}\, s_j$, where $w^{\mathrm{geo},k}_{ij}$ measures proximity in market $k$ specifically.
+\begin{assumption}[Geographic gains are local]\label{ass:competition}
+    When firm $j$ retires capacity $s_j$, the competitive benefit to firm $i$ in market $k$ is $G_{ik}(\mathbf{s}) = \delta \sum_j w^{\mathrm{geo},k}_{ij}\, s_j$ with $\delta > 0$, where $w^{\mathrm{geo},k}_{ij}$ measures proximity in market $k$ specifically. The gains $G_{ik}$ and $G_{ik'}$ are independent across markets $k \neq k'$.
 \end{assumption}
 
-\begin{assumption}[Technological Obsolescence]\label{ass:obsolescence}
-    Under the strict regulatory state ($\omega = 1$), the retirement of fuel-similar capacity imposes a penalty proportional to fuel similarity $w^{\mathrm{fuel}}_{ij}$ and shock size $s_j$.
-\end{assumption}
-
-\begin{lemma}[Local Competitive Benefit]\label{lem:geo}
-    In a Cournot equilibrium with $n_i + 1$ symmetric generators in market $k$, facing linear inverse demand $P(Q) = a - bQ$ with marginal cost $c < a$, if one competitor exits, firm $i$'s profit increases by:
-    \begin{equation}\label{eq:cournot_profit}
-        \Delta\pi_{ik} = \frac{(a-c)^2}{b}\left[\frac{1}{n_i^2} - \frac{1}{(n_i+1)^2}\right] > 0.
+\begin{assumption}[Technology exposure is firm-level]\label{ass:obsolescence}
+    Technology obsolescence enters as a firm-level common factor that does not decompose across markets:
+    \begin{equation}\label{eq:obsolescence}
+        \varphi_i(\alpha_i, \mathbf{s}) = \phi\!\left(\alpha_i + \sum_{j} w^{\mathrm{fuel}}_{ij}\, s_j\right), \qquad \phi > 0,
     \end{equation}
-\end{lemma}
+    where $\alpha_i \in [0,1]$ is firm $i$'s fossil intensity. Firms with higher fossil shares and greater fuel-mix similarity to retiring peers bear a larger penalty.
+\end{assumption}
 
-\begin{proof}
-    Standard Cournot. With $m$ symmetric firms, each earns $\pi^* = (a-c)^2/[b(m+1)^2]$. Exit reduces $m$ by one. The difference is strictly positive since $n_i < n_i + 1$. \qed
-\end{proof}
+The first assumption is standard: a rival's exit raises residual demand for remaining local generators \citep{DavisHausman2016}. The independence condition captures the fact that local grids serve geographically segmented markets. The second assumption replaces the binary regulatory state and Bayesian updating apparatus common in the literature with a direct obsolescence factor. The economic content is the same: retirements reveal that a generation technology is losing viability, and the penalty falls on firms whose portfolios depend on that technology. I assume $\phi > 0$ throughout, meaning some technology obsolescence risk is priced. The magnitude of $\phi$ is an empirical quantity estimated in Section~\ref{sec:empirical}.
 
-The geographic benefit aggregates over plants:
-\begin{equation}\label{eq:G_function}
-    \sum_{k=1}^{K_i} \theta_{ik}\, G_{ik}(\mathbf{s}) = \delta \sum_{k=1}^{K_i} \theta_{ik} \sum_j w^{\text{geo},k}_{ij}\, s_j, \qquad \delta > 0.
-\end{equation}
+\subsection{Aggregation}\label{sec:aggregation}
 
-The technology penalty operates under the strict regime ($\omega = 1$):
-\begin{equation}\label{eq:F_function}
-    F_i(\mathbf{s},\alpha_i) = \beta \alpha_i + \phi \sum_{j} w^{\text{fuel}}_{ij}\, s_j, \qquad \beta, \phi > 0.
-\end{equation}
-
-The first term is a direct cost of fossil intensity. The second is the network penalty: the market infers that firm $i$'s technology is vulnerable because a fuel-similar peer has exited.
-
-\subsection{Asymmetric Aggregation}\label{sec:aggregation}
-
-The geographic and technology channels enter the cash flow equation~(\ref{eq:cashflows}) symmetrically: both are weighted sums over peer shocks. But they aggregate to the stock level in asymmetric ways.
-
-The reason is structural. Geographic proximity varies at the plant level. A firm with plants in Germany and Brazil has different geographic neighbours in each market. Fuel-mix similarity is defined at the firm level. A firm with 60 percent coal has 60 percent coal in every market it operates in.
+The geographic and technology channels enter equation~(\ref{eq:cashflows}) symmetrically as weighted sums over peer shocks. But they aggregate to the stock level in asymmetric ways. Geographic proximity varies at the plant level: a firm with plants in Germany and Brazil has different geographic neighbours in each market. Fuel-mix similarity is a property of the portfolio: a firm with 60 per cent coal has 60 per cent coal regardless of where it operates.
 
 \begin{lemma}[Aggregation Attenuation]\label{lem:aggregation}
-    The stock-level geographic exposure of firm $i$ is:
-    \begin{equation}\label{eq:aggregation}
-        \beta^{\mathrm{stock}}_{\mathrm{geo},i} = A\delta \sum_{k=1}^{K_i} \theta_{ik} \sum_j w^{\mathrm{geo},k}_{ij} s_j.
-    \end{equation}
-    If local competitive shocks are independent across markets (i.e., $\mathrm{Cov}(G_{ik}, G_{ik'}) = 0$ for $k \neq k'$), the variance of geographic exposure scales as $\mathrm{Var}(\beta^{\mathrm{stock}}_{\mathrm{geo},i}) \propto \sum_k \theta_{ik}^2 \leq 1/K_i$. For a firm operating in many markets ($K_i$ large), the geographic component is attenuated.
-
-    In contrast, the fuel-similarity penalty:
-    \begin{equation}
-        \beta^{\mathrm{stock}}_{\mathrm{fuel},i} = -Ap_1\phi \sum_j w^{\mathrm{fuel}}_{ij} s_j
-    \end{equation}
-    does not attenuate with $K_i$ because $w^{\mathrm{fuel}}_{ij}$ is a property of the firm's entire generation portfolio, not any single local market.
+    Under Assumptions~\ref{ass:competition}--\ref{ass:obsolescence}, the variance of firm $i$'s geographic exposure satisfies $\mathrm{Var}\!\bigl(\sum_k \theta_{ik}\, G_{ik}\bigr) \propto \sum_k \theta_{ik}^2 \leq 1/K_i$ and vanishes as $K_i \to \infty$. The variance of the technology penalty $\varphi_i$ does not depend on $K_i$.
 \end{lemma}
 
-\begin{proof}
-    The geographic term in~(\ref{eq:cashflows}) is $\delta \sum_k \theta_{ik} \sum_j w^{\text{geo},k}_{ij} s_j$. Under independence of local markets, the variance of this sum equals $\delta^2 \sum_k \theta_{ik}^2 \, \text{Var}(\sum_j w^{\text{geo},k}_{ij} s_j)$. By the constraint $\sum_k \theta_{ik} = 1$ and Cauchy-Schwarz, $\sum_k \theta_{ik}^2 \leq 1$ with equality only when $K_i = 1$, and $\sum_k \theta_{ik}^2 \leq 1/K_i$ when revenue shares are equal. As $K_i \to \infty$, the geographic variance vanishes. The fuel term $\phi \sum_j w^{\text{fuel}}_{ij} s_j$ is defined at the firm level and does not decompose into independent market components. \qed
-\end{proof}
+\noindent The proof, which follows from the independence of local market shocks and the constraint $\sum_k \theta_{ik} = 1$, is given in Appendix~\ref{app:aggregation_proof}. The logic parallels the diversification argument in production networks \citep{AcemogluCarvalhoOzdaglarTahbazSalehi2012}: in a balanced network, idiosyncratic shocks wash out at rate $1/\sqrt{N}$, while a common factor transmits to all connected nodes simultaneously. Here, technology obsolescence is the common factor, and all firms sharing that technology are the nodes.
 
 \begin{remark}\label{rem:aggregation_scope}
-    The independence assumption $\mathrm{Cov}(G_{ik}, G_{ik'}) = 0$ is sufficient but not necessary. Under partial correlation $\rho > 0$ across markets (for instance, from interconnected grids or correlated regulatory shocks), the geographic variance converges to $\rho \, \delta^2 \, \mathrm{Var}(G)$ rather than zero. The qualitative prediction is unchanged: fuel exposure does not attenuate with the number of markets, while geographic exposure does, albeit to a positive lower bound rather than to zero. The empirical content of the lemma is therefore the weaker claim that the two channels aggregate asymmetrically, not the specific rate at which geographic exposure declines with $K_i$.
+    The independence condition in Assumption~\ref{ass:competition} is sufficient but not necessary. Under partial correlation $\rho > 0$ across markets, geographic variance converges to $\rho \, \delta^2 \, \mathrm{Var}(G)$ rather than to zero. The qualitative content of the lemma is that the two channels aggregate asymmetrically, not the specific rate at which geographic exposure declines with $K_i$.
 \end{remark}
 
-The logic parallels the diversification argument in production networks \citep{AcemogluCarvalhoOzdaglarTahbazSalehi2012}. In a balanced network, idiosyncratic shocks wash out at rate $1/\sqrt{N}$. In a star network, the hub transmits shocks to all nodes and diversification fails. Here, the fuel-mix network has a common-factor structure: technology obsolescence is the hub, and all firms sharing that technology are the spokes. Local competitive effects, by contrast, are independent across markets and diversify away at rate $1/\sqrt{K_i}$.
+\subsection{Technology Dominance}\label{sec:predictions}
 
-\subsection{Equilibrium and Predictions}\label{sec:predictions}
-
-\begin{definition}[Equilibrium]\label{def:equilibrium}
-    An equilibrium consists of prices $\{V_{i,1}\}_{i=1}^N$ at $t = 1$ such that each price satisfies the SDF pricing equation $V_{i,1} = \E_1[m_{1,2}\, \Pi_i]$, where $m_{1,2} = \beta_d (W_2/W_1)^{-\gamma}$, and the representative investor holds the market portfolio. The constant $A \equiv \beta_d \E_1[(W_2/W_1)^{-\gamma}] > 0$ collects the SDF terms that are common across firms.
-\end{definition}
+Equilibrium prices satisfy $V_{i,1} = \E_1[m_{1,2}\, \Pi_i]$, where $m_{1,2} > 0$ is the stochastic discount factor and the representative investor holds the market portfolio. Let $A \equiv \E_1[m_{1,2}] > 0$ collect the SDF terms common across firms.\label{def:equilibrium}
 
 \begin{proposition}[Technology Dominance]\label{prop:tech_dominance}
     Under Assumptions~\ref{ass:competition}--\ref{ass:obsolescence} and Lemma~\ref{lem:aggregation}, a restructuring shock $\mathbf{s}$ transmits to stock prices primarily through fuel-mix similarity:
     \begin{enumerate}
-        \item[(i)] The fuel-similarity coefficient is $-Ap_1\phi < 0$ (systematic).
-        \item[(ii)] The geographic coefficient is $A\delta\,H_i \approx 0$ for diversified firms, where $H_i = \sum_k \theta_{ik}^2$ is the Herfindahl index of market concentration (idiosyncratic).
-        \item[(iii)] The difference $\beta_{\mathrm{fuel}} - \beta_{\mathrm{geo}}$ is strictly negative for any $p_1 > 0$.
+        \item[(i)] The fuel-similarity coefficient is $-A\phi < 0$ (systematic, does not attenuate with diversification).
+        \item[(ii)] The geographic coefficient is attenuated by a factor proportional to the Herfindahl index $H_i = \sum_k \theta_{ik}^2$, which vanishes for diversified firms (idiosyncratic).
+        \item[(iii)] In the cross-section of cumulative abnormal returns, technology dominates:
     \end{enumerate}
+    \begin{equation}\label{eq:reduced_form}
+        \mathrm{CAR}_i = \alpha + \gamma_{\mathrm{fuel}}\, w^{\mathrm{fuel}}_i + \gamma_{\mathrm{geo}}\, w^{\mathrm{geo}}_i + \varepsilon_i,
+    \end{equation}
+    with $\gamma_{\mathrm{fuel}} < 0$ and $\gamma_{\mathrm{geo}} \approx 0$.
 \end{proposition}
 
 \begin{proof}
-    Part (i) follows from Assumption~\ref{ass:obsolescence} and $p_1 > 0$. Part (ii): by Lemma~\ref{lem:aggregation}, the variance of geographic exposure scales as $H_i$, which vanishes for diversified firms. When local shocks have heterogeneous signs across markets, the mean geographic effect tends to zero by a law of large numbers. Part (iii): the difference is $-Ap_1\phi - A\delta H_i < 0$ since $p_1\phi > 0$ and $\delta H_i \geq 0$. \qed
+    Part (i): substituting equation~(\ref{eq:obsolescence}) into the pricing equation, the fuel penalty enters as $-A\phi(\alpha_i + \sum_j w^{\mathrm{fuel}}_{ij} s_j)$, a firm-level term independent of market count. Part (ii): by Lemma~\ref{lem:aggregation}, the variance of geographic exposure scales as $H_i \leq 1/K_i$, which vanishes for diversified firms. Part (iii): combining (i) and (ii), the cross-sectional regression of $\mathrm{CAR}_i$ on both network exposures recovers a negative fuel coefficient and a geographic coefficient attenuated toward zero. \qed
 \end{proof}
 
 \begin{corollary}[Asymmetric Aggregation]\label{cor:asymmetry}
     The cross-sectional average return around a restructuring shock is negative, driven by the technology penalty:
     \begin{equation}
-        \frac{1}{N}\sum_{i=1}^N \Delta V_{i,1} \approx -Ap_1\phi\,\overline{w^{\mathrm{fuel}} s} < 0.
+        \frac{1}{N}\sum_{i=1}^N \Delta V_{i,1} \approx -A\phi\,\overline{\varphi} < 0,
     \end{equation}
+    where $\overline{\varphi}$ is the cross-sectional mean of technology exposure.
 \end{corollary}
 
-\begin{remark}[Policy Amplification]\label{prop:ets}
-    The fuel coefficient $-Ap_1\phi$ is increasing in absolute value in the posterior belief $p_1$. Since $p_1$ depends on the prior $p_0$ through equation~(\ref{eq:bayes}), jurisdictions with higher prior probability of strict enforcement produce a more negative fuel coefficient. This observation follows directly from the monotonicity of $p_1$ in $p_0$: a higher prior produces a higher posterior for any realisation of $\mathbf{s}$, so the fuel coefficient is more negative when $p_0$ is higher. The empirical relevance of this channel is examined in the robustness section.
-\end{remark}
-
-The model generates two predictions.
+The model generates two predictions.\label{prop:ets}
 
 \begin{prediction}\label{pred:fuel}
 The fuel-similarity coefficient is negative. The geographic coefficient is attenuated toward zero in the aggregate.
@@ -231,8 +167,6 @@ The fuel-similarity coefficient is negative. The geographic coefficient is atten
 \begin{prediction}\label{pred:dominance}
 The fuel coefficient dominates the geographic coefficient in the cross-section: the technology channel is systematic, the competitive channel is idiosyncratic.
 \end{prediction}
-
-
 
 %----------------------------------------------------------------------
 \section{Empirical Strategy}\label{sec:empirical}
@@ -360,7 +294,7 @@ The fuel channel is significant at the 1 percent level under all three inference
 \caption{Distribution of event-level coefficients: fuel-mix similarity versus geographic proximity}
 \label{fig:fuel_vs_geo}
 \begin{flushleft}\footnotesize
-Notes: Each density summarises 117 event-level Fama-MacBeth coefficients (events with $\geq 20$ firms). Dashed lines mark channel means. The fuel-mix distribution is centred well below zero (mean $= -4.8$), while the geographic distribution clusters near zero (mean $= -0.6$). In 82 of 117 events (70 percent), $\hat{\gamma}_{\text{fuel}} < \hat{\gamma}_{\text{geo}}$.
+Notes: Each panel summarises 117 event-level Fama-MacBeth coefficients (events with $\geq 20$ firms). Dashed lines mark channel means. The fuel-mix distribution is centred well below zero (mean $= -4.8$), while the geographic distribution clusters near zero (mean $= -0.6$). In 82 of 117 events (70 percent), $\hat{\gamma}_{\text{fuel}} < \hat{\gamma}_{\text{geo}}$. One geographic outlier ($\hat{\gamma}_{\text{geo}} = -28.5$) is omitted for legibility.
 \end{flushleft}
 \end{figure}
 
@@ -512,6 +446,10 @@ For practitioners and policymakers, the implication is that transition risk asse
 \input{../results/tables/table_spec_progression.tex}
 
 \input{../results/tables/table_bandwidth_sensitivity.tex}
+
+\section{Proof of Lemma~\ref{lem:aggregation}}\label{app:aggregation_proof}
+
+The geographic term in equation~(\ref{eq:cashflows}) is $\delta \sum_k \theta_{ik} \sum_j w^{\text{geo},k}_{ij} s_j$. Under independence of local markets (Assumption~\ref{ass:competition}), the variance of this sum equals $\delta^2 \sum_k \theta_{ik}^2 \, \text{Var}(\sum_j w^{\text{geo},k}_{ij} s_j)$. By the constraint $\sum_k \theta_{ik} = 1$ and Cauchy-Schwarz, $\sum_k \theta_{ik}^2 \leq 1$ with equality only when $K_i = 1$, and $\sum_k \theta_{ik}^2 \leq 1/K_i$ when revenue shares are equal. As $K_i \to \infty$, the geographic variance vanishes. The technology penalty $\varphi_i(\alpha_i, \mathbf{s})$ is defined at the firm level and does not decompose into independent market components, so its variance is invariant to $K_i$. \qed
 
 
 \end{document}
