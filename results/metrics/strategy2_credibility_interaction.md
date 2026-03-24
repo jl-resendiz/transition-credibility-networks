@@ -83,10 +83,10 @@ Fuel Q5-Q1 spread by ETS status (event-level, then averaged):
 
 | Group | Fuel Q5-Q1 spread | t-stat | N events |
 |---|---:|---:|---:|
-| ETS firms | -0.0438*** | -5.498 | 165 |
-| Non-ETS firms | +0.0247** | 2.291 | 165 |
-| Difference | -0.0685*** | -5.112 | 165 (paired) |
+| ETS firms | -0.0585*** | -7.277 | 165 |
+| Non-ETS firms | +0.0222*** | 2.839 | 165 |
+| Difference | -0.0807*** | -7.194 | 165 (paired) |
 
 ## Summary
 
-This test examines whether policy credibility (p_t) moderates the spatial transmission of coal retirement shocks through fuel-similarity networks, using 55580 event-firm observations from 179 first-mover coal retirements. The ETS interaction coefficient on fuel similarity is -4.2637 (t = -3.04, one-sided p = 0.001), indicating that fuel contagion is significantly more negative for firms operating under emissions trading systems. Portfolio sorts confirm the pattern: the fuel Q5-Q1 spread is -0.0438 for ETS firms versus +0.0247 for non-ETS firms (difference t = -5.11).
+This test examines whether policy credibility (p_t) moderates the spatial transmission of coal retirement shocks through fuel-similarity networks, using 55580 event-firm observations from 179 first-mover coal retirements. The ETS interaction coefficient on fuel similarity is -4.2637 (t = -3.04, one-sided p = 0.001), indicating that fuel contagion is significantly more negative for firms operating under emissions trading systems. Portfolio sorts confirm the pattern: the fuel Q5-Q1 spread is -0.0585 for ETS firms versus +0.0222 for non-ETS firms (difference t = -7.19).

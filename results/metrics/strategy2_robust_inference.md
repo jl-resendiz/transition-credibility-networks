@@ -31,16 +31,16 @@ Valid events: 175 (min 25 firms per event for quintile formation)
 
 | Spread | Mean | NW SE | t(NW) | p | t(simple) |
 |---|---:|---:|---:|---:|---:|
-| Fuel Q5-Q1 | -0.0098 | 0.0088 | -1.114 | 0.2652 | -1.739 |
-| Geo Q5-Q1 | -0.0076 | 0.0114 | -0.664 | 0.5066 | -1.117 |
-| Channel split (G-F) | +0.0022 | 0.0142 | 0.156 | 0.8758 | 0.277 |
+| Fuel Q5-Q1 | -0.0104 | 0.0088 | -1.186 | 0.2357 | -1.836 |
+| Geo Q5-Q1 | -0.0048 | 0.0114 | -0.417 | 0.6768 | -0.705 |
+| Channel split (G-F) | +0.0056 | 0.0137 | 0.413 | 0.6795 | 0.733 |
 
 ## Approach 3: Long-Short Portfolio (Newey-West)
 
 Events: 175
-Mean L/S return: -0.0011 (-0.11%)
-NW SE: 0.0061, t(NW) = -0.186, p = 0.8526
-t(simple) = -0.319 (for comparison)
+Mean L/S return: -0.0003 (-0.03%)
+NW SE: 0.0058, t(NW) = -0.051, p = 0.9597
+t(simple) = -0.087 (for comparison)
 
 ## Summary: Inference Comparison
 
@@ -49,7 +49,7 @@ t(simple) = -0.319 (for comparison)
 | Pooled, event-clustered | 2.972 | -3.160 | 3.646 | Original (inflated) |
 | Pooled, two-way clustered | 1.080 | -0.917 | 1.128 | Conservative |
 | Fama-MacBeth + NW | -1.297 | -7.362 | 5.703 | Gold standard |
-| Portfolio sorts + NW | -0.664 | -1.114 | 0.156 | Non-parametric |
+| Portfolio sorts + NW | -0.417 | -1.186 | 0.413 | Non-parametric |
 
 ## Interpretation
 
