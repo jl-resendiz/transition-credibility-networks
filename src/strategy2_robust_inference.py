@@ -700,6 +700,286 @@ _print(f'  t (simple): {simple_t_ls:.3f} (for comparison)')
 
 
 # ══════════════════════════════════════════════════════════════════════
+# APPROACH 4: EVENT WINDOW SENSITIVITY
+# ══════════════════════════════════════════════════════════════════════
+
+_print('\n' + '=' * 70)
+_print('APPROACH 4: EVENT WINDOW SENSITIVITY')
+_print('Pooled OLS with event-clustered SEs at multiple windows')
+_print('=' * 70)
+
+window_sensitivity = []  # list of dicts with results per window
+
+for post_m in [1, 2, 3]:
+    window_label = f'[-1, +{post_m}]'
+    _print(f'\n  Window {window_label} ...')
+
+    # Rebuild CARs for this window
+    w_obs_all = []
+    w_event_ids = []
+    for event_id, event in enumerate(all_events):
+        event_gvkeys = set(event['gvkeys'])
+        year = event['year']
+        event_date = event.get('event_date', '')
+        if event_date and len(event_date) >= 7:
+            event_month = event_date[:7]
+        else:
+            event_month = f'{year}-07' if year else None
+        if not event_month:
+            continue
+
+        fm_sic4 = None
+        for gk in event_gvkeys:
+            fm_sic4 = get_sic4(gk)
+            if fm_sic4:
+                break
+
+        obs = []
+        for fm_gk in event_gvkeys:
+            if fm_gk not in W_geo:
+                continue
+            neighbors = W_geo[fm_gk]
+            neighbor_gks = set(neighbors.keys()) - event_gvkeys
+            non_connected = [gk for gk in fundamentals
+                             if gk not in event_gvkeys and gk not in neighbors]
+            stable_seed = int(hashlib.md5(
+                str(fm_gk).encode('utf-8')).hexdigest()[:8], 16)
+            random.seed(stable_seed)
+            n_ctrl = min(len(non_connected),
+                         max(5 * len(neighbor_gks), 20))
+            ctrl_sample = (random.sample(non_connected, n_ctrl)
+                           if len(non_connected) > n_ctrl
+                           else non_connected)
+            candidate_firms = list(neighbor_gks) + ctrl_sample
+
+            for gk in candidate_firms:
+                w_geo_val = neighbors.get(gk, 0.0)
+                w_fuel_val = W_fuel.get(fm_gk, {}).get(gk, 0.0)
+                car = compute_monthly_car(gk, event_month, post=post_m)
+                if car is None:
+                    continue
+                obs.append({
+                    'car': car,
+                    'w_geo': w_geo_val,
+                    'w_fuel': w_fuel_val,
+                    'event_id': event_id,
+                })
+
+        if len(obs) >= MIN_OBS_PER_EVENT:
+            w_obs_all.extend(obs)
+            w_event_ids.append(event_id)
+
+    if len(w_obs_all) < 10 or len(w_event_ids) < 2:
+        _print(f'    Skipping: too few obs ({len(w_obs_all)}) or events ({len(w_event_ids)})')
+        continue
+
+    # Pooled OLS: CAR = a + b1*w_fuel + b2*w_geo + e
+    y_w = [o['car'] for o in w_obs_all]
+    X_w = [[1.0, o['w_fuel'], o['w_geo']] for o in w_obs_all]
+    result_w = ols_simple(y_w, X_w)
+    if result_w is None:
+        _print('    OLS failed')
+        continue
+
+    beta_w = result_w['beta']
+    resid_w = result_w['resid']
+    n_w = result_w['n']
+    k_w = 3  # intercept + 2 channels
+
+    # Event-clustered standard errors
+    # V = (X'X)^-1 * ( sum_g X_g' e_g e_g' X_g ) * (X'X)^-1
+    XtX = [[sum(X_w[i][a] * X_w[i][b] for i in range(n_w))
+            for b in range(k_w)] for a in range(k_w)]
+    inv_XtX = invert_matrix(XtX)
+    if inv_XtX is None:
+        _print('    Singular X\'X')
+        continue
+
+    # Group residuals by event
+    event_groups = defaultdict(list)
+    for idx, o in enumerate(w_obs_all):
+        event_groups[o['event_id']].append(idx)
+
+    G = len(event_groups)
+    meat = [[0.0] * k_w for _ in range(k_w)]
+    for eid, indices in event_groups.items():
+        # X_g' * e_g  (k x 1 vector)
+        score = [sum(X_w[i][a] * resid_w[i] for i in indices) for a in range(k_w)]
+        for a in range(k_w):
+            for b in range(k_w):
+                meat[a][b] += score[a] * score[b]
+
+    # Small-sample correction: G/(G-1) * (n-1)/(n-k)
+    correction = (G / (G - 1.0)) * ((n_w - 1.0) / (n_w - k_w))
+    for a in range(k_w):
+        for b in range(k_w):
+            meat[a][b] *= correction
+
+    V_cl = mat_mul(mat_mul(inv_XtX, meat), inv_XtX)
+
+    se_fuel = math.sqrt(max(V_cl[1][1], 0.0))
+    se_geo = math.sqrt(max(V_cl[2][2], 0.0))
+    t_fuel_w = beta_w[1] / se_fuel if se_fuel > 1e-15 else 0.0
+    t_geo_w = beta_w[2] / se_geo if se_geo > 1e-15 else 0.0
+
+    row = {
+        'window': window_label,
+        'post_months': post_m,
+        'n_obs': n_w,
+        'n_events': G,
+        'fuel_beta': beta_w[1],
+        'fuel_se': se_fuel,
+        'fuel_t': t_fuel_w,
+        'geo_beta': beta_w[2],
+        'geo_se': se_geo,
+        'geo_t': t_geo_w,
+        'r2': result_w['r2'],
+    }
+    window_sensitivity.append(row)
+    _print(f'    N={n_w}, events={G}, fuel beta={beta_w[1]:+.6f} (t={t_fuel_w:.3f}), '
+           f'geo beta={beta_w[2]:+.6f} (t={t_geo_w:.3f})')
+
+# Also add [0, +1] window (no pre-event month)
+_print(f'\n  Window [0, +1] (custom) ...')
+w_obs_01 = []
+w_event_ids_01 = []
+for event_id, event in enumerate(all_events):
+    event_gvkeys = set(event['gvkeys'])
+    year = event['year']
+    event_date = event.get('event_date', '')
+    if event_date and len(event_date) >= 7:
+        event_month = event_date[:7]
+    else:
+        event_month = f'{year}-07' if year else None
+    if not event_month:
+        continue
+
+    for fm_gk in event_gvkeys:
+        if fm_gk not in W_geo:
+            continue
+        neighbors = W_geo[fm_gk]
+        neighbor_gks = set(neighbors.keys()) - event_gvkeys
+        non_connected = [gk for gk in fundamentals
+                         if gk not in event_gvkeys and gk not in neighbors]
+        stable_seed = int(hashlib.md5(
+            str(fm_gk).encode('utf-8')).hexdigest()[:8], 16)
+        random.seed(stable_seed)
+        n_ctrl = min(len(non_connected),
+                     max(5 * len(neighbor_gks), 20))
+        ctrl_sample = (random.sample(non_connected, n_ctrl)
+                       if len(non_connected) > n_ctrl
+                       else non_connected)
+        candidate_firms = list(neighbor_gks) + ctrl_sample
+
+        for gk in candidate_firms:
+            w_geo_val = neighbors.get(gk, 0.0)
+            w_fuel_val = W_fuel.get(fm_gk, {}).get(gk, 0.0)
+            # Custom CAR for [0, +1]: no pre-event month
+            if gk not in monthly_ret:
+                continue
+            months_gk = sorted(monthly_ret[gk].keys())
+            ev_idx = None
+            for mi, m in enumerate(months_gk):
+                if m >= event_month:
+                    ev_idx = mi
+                    break
+            if ev_idx is None:
+                continue
+            # Pre-period AR for adjustment
+            pre_rets_01 = [monthly_ret[gk][months_gk[pi]]
+                           for pi in range(max(0, ev_idx - PRE_MONTHS), ev_idx)
+                           if months_gk[pi] in monthly_ret[gk]]
+            if len(pre_rets_01) < 12:
+                continue
+            ar_list_01 = []
+            for pi in range(max(0, ev_idx - PRE_MONTHS), ev_idx):
+                m = months_gk[pi]
+                if m in monthly_ret[gk] and m in market_ret_monthly:
+                    ar_list_01.append(monthly_ret[gk][m] - market_ret_monthly[m])
+            pre_mean_ar_01 = (sum(ar_list_01) / len(ar_list_01)) if ar_list_01 else 0.0
+            car_01 = 0.0
+            for offset in range(0, 2):  # month 0 and month +1
+                idx = ev_idx + offset
+                if 0 <= idx < len(months_gk) and months_gk[idx] in monthly_ret[gk]:
+                    m = months_gk[idx]
+                    r_it = monthly_ret[gk][m]
+                    if m in market_ret_monthly:
+                        ar = r_it - market_ret_monthly[m]
+                        car_01 += ar - pre_mean_ar_01
+            w_obs_01.append({
+                'car': car_01,
+                'w_geo': w_geo_val,
+                'w_fuel': w_fuel_val,
+                'event_id': event_id,
+            })
+
+    if event_id not in [o['event_id'] for o in w_obs_01]:
+        continue
+    # Count obs for this event
+    n_this = sum(1 for o in w_obs_01 if o['event_id'] == event_id)
+    if n_this >= MIN_OBS_PER_EVENT and event_id not in w_event_ids_01:
+        w_event_ids_01.append(event_id)
+
+# Filter to events with enough obs
+w_obs_01_filtered = [o for o in w_obs_01 if o['event_id'] in w_event_ids_01]
+
+if len(w_obs_01_filtered) >= 10 and len(w_event_ids_01) >= 2:
+    y_01 = [o['car'] for o in w_obs_01_filtered]
+    X_01 = [[1.0, o['w_fuel'], o['w_geo']] for o in w_obs_01_filtered]
+    result_01 = ols_simple(y_01, X_01)
+    if result_01 is not None:
+        beta_01 = result_01['beta']
+        resid_01 = result_01['resid']
+        n_01 = result_01['n']
+        k_01 = 3
+
+        XtX_01 = [[sum(X_01[i][a] * X_01[i][b] for i in range(n_01))
+                    for b in range(k_01)] for a in range(k_01)]
+        inv_XtX_01 = invert_matrix(XtX_01)
+        if inv_XtX_01 is not None:
+            event_groups_01 = defaultdict(list)
+            for idx, o in enumerate(w_obs_01_filtered):
+                event_groups_01[o['event_id']].append(idx)
+            G_01 = len(event_groups_01)
+            meat_01 = [[0.0] * k_01 for _ in range(k_01)]
+            for eid, indices in event_groups_01.items():
+                score = [sum(X_01[i][a] * resid_01[i] for i in indices)
+                         for a in range(k_01)]
+                for a in range(k_01):
+                    for b in range(k_01):
+                        meat_01[a][b] += score[a] * score[b]
+            correction_01 = (G_01 / (G_01 - 1.0)) * ((n_01 - 1.0) / (n_01 - k_01))
+            for a in range(k_01):
+                for b in range(k_01):
+                    meat_01[a][b] *= correction_01
+            V_01 = mat_mul(mat_mul(inv_XtX_01, meat_01), inv_XtX_01)
+            se_fuel_01 = math.sqrt(max(V_01[1][1], 0.0))
+            se_geo_01 = math.sqrt(max(V_01[2][2], 0.0))
+            t_fuel_01 = beta_01[1] / se_fuel_01 if se_fuel_01 > 1e-15 else 0.0
+            t_geo_01 = beta_01[2] / se_geo_01 if se_geo_01 > 1e-15 else 0.0
+
+            window_sensitivity.append({
+                'window': '[0, +1]',
+                'post_months': 1,
+                'n_obs': n_01,
+                'n_events': G_01,
+                'fuel_beta': beta_01[1],
+                'fuel_se': se_fuel_01,
+                'fuel_t': t_fuel_01,
+                'geo_beta': beta_01[2],
+                'geo_se': se_geo_01,
+                'geo_t': t_geo_01,
+                'r2': result_01['r2'],
+            })
+            _print(f'    N={n_01}, events={G_01}, fuel beta={beta_01[1]:+.6f} (t={t_fuel_01:.3f}), '
+                   f'geo beta={beta_01[2]:+.6f} (t={t_geo_01:.3f})')
+
+# Sort sensitivity results by window for display
+window_order = {'[-1, +1]': 0, '[-1, +2]': 1, '[-1, +3]': 2, '[0, +1]': 3}
+window_sensitivity.sort(key=lambda r: window_order.get(r['window'], 99))
+
+
+# ══════════════════════════════════════════════════════════════════════
 # WRITE OUTPUT
 # ══════════════════════════════════════════════════════════════════════
 
@@ -785,6 +1065,26 @@ lines += [
     'The Fama-MacBeth approach is the appropriate gold standard for this',
     'repeated cross-section design (Petersen 2009, Table 5).',
 ]
+
+# Window sensitivity section
+if window_sensitivity:
+    lines += [
+        '',
+        '## Approach 4: Event Window Sensitivity',
+        '',
+        'Pooled OLS with event-clustered SEs at alternative windows.',
+        'Referee-requested robustness check for the baseline [-1, +3] window.',
+        '',
+        '| Window | N | Events | Fuel beta | Fuel SE | Fuel t | Geo beta | Geo SE | Geo t | R2 |',
+        '|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|',
+    ]
+    for r in window_sensitivity:
+        lines.append(
+            f'| {r["window"]} | {r["n_obs"]} | {r["n_events"]} '
+            f'| {r["fuel_beta"]:+.6f} | {r["fuel_se"]:.6f} | {r["fuel_t"]:.3f} '
+            f'| {r["geo_beta"]:+.6f} | {r["geo_se"]:.6f} | {r["geo_t"]:.3f} '
+            f'| {r["r2"]:.4f} |'
+        )
 
 with open(out_path, 'w', encoding='utf-8') as f:
     f.write('\n'.join(lines))

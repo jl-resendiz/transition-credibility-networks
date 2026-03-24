@@ -123,6 +123,56 @@ def p_from_t(t_stat):
     return 2.0 * (1.0 - _normal_cdf(abs(t_stat)))
 
 
+def _beta_inc(a, b, x, niter=200):
+    """Regularised incomplete beta function I_x(a,b) via continued fraction."""
+    if x < 0 or x > 1:
+        return 0.0
+    if x == 0 or x == 1:
+        return x
+    from math import lgamma, exp
+    lbeta = lgamma(a) + lgamma(b) - lgamma(a + b)
+    front = exp(a * math.log(x) + b * math.log(1 - x) - lbeta) / a
+    # Lentz continued fraction
+    f = 1.0
+    c = 1.0
+    d = 1.0 - (a + b) * x / (a + 1)
+    if abs(d) < 1e-30:
+        d = 1e-30
+    d = 1.0 / d
+    f = d
+    for m in range(1, niter + 1):
+        # even step
+        num = m * (b - m) * x / ((a + 2 * m - 1) * (a + 2 * m))
+        d = 1.0 + num * d
+        if abs(d) < 1e-30: d = 1e-30
+        c = 1.0 + num / c
+        if abs(c) < 1e-30: c = 1e-30
+        d = 1.0 / d
+        f *= d * c
+        # odd step
+        num = -(a + m) * (a + b + m) * x / ((a + 2 * m) * (a + 2 * m + 1))
+        d = 1.0 + num * d
+        if abs(d) < 1e-30: d = 1e-30
+        c = 1.0 + num / c
+        if abs(c) < 1e-30: c = 1e-30
+        d = 1.0 / d
+        delta = d * c
+        f *= delta
+        if abs(delta - 1.0) < 1e-12:
+            break
+    return front * f
+
+
+def p_from_t_df(t_stat, df):
+    """Two-sided p-value from t-stat using the t-distribution with df degrees
+    of freedom. Falls back to normal approximation for df > 200."""
+    if df > 200:
+        return p_from_t(t_stat)
+    x = df / (df + t_stat * t_stat)
+    p_two = _beta_inc(df / 2.0, 0.5, x)
+    return max(0.0, min(1.0, p_two))
+
+
 # ── Newey-West HAC standard errors ──────────────────────────────────
 
 def newey_west_se(series, max_lag=None):
@@ -923,12 +973,13 @@ for v in ['intercept'] + SPEC_VARS_BARTIK:
     mean_b = sum(clean) / len(clean)
     nw_se = newey_west_se(clean)
     t_stat = mean_b / nw_se if nw_se > 1e-15 else 0.0
-    p_val = p_from_t(t_stat)
+    df = len(clean) - 1
+    p_val = p_from_t_df(t_stat, df)
     stars = '***' if p_val < 0.01 else '**' if p_val < 0.05 else '*' if p_val < 0.10 else ''
-    _print(f'  {v:<15} {mean_b:+12.6f} {nw_se:10.6f} {t_stat:8.3f} {p_val:8.4f}{stars}')
+    _print(f'  {v:<15} {mean_b:+12.6f} {nw_se:10.6f} {t_stat:8.3f} {p_val:8.4f}{stars}  (df={df})')
     fm_bartik[v] = {
         'mean': mean_b, 'se': nw_se, 't': t_stat, 'p': p_val,
-        'n_events': len(clean),
+        'n_events': len(clean), 'df': df,
     }
 
 
