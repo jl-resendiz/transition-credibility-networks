@@ -8,13 +8,31 @@ Build scripts run in dependency order:
   parse_gem -> match_gem_compustat -> build_* / compute_returns -> build_events
 
 Analysis scripts are independent and run in any order.
+
+Julia (.jl) scripts are used for computationally intensive bootstrap
+procedures where they provide >10x speedup over Python. If Julia is
+not installed, the pipeline falls back to equivalent Python scripts.
 """
 import os
 import sys
+import shutil
 import subprocess
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 SRC = os.path.join(ROOT, 'src')
+
+# Locate Julia binary (optional; pipeline falls back to Python if absent)
+JULIA = shutil.which('julia')
+if not JULIA:
+    _julia_winapp = os.path.expanduser(
+        r'~\AppData\Local\Microsoft\WindowsApps\julia.exe')
+    if os.path.exists(_julia_winapp):
+        JULIA = _julia_winapp
+
+# Fallback map: Julia script -> Python equivalent
+_FALLBACK = {
+    'strategy2_joint_tests.jl': 'strategy2_joint_tests.py',
+}
 
 
 def run(script_name):
@@ -25,10 +43,19 @@ def run(script_name):
     print(f'\n{"=" * 60}', flush=True)
     print(f'>>> {script_name}', flush=True)
     print('=' * 60, flush=True)
-    result = subprocess.run(
-        [sys.executable, path],
-        cwd=SRC,
-    )
+    if script_name.endswith('.jl'):
+        if JULIA:
+            cmd = [JULIA, path]
+        elif script_name in _FALLBACK:
+            fb = _FALLBACK[script_name]
+            print(f'  Julia not found, falling back to {fb}', flush=True)
+            cmd = [sys.executable, os.path.join(SRC, fb)]
+        else:
+            print(f'  SKIP (Julia not found, no fallback): {script_name}')
+            return
+    else:
+        cmd = [sys.executable, path]
+    result = subprocess.run(cmd, cwd=SRC)
     if result.returncode != 0:
         print(f'\n*** FAILED: {script_name} (exit code {result.returncode}) ***')
         raise SystemExit(result.returncode)
@@ -76,7 +103,7 @@ def main():
     analysis_scripts = [
         # Main results
         'strategy2_robust_inference.py',
-        'strategy2_joint_tests.py',
+        'strategy2_joint_tests.jl',        # ~42s Julia vs ~268s Python
         'strategy2_credibility_interaction.py',
         'strategy2_esg_horse_race.py',
 
