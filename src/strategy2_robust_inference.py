@@ -1045,10 +1045,10 @@ lines += [
     '|---|---:|---:|---:|---|',
 ]
 
-# Original event-clustered (source: strategy2_joint_tests.py → strategy2_joint_tests.md)
-lines.append('| Pooled, event-clustered | 2.972 | -3.160 | 3.646 | Original (inflated) |')
-# Two-way clustered (source: strategy2_firm_level_test.py → strategy2_firm_level_test.md)
-lines.append('| Pooled, two-way clustered | 1.080 | -0.917 | 1.128 | Conservative |')
+# Pooled event-clustered (computed above)
+geo_t_ec = pooled_results.get('w_geo', {}).get('t', 0)
+fuel_t_ec = pooled_results.get('w_fuel', {}).get('t', 0)
+lines.append(f'| Pooled, event-clustered | {geo_t_ec:.3f} | {fuel_t_ec:.3f} | -- | Primary |')
 # Fama-MacBeth
 geo_t_fm = fm_results.get('w_geo', {}).get('t', 0)
 fuel_t_fm = fm_results.get('w_fuel', {}).get('t', 0)
