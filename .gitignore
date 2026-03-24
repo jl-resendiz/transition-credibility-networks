@@ -40,3 +40,10 @@ manuscript/nber_manuscript.pdf
 # Licensed data (not for distribution)
 data/raw/eikon/
 src/_explore_sustainable_finance.py
+
+# Experiments (not part of the reproducible pipeline)
+experiments/
+
+# Audit reports (development artifacts)
+prompts/audit_*.md
+prompts/pipeline_optimization_report.md
