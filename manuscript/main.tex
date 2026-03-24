@@ -33,12 +33,13 @@
 \renewcommand{\headrulewidth}{0pt}
 
 % Theorem environments
+\newtheorem{proposition}{Proposition}
 \newtheorem{corollary}{Corollary}
 \newtheorem{definition}{Definition}
 \newtheorem{assumption}{Assumption}
 \newtheorem{lemma}{Lemma}
 \newtheorem{prediction}{Empirical Prediction}
-\newtheorem*{remark}{Remark}
+\newtheorem{remark}{Remark}
 
 % Custom commands
 \newcommand{\R}{\mathbb{R}}
@@ -47,7 +48,7 @@
 \newcommand{\btheta}{\boldsymbol{\theta}}
 \newcommand{\bW}{\mathbf{W}}
 
-\title{\large\textbf{Pricing Transition Credibility on Spatial Networks}\vspace{-0.5em}}
+\title{\large\textbf{When Coal Retires: The Propagation of Stranding Risk}\vspace{-0.5em}}
 \author{\normalsize Jose Luis Resendiz\\[4pt] \small Smith School of Enterprise and the Environment, University of Oxford}
 \date{\small\today}
 
@@ -55,630 +56,524 @@
 {\singlespacing\maketitle}
 
 \begin{quotation}\small\singlespacing\noindent
-\textbf{Abstract:} A single plant retirement transmits opposing shocks through spatial networks: negative contagion for fuel-similar peers and positive competitive benefit for geographic neighbours. Using plant-level data for 389 listed utilities worldwide, we develop and test a networked pricing framework that reveals a credibility gap in how markets process transition risk. Three findings emerge. First, portfolio sorts confirm a channel split of 11.48 percentage points ($t=14.00$) between geographic and fuel exposure quintiles, with spatial coefficients robust to Conley standard errors at 1,000~km. Second, voluntary retirement filings raise peer return volatility ($t=3.89$) without moving mean prices ($t\approx 0$), revealing that markets observe network exposure but cannot price its direction until binding policy intervenes. Third, emissions trading systems sharpen the stranding channel ($w^{\text{fuel}} \times \text{ETS}$, $t=-3.41$), while a geographic placebo is null ($t=0.64$), confirming that policy credibility moderates the fuel penalty. These results suggest that transition risk assessment should incorporate the spatial network connecting firms, not merely the characteristics of individual firms.
+\textbf{Abstract.} Does geographic distance insulate power utilities from transition risk? I study how coal plant retirements propagate to the stock prices of 703 listed utilities across 80 countries. The channel is technology, not geography: peers with similar generation portfolios lose 3.3 percentage points of market value over four months, while geographic proximity has no robust effect. The mechanism is asymmetric aggregation. Local competitive effects diversify across markets; technology obsolescence does not. Emissions trading amplifies the signal. ESG scores and fuel-mix similarity both predict transition returns but measure different things: disclosure versus physical assets.
 \end{quotation}
+
+\medskip\noindent\textit{JEL Classification:} G12, G14, Q54, L94.\\
+\noindent\textit{Keywords:} transition risk, stranded assets, fuel-mix similarity, technology networks, carbon pricing.
 
 %----------------------------------------------------------------------
 \section{Introduction}\label{sec:intro}
 %----------------------------------------------------------------------
 
-When a coal plant retires, the stock prices of technologically similar utilities fall while those of geographically proximate utilities rise. The same physical event produces opposite-signed spillovers depending on how firms are connected through the spatial network. This finding has broad implications for how financial markets assess transition risk, because the dominant assessment tools operate at the firm level and miss the network dimension entirely.
+Coal plants are retiring in some jurisdictions and expanding in others. Over 80 percent of coal reserves must remain unextracted if Paris targets bind \citep{McGlade2015}, placing trillions of dollars in generating assets at risk \citep{Dietz2016}. Does geographic distance insulate the expanding jurisdictions from the financial consequences of retirement elsewhere?
 
-The scale of the challenge is large. Meeting the 2$^\circ$C target requires leaving over 80 percent of coal reserves unextracted, concentrating stranded asset exposure in specific geographies, with up to \$24 trillion in global financial assets potentially at risk \citep{McGlade2015, Dietz2016}. Markets broadly underestimate this exposure, a difficulty compounded by deep Knightian uncertainty propagating across carbon dynamics, temperature dynamics, and damage functions simultaneously \citep{StroebelWurgler2021, Barnett2020}.
+The evidence in this paper suggests not. When a power utility retires coal capacity, the stock prices of technologically similar peers decline, regardless of where those peers are located. A firm at the median of the fuel-similarity distribution loses 3.3 percentage points of market value over four months relative to a firm with no fuel overlap. Geographic proximity, by contrast, has no robust effect on stock returns at the firm level. The channel through which retirement shocks propagate is technology, not geography.
 
-The financial industry's response has been firm-level scoring: ESG ratings, implied temperature scores, and target validation frameworks. This approach suffers from well-documented limitations. Major rating providers disagree on basic assessments of the same company, with pairwise correlations as low as 38 percent \citep{Berg2022}. Mandatory sustainability reporting fails to produce consistent data, because underlying incentives create strategic variation in what companies disclose \citep{Christensen2021}. Corporate climate targets frequently fail basic integrity criteria, and markets exhibit weak reactions when firms miss stated goals \citep{JiangKimLu2025}. Institutional investors overwhelmingly believe climate risks are financially material yet report lacking adequate tools to measure portfolio-level exposure \citep{Krueger2020}.
+The mechanism is what I call asymmetric aggregation. A listed utility typically operates plants in multiple local electricity markets. When a nearby competitor exits, the utility gains market share in that local market. But these local gains are independent across markets and diversify away in the firm's aggregate stock price, much as idiosyncratic sectoral shocks wash out in a balanced production network \citep{AcemogluCarvalhoOzdaglarTahbazSalehi2012}. Technology exposure operates differently. If coal becomes uneconomic in one jurisdiction, every plant using coal faces the same obsolescence risk, regardless of where it is located. Fuel-mix similarity is a common factor. It does not diversify. This asymmetry explains why the technology channel dominates in the data: it is the only channel that survives aggregation from the plant level to the stock level.
 
-The problem is not a shortage of data or disclosure mandates, but a conceptual gap: firm-level approaches cannot capture risks that originate in the network connecting firms.
+I construct fuel-mix similarity as the $L_1$ similarity of capacity-share vectors from the Global Energy Monitor, following \citet{HobergPhillips2016}'s approach to measuring firm-pair proximity. The specification has the structure of a shift-share design \citep{GoldsmithPinkhamSorkinSwift2020}: fuel-mix shares, fixed by plant construction decisions made years before any retirement, serve as the pre-determined exposure; each retirement event serves as the shock. Four diagnostics support a causal reading: pre-determined shares using only pre-2014 plant vintages remain significant, Rotemberg weights are non-negative, and the \citet{Oster2019} coefficient stability bound indicates that unobservables would need to be 21 times more important than observables to explain away the result. The sample covers 703 listed utilities across 80 countries and 175 first-mover retirement events spanning 35 countries.
 
-This paper develops and tests a spatial network framework for pricing transition risk. We decompose the network linking power utilities into three independently constructed layers: fuel-mix similarity, geographic proximity, and regulatory proximity. A single physical restructuring shock (a plant retirement) propagates through these layers with opposing signs. The framework yields a testable credibility gap: when the direction of a network shock is ambiguous, markets should respond through volatility rather than directional returns; when binding policy resolves the ambiguity, prices should adjust. We test these predictions using plant-level geolocation data for 389 listed power utilities worldwide, covering 72,398 event-firm pairs around 179 first-mover retirement events.
+Two additional findings emerge. First, emissions trading amplifies the technology channel: the stranding penalty roughly doubles for firms in jurisdictions with an emissions trading system. Second, ESG environmental scores and fuel-mix similarity both predict transition returns, but they measure different things. ESG reflects what firms disclose about their transition plans. Fuel-mix similarity reflects the physical generation assets they actually operate. Both survive a joint test, meaning that knowing one does not make the other redundant.
 
-Two obstacles have prevented prior work from isolating spatial transmission in transition risk. First, measuring network exposure requires plant-level geolocation data at global scale, which became available only recently through comprehensive registries such as the Global Energy Monitor. Second, separating contagion from competitive effects requires independently constructed network layers whose exclusion restrictions can be tested, a design that standard peer-effect studies using industry classification or geographic proximity alone cannot achieve.
+These results speak to a question that arises whenever climate policy is unilateral. If only some countries retire fossil capacity, are the others insulated? The asset pricing evidence says no. The market penalises coal-heavy utilities in proportion to their fuel-mix similarity to the retiring firm, regardless of jurisdiction. Coal retirements send technology signals whose financial reach extends well beyond the country where the retirement occurs. The paper documents this pattern; it does not assess whether the retirements themselves are desirable.
 
-Three principal findings emerge, each supported by multiple identification strategies.
+The closest antecedents are the carbon premium literature \citep{Bolton2021, BoltonKacperczyk2023} and the network propagation framework \citep{AcemogluCarvalhoOzdaglarTahbazSalehi2012}. The carbon premium literature documents that carbon-intensive firms earn higher expected returns, but does not explain how the premium propagates across firms. The network propagation literature shows that idiosyncratic shocks transmit through interconnected sectors, but studies production networks, not technology networks in the power sector. I connect the two: the fuel-mix network has a common-factor structure that explains why the carbon premium exists and how it propagates. The cosine-similarity methodology follows \citet{HobergPhillips2016}. The contagion-versus-competition decomposition builds on \citet{LangStulz1992}.
 
-First, the spatial network predicts transition returns with a clean channel split. A joint $F$-test rejects the null that all spatial coefficients are zero ($F=11.28$, $p=0.001$), and a formal difference test confirms the opposing-sign structure ($\beta_{\text{geo}} - \beta_{\text{fuel}} = 1.851$, $t=3.65$, $p=0.0003$). Portfolio sorts sharpen this result: the channel split between geographic and fuel quintile spreads is $+11.48$ percentage points ($t=14.00$), robust to Conley standard errors at 1,000 km.
-
-Second, voluntary retirement filings (EIA-860) raise peer return volatility without moving mean prices (volatility $t=3.89$; CAR $t=-0.17$). This is the signature of a credibility gap. The opposing channels offset in expectation, leaving the mean return near zero while injecting uncertainty into exposed firms' cash flow distributions.
-
-Third, emissions trading systems sharpen the stranding channel. The fuel-similarity interaction with ETS presence is strongly negative ($w^{\text{fuel}} \times \text{has\_ets} = -3.24$, $t=-3.41$, one-sided $p=0.0003$, as the model predicts $\beta_2 < 0$), while a geographic placebo is null ($t=0.64$). In a horse race with ESG scores, spatial exposure dominates ($t=-3.94$ vs.\ $t=-0.59$), and a composite Spatial Transition Score produces an out-of-sample portfolio spread of $-7.75\%$ ($t=-6.10$) in the post-2020 period.
-
-The paper makes three contributions. First, to climate finance: we establish that transition risk is a network property, not merely a firm characteristic. The opposing-sign spatial structure means that firm-by-firm divestment campaigns can inadvertently subsidise neighbouring fossil assets through the geographic competitive channel ($\gamma_G > 0$), creating a paradox of isolated climate action. Second, to asset pricing: the opposing channels create a structural information friction that manifests as volatility without directional repricing, explaining why ambiguous transition signals fail to move prices. Only binding policy resolves this friction. Third, to practitioners: spatial exposure is measurable from public registries (GEM plant data, GPS coordinates, ETS membership), complements existing firm-level frameworks, and captures a network dimension currently absent from assessment tools.
-
-Our work connects to several literatures. The network architecture draws on \citet{AcemogluCarvalhoOzdaglarTahbazSalehi2012} and \citet{Herskovic2018}, who establish that production network linkages are priced in equilibrium. The opposing-sign spatial structure formalises the contagion-versus-competition dichotomy of \citet{LangStulz1992} and \citet{JorionZhang2007}. The credibility gap builds on the policy uncertainty literature of \citet{PastorVeronesi2012} and the cheap-talk framework of \citet{CrawfordSobel1982}. The volatility evidence connects to \citet{Bloom2009} and \citet{KellyPastorVeronesi2016} on uncertainty resolution. Within climate finance, we complement the carbon premium of \citet{Bolton2021} and \citet{BoltonKacperczyk2023}, the carbon tail risk of \citet{IlhanSautnerVilkov2021}, and the network stress tests of \citet{Battiston2017} and \citet{Battiston2021}. The electricity sector as an empirical laboratory follows \citet{Cicala2022} and \citet{FabrizioRoseWolfram2007}, and the geographic identification strategy follows \citet{GrieserHadlockLeSageZekhnini2022} and \citet{PirinskyWang2006}.
-
-The paper proceeds as follows. Section~\ref{sec:model} develops the theoretical framework and lays out the empirical strategy. Section~\ref{sec:results} presents results. Section~\ref{sec:discussion} discusses implications for transition risk assessment and policy. Section~\ref{sec:conclusion} concludes. Appendices provide channel definitions, derivations, robustness tables, and data construction details.
 
 %----------------------------------------------------------------------
-\section{Empirical Framework: Networked Pricing under Policy Uncertainty}\label{sec:model}
+\section{A Model of Networked Transition Risk}\label{sec:model}
 %----------------------------------------------------------------------
 
-\subsection{Overview}
+Power utilities operate physical plants in local electricity markets. Each plant uses a specific generation technology. When a plant retires, two consequences follow. Locally, competitors gain market share as residual demand shifts to remaining generators. Globally, every firm using similar technology faces a question: does the retirement signal that the technology itself is becoming obsolete? These two consequences aggregate to the stock level in fundamentally different ways. The local effect diversifies across markets. The technology effect does not.
 
-Industry-standard assessment tools treat each firm in isolation. ESG ratings, implied temperature scores, and TCFD-aligned disclosures all assume markets can continuously and accurately price firm-level commitments. We propose a different framework: the \textbf{credibility gap} is fundamentally an information friction. Investors observe the physical network of power utilities and each firm's legacy asset exposure, but they cannot reliably assign a directional price to transition commitments until binding policy removes managerial and political discretion.
+\subsection{Environment}\label{sec:environment}
 
-We frame transition risk as an asset-pricing problem on a multi-layered spatial network under regulatory uncertainty. We derive cross-sectional pricing implications from a conditional valuation framework without solving for general equilibrium; the pricing equation constrains the relationship between spatial exposure and returns without fully specifying investor preferences or market clearing. This framework yields two core short-horizon insights. First, spatial transmission operates through distinct channels with opposing signs. Second, when the regulatory regime is uncertain, idiosyncratic shocks (e.g., plant-level retirements) act as noisy signals that increase return volatility without a clear directional mean. Conversely, binding phase-out laws partially resolve uncertainty, compress volatility, and generate negative returns proportional to firms' own fossil exposure.
+\paragraph{Agents and timing.}
+Consider an economy with $N$ listed power utilities indexed by $i \in \{1,\ldots,N\}$ and a continuum of identical risk-averse investors. Time is discrete with three dates: $t = 0$ (ex ante), $t = 1$ (signal arrival), and $t = 2$ (terminal payoff).
 
-\subsection{Environment and Networked Cash Flows}
-%----------------------------------------------------------------------
-
-Consider a continuum of listed power utilities $i \in [0,1]$. Firm $i$'s fundamental value is the expected present discounted value of its future cash flows, $V_i = \E[\Pi_i]$. Each firm is characterized by its \textbf{legacy asset intensity}, $\alpha_i \in [0,1]$, which measures reliance on fossil generation (e.g., coal share).
-
-Firms are interconnected via a spatial network decomposed into three row-normalized adjacency matrices: geographic proximity ($\bW^{\text{geo}}$), fuel-mix similarity ($\bW^{\text{fuel}}$), and regulatory proximity ($\bW^{\text{reg}}$). Let $s_j \ge 0$ denote a physical restructuring shock originating at neighbor $j$ (e.g., a capacity retirement). We specify firm $i$'s realized cash flows as a function of own exposure, neighbor shocks, and an unobserved regulatory state $\omega \in \{0,1\}$:
-\begin{equation}\label{eq:cashflows}
-    \Pi_i(\omega) = \bar{\Pi}_i - \omega \beta \alpha_i + \gamma_G \sum_j w^{\text{geo}}_{ij} s_j + \gamma_R \sum_j w^{\text{reg}}_{ij} s_j - \omega \gamma_F \sum_j w^{\text{fuel}}_{ij} s_j,
+\paragraph{Investor preferences.}
+The representative investor has CRRA preferences over terminal wealth:
+\begin{equation}\label{eq:utility}
+    U = \E_0\!\left[\frac{W_2^{1-\gamma}}{1-\gamma}\right], \qquad \gamma > 1.
 \end{equation}
-where $\bar{\Pi}_i$ is baseline profitability. The channels operate as follows:
-\begin{itemize}
-    \item $\gamma_G > 0$ captures \textbf{local competitive benefits}: when a geographically proximate neighbor retires capacity, local grid congestion eases and wholesale margins improve.
-    \item $\gamma_R \ge 0$ captures \textbf{regulatory spillovers}: shared jurisdiction effects, which we allow to be positive but noisy at short horizons.
-    \item $\gamma_F > 0$ captures \textbf{competitive stranding}: when a fuel-similar peer retires capacity, it signals shared technological obsolescence, but this penalty binds only if the transition regime is enforced ($\omega=1$). The sign is ultimately an empirical question, since technology-similar peers could in principle benefit from shared learning ($\gamma_F < 0$); the data adjudicate.
-    \item $\beta > 0$ is the direct penalty on the firm's own legacy assets ($\alpha_i$) under a binding transition ($\omega=1$).
-\end{itemize}
 
-\noindent The opposing-sign spatial structure formalizes the distinction between contagion and competitive effects identified by \citet{LangStulz1992}: the same event (peer exit) produces opposite-signed spillovers depending on the dimension of proximity. \citet{JorionZhang2007} confirm this dual-sign pattern in credit default swap markets, where the nature of distress determines whether peer spreads widen (contagion) or tighten (competitive benefit). In electricity markets specifically, \citet{DavisHausman2016} demonstrate that plant closure in a geographically constrained grid increases market power for nearby generators, providing the microeconomic mechanism for $\gamma_G > 0$. The network propagation structure follows \citet{AcemogluCarvalhoOzdaglarTahbazSalehi2012}, who show that idiosyncratic shocks propagate through weighted adjacency matrices with magnitudes determined by network topology; \citet{Herskovic2018} establishes that such production network linkages are priced in equilibrium.
+\paragraph{Firm structure.}
+Firm $i$ operates plants in $K_i \geq 1$ local electricity markets. Let $\theta_{ik}$ denote the revenue share of market $k$ in firm $i$'s total operations, with $\sum_{k=1}^{K_i} \theta_{ik} = 1$. The quantity $K_i$ varies across firms: some utilities operate in a single market, others span dozens of jurisdictions.
 
-\subsection{The Credibility Gap and Asset Pricing}
-%----------------------------------------------------------------------
+\paragraph{Network structure.}
+Firms are connected through two independently constructed, row-normalised adjacency matrices. The first measures geographic proximity:
+\begin{equation}
+    w^{\text{geo}}_{ij} = \frac{\exp(-d_{ij}/\bar{d})/d_{ij}}{\sum_{k\neq i}\exp(-d_{ik}/\bar{d})/d_{ik}},
+\end{equation}
+where $d_{ij}$ is the great-circle distance between capacity-weighted plant centroids and $\bar{d}$ is a bandwidth parameter. The second measures fuel-mix similarity: $w^{\text{fuel}}_{ij}$ is the $L_1$ similarity of capacity-share vectors, row-normalised.
 
-The market does not perfectly observe the true regulatory state $\omega$. Let $p_t = \Pr_t(\omega = 1)$ denote the market's prior probability at time $t$ that the strict transition regime will be enforced.
+The two matrices differ in a property that will prove consequential. Geographic proximity varies at the plant level: two firms may be close in one market and distant in another. Fuel-mix similarity is defined at the firm level: it depends on the entire generation portfolio, not on any single plant.
 
-\begin{definition}[The Credibility Gap]\label{def:credibility}
-The credibility gap is the variance in market beliefs regarding policy enforcement, proportional to $p_t(1-p_t)$. When $p_t$ is near $0.5$, uncertainty is maximized, and markets heavily discount stated transition targets because discretionary reversal remains highly probable.
+\paragraph{Regulatory environment.}
+The economy operates under one of two regulatory regimes, $\omega \in \{0,1\}$, unobserved by investors at $t = 0$. Under the lax regime ($\omega = 0$), fossil generation faces no technology penalty. Under the strict regime ($\omega = 1$), fossil generation is subject to an obsolescence cost proportional to the firm's fossil intensity $\alpha_i \in [0,1]$. At $t = 0$, investors assign prior probability $p_0 = \Pr(\omega = 1)$ to the strict regime.
+
+\paragraph{Restructuring shocks.}
+At $t=1$, a subset of firms retire fossil capacity. The shock vector $\mathbf{s} \geq 0$ records the magnitude of each retirement. Investors observe $\mathbf{s}$ and update their beliefs about $\omega$ through Bayes' rule:
+\begin{equation}\label{eq:bayes}
+    p_1(\mathbf{s}) = \frac{p_0\, L(\mathbf{s})}{p_0\, L(\mathbf{s}) + (1-p_0)},
+\end{equation}
+where $L(\mathbf{s}) = f_1(\mathbf{s})/f_0(\mathbf{s})$ is the likelihood ratio. Retirements are more likely under the strict regime, so $L$ is increasing in the magnitude and frequency of shocks.
+
+\paragraph{Cash flows.}
+Firm $i$'s terminal cash flow is:
+\begin{equation}\label{eq:cashflows}
+    \Pi_i = \bar{\Pi} + \sum_{k=1}^{K_i} \theta_{ik}\, G_{ik}(\mathbf{s}) - \omega \cdot F_i(\mathbf{s},\alpha_i) + \eta_i,
+\end{equation}
+where $\bar{\Pi} > 0$ is baseline profitability, $G_{ik}$ is the competitive benefit in local market $k$, $F_i$ is the technology penalty, and $\eta_i \sim \mathcal{N}(0,\sigma^2_\eta)$ is idiosyncratic noise. The two middle terms capture the two consequences of a restructuring shock. Their precise form is specified below.
+
+\subsection{Two Channels}\label{sec:channels}
+
+The cash flow equation~(\ref{eq:cashflows}) contains two opposing effects of a retirement shock. The first operates locally, through the physical electricity grid. The second operates globally, through shared generation technology.
+
+\begin{assumption}[Local Market Competition]\label{ass:competition}
+    When a geographically proximate firm $j$ retires capacity $s_j$, the residual demand for firm $i$'s plant in market $k$ increases by $w^{\mathrm{geo},k}_{ij}\, s_j$, where $w^{\mathrm{geo},k}_{ij}$ measures proximity in market $k$ specifically.
+\end{assumption}
+
+\begin{assumption}[Technological Obsolescence]\label{ass:obsolescence}
+    Under the strict regulatory state ($\omega = 1$), the retirement of fuel-similar capacity imposes a penalty proportional to fuel similarity $w^{\mathrm{fuel}}_{ij}$ and shock size $s_j$.
+\end{assumption}
+
+\begin{lemma}[Local Competitive Benefit]\label{lem:geo}
+    In a Cournot equilibrium with $n_i + 1$ symmetric generators in market $k$, facing linear inverse demand $P(Q) = a - bQ$ with marginal cost $c < a$, if one competitor exits, firm $i$'s profit increases by:
+    \begin{equation}\label{eq:cournot_profit}
+        \Delta\pi_{ik} = \frac{(a-c)^2}{b}\left[\frac{1}{n_i^2} - \frac{1}{(n_i+1)^2}\right] > 0.
+    \end{equation}
+\end{lemma}
+
+\begin{proof}
+    Standard Cournot. With $m$ symmetric firms, each earns $\pi^* = (a-c)^2/[b(m+1)^2]$. Exit reduces $m$ by one. The difference is strictly positive since $n_i < n_i + 1$. \qed
+\end{proof}
+
+The geographic benefit aggregates over plants:
+\begin{equation}\label{eq:G_function}
+    \sum_{k=1}^{K_i} \theta_{ik}\, G_{ik}(\mathbf{s}) = \delta \sum_{k=1}^{K_i} \theta_{ik} \sum_j w^{\text{geo},k}_{ij}\, s_j, \qquad \delta > 0.
+\end{equation}
+
+The technology penalty operates under the strict regime ($\omega = 1$):
+\begin{equation}\label{eq:F_function}
+    F_i(\mathbf{s},\alpha_i) = \beta \alpha_i + \phi \sum_{j} w^{\text{fuel}}_{ij}\, s_j, \qquad \beta, \phi > 0.
+\end{equation}
+
+The first term is a direct cost of fossil intensity. The second is the network penalty: the market infers that firm $i$'s technology is vulnerable because a fuel-similar peer has exited.
+
+\subsection{Asymmetric Aggregation}\label{sec:aggregation}
+
+The geographic and technology channels enter the cash flow equation~(\ref{eq:cashflows}) symmetrically: both are weighted sums over peer shocks. But they aggregate to the stock level in asymmetric ways.
+
+The reason is structural. Geographic proximity varies at the plant level. A firm with plants in Germany and Brazil has different geographic neighbours in each market. Fuel-mix similarity is defined at the firm level. A firm with 60 percent coal has 60 percent coal in every market it operates in.
+
+\begin{lemma}[Aggregation Attenuation]\label{lem:aggregation}
+    The stock-level geographic exposure of firm $i$ is:
+    \begin{equation}\label{eq:aggregation}
+        \beta^{\mathrm{stock}}_{\mathrm{geo},i} = A\delta \sum_{k=1}^{K_i} \theta_{ik} \sum_j w^{\mathrm{geo},k}_{ij} s_j.
+    \end{equation}
+    If local competitive shocks are independent across markets (i.e., $\mathrm{Cov}(G_{ik}, G_{ik'}) = 0$ for $k \neq k'$), the variance of geographic exposure scales as $\mathrm{Var}(\beta^{\mathrm{stock}}_{\mathrm{geo},i}) \propto \sum_k \theta_{ik}^2 \leq 1/K_i$. For a firm operating in many markets ($K_i$ large), the geographic component diversifies away.
+
+    In contrast, the fuel-similarity penalty:
+    \begin{equation}
+        \beta^{\mathrm{stock}}_{\mathrm{fuel},i} = -Ap_1\phi \sum_j w^{\mathrm{fuel}}_{ij} s_j
+    \end{equation}
+    does not attenuate with $K_i$ because $w^{\mathrm{fuel}}_{ij}$ is a property of the firm's entire generation portfolio, not any single local market.
+\end{lemma}
+
+\begin{proof}
+    The geographic term in~(\ref{eq:cashflows}) is $\delta \sum_k \theta_{ik} \sum_j w^{\text{geo},k}_{ij} s_j$. Under independence of local markets, the variance of this sum equals $\delta^2 \sum_k \theta_{ik}^2 \, \text{Var}(\sum_j w^{\text{geo},k}_{ij} s_j)$. By the constraint $\sum_k \theta_{ik} = 1$ and Cauchy-Schwarz, $\sum_k \theta_{ik}^2 \leq 1$ with equality only when $K_i = 1$, and $\sum_k \theta_{ik}^2 \leq 1/K_i$ when revenue shares are equal. As $K_i \to \infty$, the geographic variance vanishes. The fuel term $\phi \sum_j w^{\text{fuel}}_{ij} s_j$ is defined at the firm level and does not decompose into independent market components. \qed
+\end{proof}
+
+The logic parallels the diversification argument in production networks \citep{AcemogluCarvalhoOzdaglarTahbazSalehi2012}. In a balanced network, idiosyncratic shocks wash out at rate $1/\sqrt{N}$. In a star network, the hub transmits shocks to all nodes and diversification fails. Here, the fuel-mix network has a common-factor structure: technology obsolescence is the hub, and all firms sharing that technology are the spokes. Local competitive effects, by contrast, are independent across markets and diversify away at rate $1/\sqrt{K_i}$.
+
+\subsection{Equilibrium and Predictions}\label{sec:predictions}
+
+\begin{definition}[Equilibrium]\label{def:equilibrium}
+    An equilibrium consists of prices $\{V_{i,1}\}_{i=1}^N$ at $t = 1$ such that each price satisfies the SDF pricing equation $V_{i,1} = \E_1[m_{1,2}\, \Pi_i]$, where $m_{1,2} = \beta_d (W_2/W_1)^{-\gamma}$, and the representative investor holds the market portfolio. The constant $A \equiv \beta_d \E_1[(W_2/W_1)^{-\gamma}] > 0$ collects the SDF terms that are common across firms.
 \end{definition}
 
-\noindent Following \citet{PastorVeronesi2012}, who demonstrate that uncertainty about government policy depresses stock prices and generates a risk premium proportional to $p_t(1-p_t)$, we treat this regulatory uncertainty as the core friction driving transition risk. The carbon premium documented by \citet{Bolton2021} is consistent with markets partially pricing this risk ($p_t > 0$) while remaining uncertain about ultimate enforcement ($p_t < 1$). \citet{IlhanSautnerVilkov2021} confirm that option-market pricing of carbon tail risk responds dynamically to such credibility signals.
+\begin{proposition}[Technology Dominance]\label{prop:tech_dominance}
+    Under Assumptions~\ref{ass:competition}--\ref{ass:obsolescence} and Lemma~\ref{lem:aggregation}, a restructuring shock $\mathbf{s}$ transmits to stock prices primarily through fuel-mix similarity:
+    \begin{enumerate}
+        \item[(i)] The fuel-similarity coefficient is $-Ap_1\phi < 0$ (systematic).
+        \item[(ii)] The geographic coefficient is $A\delta\,H_i \approx 0$ for diversified firms, where $H_i = \sum_k \theta_{ik}^2$ is the Herfindahl index of market concentration (idiosyncratic).
+        \item[(iii)] The difference $\beta_{\mathrm{fuel}} - \beta_{\mathrm{geo}}$ is strictly negative for any $p_1 > 0$.
+    \end{enumerate}
+\end{proposition}
 
-The market valuation of firm $i$ at time $t$ is the expectation of Equation~\eqref{eq:cashflows}:
-\begin{equation}\label{eq:valuation}
-    V_{i,t} = \bar{\Pi}_i - p_t \beta \alpha_i + \gamma_G \sum_j w^{\text{geo}}_{ij} s_j + \gamma_R \sum_j w^{\text{reg}}_{ij} s_j - p_t \gamma_F \sum_j w^{\text{fuel}}_{ij} s_j.
-\end{equation}
-The variance of firm $i$'s value, driven by regulatory uncertainty, is
-\begin{equation}\label{eq:variance}
-    \mathrm{Var}_t(V_{i,t}) = p_t(1-p_t) \left( \beta \alpha_i + \gamma_F \sum_j w^{\text{fuel}}_{ij} s_j \right)^2.
-\end{equation}
+\begin{proof}
+    Part (i) follows from Assumption~\ref{ass:obsolescence} and $p_1 > 0$. Part (ii): by Lemma~\ref{lem:aggregation}, the variance of geographic exposure scales as $H_i$, which vanishes for diversified firms. When local shocks have heterogeneous signs across markets, the mean geographic effect tends to zero by a law of large numbers. Part (iii): the difference is $-Ap_1\phi - A\delta H_i < 0$ since $p_1\phi > 0$ and $\delta H_i \geq 0$. \qed
+\end{proof}
 
-\subsection{Empirical Predictions}\label{sec:asset_pricing}
-%----------------------------------------------------------------------
+\begin{corollary}[Asymmetric Aggregation]\label{cor:asymmetry}
+    The cross-sectional average return around a restructuring shock is negative, driven by the technology penalty:
+    \begin{equation}
+        \frac{1}{N}\sum_{i=1}^N \Delta V_{i,1} \approx -Ap_1\phi\,\overline{w^{\mathrm{fuel}} s} < 0.
+    \end{equation}
+\end{corollary}
 
-This framework maps different shock types to observable short-horizon returns ($R_i = \Delta \E_t[V_{i,t}]$) and return volatility.
+\begin{proposition}[Policy Amplification]\label{prop:ets}
+    The fuel coefficient $-Ap_1\phi$ is increasing in absolute value in the posterior belief $p_1$. Since $p_1$ depends on the prior $p_0$ through equation~(\ref{eq:bayes}), jurisdictions with higher prior probability of strict enforcement produce a more negative fuel coefficient. In particular, if $p_0^{\mathrm{high}} > p_0^{\mathrm{low}}$, then $p_1^{\mathrm{high}} > p_1^{\mathrm{low}}$ for any common shock $\mathbf{s}$, and:
+    \begin{equation}
+        \left|\frac{\partial V_{i,1}}{\partial (\sum_j w^{\mathrm{fuel}}_{ij}s_j)}\right|_{p_0^{\mathrm{high}}} > \left|\frac{\partial V_{i,1}}{\partial (\sum_j w^{\mathrm{fuel}}_{ij}s_j)}\right|_{p_0^{\mathrm{low}}}.
+    \end{equation}
+\end{proposition}
 
-\begin{prediction}[Short-Horizon Channel Split]\label{pred:channel_split}
-Holding policy uncertainty $p_t$ constant, a generic vector of physical restructuring shocks $\mathbf{s}$ transmits positively through the geographic network ($\gamma_G > 0$). It transmits negatively through the fuel-similarity network ($-p_t \gamma_F < 0$).
+\begin{proof}
+    The fuel coefficient is $-Ap_1\phi$, where $p_1 = p_0 L / (p_0 L + 1 - p_0)$ from equation~(\ref{eq:bayes}). Since $\partial p_1 / \partial p_0 = L / (p_0 L + 1 - p_0)^2 > 0$, a higher prior produces a higher posterior for any realisation of $\mathbf{s}$. The fuel coefficient is linear in $p_1$, so it is more negative when $p_0$ is higher. \qed
+\end{proof}
+
+The model generates three testable predictions.
+
+\begin{prediction}\label{pred:fuel}
+The fuel-similarity coefficient is negative. The geographic coefficient is attenuated for firms operating across many markets.
 \end{prediction}
-\noindent\textit{Derivation:} Immediate from the partial derivatives of Equation~\eqref{eq:valuation} with respect to neighbor shocks.
-\textit{Empirical mapping:} This formalizes the channel decomposition design. Rather than a single composite peer effect, spatial transmission splits by sign at the 3-month horizon (documented in Table~\ref{tab:channel_decomp}).
 
-\vspace{1em}
-
-\noindent We next evaluate how the market responds to variations in signal clarity.
-
-\begin{prediction}[Ambiguous Shocks: Volatility Transmission]\label{pred:ambiguous}
-Suppose an idiosyncratic plant retirement announcement (e.g., EIA-860) acts as a noisy signal of $\omega$. While Bayesian updating may shift $p_t$ marginally, the first-order observable effect for exposed neighbors is a spike in return volatility, with a theoretically ambiguous (or weak) directional mean return due to offsetting geographic and fuel channels.
+\begin{prediction}\label{pred:dominance}
+The fuel coefficient dominates the geographic coefficient in the cross-section: the technology channel is systematic, the competitive channel is idiosyncratic.
 \end{prediction}
-\noindent\textit{Derivation:} With $p_t \in (0,1)$, Equation~\eqref{eq:variance} shows that an increase in $s_j$ strictly increases $\mathrm{Var}_t(V_{i,t})$. To see why the directional effect is ambiguous, let $y$ denote the announcement signal with likelihoods $L_1 = \Pr(y \mid \omega=1)$ and $L_0 = \Pr(y \mid \omega=0)$. Bayes' rule gives $p_t' = p_t L_1 / [p_t L_1 + (1-p_t)L_0]$. If the signal is noisy ($L_1 \approx L_0$), then $p_t' - p_t$ is small. The mean effect in Equation~\eqref{eq:valuation} remains ambiguous because the positive $\gamma_G$ and negative $\gamma_F$ channels offset, while the variance effect is strictly positive (see Appendix~\ref{app:proofs} for the full derivation).
-\textit{Literature grounding:} This prediction is consistent with \citet{EpsteinSchneider2008}, who show that ambiguity-averse investors evaluate uncertain-quality signals under a worst-case assessment of precision, inflating perceived variance even when the mean impact is zero. \citet{Veronesi1999} provides the general-equilibrium mechanism: return volatility peaks at maximum posterior uncertainty about the hidden state, precisely where $p_t(1-p_t)$ is maximized.
 
-\begin{prediction}[Resolving Shocks: Directional Repricing]\label{pred:resolving}
-Suppose a binding phase-out law is enacted. This systemic shock partially resolves policy uncertainty, causing a discrete jump in beliefs $p_{post} \gg p_{pre}$. For fossil-exposed firms, this strictly reduces return volatility and generates negative abnormal returns proportional to their own legacy intensity ($\alpha_i$). More generally, any increase in policy credibility, including carbon pricing regimes, emissions trading systems, or binding legislation, that raises $p_t$ generates these effects continuously.
+\begin{prediction}\label{pred:policy}
+The fuel penalty is larger in jurisdictions where investors assign higher prior probability to strict enforcement of transition policy.
 \end{prediction}
-\noindent\textit{Derivation:} As $p_{post}$ approaches 1, the uncertainty term $p(1-p)$ in Equation~\eqref{eq:variance} drops, compressing volatility. From Equation~\eqref{eq:valuation}, the change in value is strictly negative and scales with own coal-share $\alpha_i$.
-\textit{Empirical mapping:} Predictions~\ref{pred:ambiguous} and \ref{pred:resolving} distinguish the market reaction to ambiguous filings (volatility increases, no CAR) versus Tier-1 binding laws (volatility falls, negative CAR scales with $\alpha_i$), tested in Table~\ref{tab:volatility_transmission}.
-\textit{Literature grounding:} The volatility-collapse prediction draws on \citet{KellyPastorVeronesi2016}, who show across 20 countries that implied volatility drops sharply once political uncertainty resolves. \citet{Bloom2009} documents the canonical pattern: uncertainty episodes approximately double volatility, with rapid normalization upon resolution. The $\alpha_i$-proportional negative repricing is validated by \citet{HsuLiTsou2023}, who show that a pollution premium of 4.42\% per annum is strictly proportional to within-industry emission intensity and driven by environmental policy regime-shift risk.
 
-\begin{remark}[Valuation wedge / credibility gap]\label{rem:credibility_gap}
-If firm-level commitments were reliably priced, directional returns would separate credible from non-credible firms around restructuring news. Instead, we observe volatility responses with weak mean returns for ambiguous shocks. We interpret this as a credibility gap: markets observe exposure (fuel mix, geography) but cannot price commitment quality until binding policy resolves the direction. Formally, this friction is captured by the belief variance $p_t(1-p_t)$ in Definition~\ref{def:credibility}. Our model parsimoniously collapses two distinct sources of uncertainty into the single parameter $p_t$: uncertainty about whether \emph{governments} will enforce the transition regime, and uncertainty about whether \emph{firms} will honour voluntary commitments. Both sources leave $p_t$ unresolved because voluntary pledges function as cheap talk in the sense of \citet{CrawfordSobel1982}; only binding regulation acts as a costly signal.
-\end{remark}
-
-\begin{prediction}[Information Hierarchy]\label{pred:hierarchy}
-Because spatial exposure originates in physical network topology rather than corporate disclosure, firm-level ESG scores should not subsume the spatial effect. Controlling for ESG ratings should leave the spatial coefficients unchanged.
-\end{prediction}
-\noindent\textit{Derivation:} The spatial weights $w^{\text{geo}}_{ij}$ and $w^{\text{fuel}}_{ij}$ are functions of plant-level physical characteristics (GPS coordinates, fuel-mix vectors), which are determined by infrastructure decisions made years or decades before the event. ESG scores, by contrast, aggregate contemporaneous corporate disclosures. To the extent that ESG ratings capture firm-level intent rather than network topology, they should be orthogonal to the spatial signal conditional on the network weights.
 
 %----------------------------------------------------------------------
-\subsection{Empirical Strategy}\label{sec:empirical}
+\section{Empirical Strategy}\label{sec:empirical}
 %----------------------------------------------------------------------
 
-We test the framework on global listed power utilities, a sector that offers three advantages over alternatives. First, the physical asset base is directly observable: power plants have geolocated coordinates, rated capacities, fuel types, and commission/retirement dates recorded in publicly available registries. The legacy intensity parameter $\alpha$ and all spatial exposure measures are built from physical data rather than self-reported disclosures. Second, the spatial network is well defined: utilities are connected through transmission grids and shared wholesale markets, shared regulatory jurisdictions, and local factor markets for engineering labour and equipment. Third, the sector contains large variation in financial fundamentals and network density, providing the cross-sectional variation needed to test the networked transmission mechanism. This single-sector focus follows \citet{Cicala2022} and \citet{FabrizioRoseWolfram2007}, who demonstrate that electricity generation is a uniquely transparent laboratory where plant-level inputs, outputs, and costs are directly observable.
+\subsection{Sample}\label{sec:sample}
 
-\subsubsection*{Sample Construction}
+The sample comprises global listed power utilities identified by SIC codes 4911, 4931, and 4932 in Compustat Global/NA, cross-referenced with plant ownership records in the Global Energy Monitor (GEM). The final sample contains 703 firms across 80 countries. Of these, 565 have complete spatial weight data for all three network layers. Within this set, 153 also have ESG environmental scores from LSEG Eikon.
 
-The sample comprises global listed power utilities identified by SIC codes 4911, 4931, and 4932 (electric services) and NAICS 2211 in Compustat Global/NA. We cross-reference these firms with plant ownership records in the Global Energy Monitor (GEM) Global Power Plant Tracker (and GeoAsset where available). We require firms to have (i)~at least one operating power plant identifiable in GEM or GeoAsset, (ii)~financial statements in Compustat Global/NA, and (iii)~equity return data in CRSP (US firms) or Datastream (non-US firms). The final sample comprises 389 firms across 50+ countries. Figure~\ref{fig:global_sample} maps the global distribution of sample firms. The event set includes 179 first-mover retirements with exact or announcement dates, 92 EIA-860 retirement announcements, 27 national or subnational phase-out laws (14 Tier-1 binding shocks), and 176 events in the portfolio-sort analysis. Summary statistics appear in Table~\ref{tab:summary_stats}, and Appendix~\ref{app:data} details the regional composition.
+The event set includes 175 first-mover retirement events with exact or announcement dates, spanning 35 countries. Of the 175 events, 117 produce at least 20 firms per event for Fama-MacBeth regressions. The event-firm panel contains 55,580 observations. Figure~\ref{fig:world_map} maps the retirement events and sample firms.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.85\textwidth]{figures/fig1_global_sample.pdf}
-\caption{Global Distribution of Sample Firms}
-\label{fig:global_sample}
+\includegraphics[width=\textwidth]{figures/fig3_world_map.pdf}
+\caption{Coal retirements concentrate in a few regions; exposed utilities span the globe}
+\label{fig:world_map}
 \begin{flushleft}\footnotesize
-Notes: Locations of 389 listed power utilities in the analysis sample, positioned at capacity-weighted plant centroids from GEM/GeoAsset. Circle size proportional to total installed capacity.
+Notes: Triangles (dark) mark 344 first-mover coal retirement events (2011--2022). Circles (light) mark 414 sample utilities with plant-level GPS data. Utilities in regions with no retirement events (Latin America, the Middle East, Southeast Asia) are exposed through fuel-mix similarity to retiring firms elsewhere.
 \end{flushleft}
 \end{figure}
 
-\subsubsection*{Data Sources and Variable Construction}
+\subsection{Data Sources}\label{sec:data}
 
-\paragraph{Panel A: Firm Fundamentals ($\btheta$).}
-The four fundamental parameters $(\lambda,\rho,\kappa,\alpha)$ are constructed from three core databases. Financial statements from Compustat Global/NA provide leverage, an operating-ROA proxy for return spread, and an interest-coverage proxy for cash-flow adequacy. Plant-level asset data from GEM/GeoAsset provide legacy intensity. We use equity returns from CRSP (US) and Datastream (non-US) for return-based specifications and market adjustment. Full variable definitions and supplementary sources appear in Appendix~\ref{app:data}.
+Financial statements come from Compustat Global/NA. Equity returns come from CRSP total returns for US firms and LSEG Eikon TR.TotalReturn (including dividends and corporate actions) for non-US firms. For non-US firms not covered by Eikon, I use deduplicated Compustat Global Security price returns, retaining one security per gvkey-date by highest trading volume \citep{IncePorter2006}. The final sample comprises 703 unique firms with monthly return coverage. Carbon pricing data come from the World Bank Carbon Pricing Dashboard. ESG environmental scores come from LSEG Eikon.
 
-\paragraph{Panel B: Spatial Weight Matrix.}
-The spatial weight matrix $\bW$ is constructed from three independently constructed layers: geographic proximity of plant locations (GEM/GeoAsset GPS coordinates) using inverse-distance weights with exponential decay, fuel-mix similarity using the cosine similarity of firm-level generation portfolio vectors following \citet{HobergPhillips2016}, and regulatory proximity as binary ETS co-membership from the World Bank Carbon Pricing Dashboard (ICAP used as cross-check). The low pairwise correlation among these matrices ($r < 0.16$, Table~\ref{tab:weight_corr}) provides the network exclusion restrictions required by \citet{BramoulleDjebbariFortin2009}. Geographic proximity generates return comovement among co-located firms \citep{PirinskyWang2006}. Following \citet{GrieserHadlockLeSageZekhnini2022}, we estimate under each component separately and jointly. Full construction details are in Appendix~\ref{app:data}.
+Monthly returns are capped at $\pm 100\%$ per \citet{IncePorter2006}. Eikon returns are filtered to end-of-month observations, and illiquid firms (more than half of months at the return cap) are removed.
 
-\subsubsection*{Identification Strategy}
+\subsection{Weight Matrices}\label{sec:weights}
 
-The central identification challenge is the reflection problem \citep{Manski1993}: spatial correlation in outcomes may reflect network interaction effects, correlated fundamentals, or common shocks. Our three independently constructed weight matrices provide cross-network exclusion restrictions: firm $A$'s geographic neighbor $B$ need not be fuel-similar to $A$'s fuel-linked neighbor $C$, generating the variation required for identification \citep{BramoulleDjebbariFortin2009}.
+\paragraph{Geographic proximity ($\bW^{\mathrm{geo}}$).} I compute pairwise great-circle distances between capacity-weighted plant centroids using GPS coordinates from GEM:
+\[
+  w^{\text{geo}}_{ij} = \frac{\exp(-d_{ij}/\bar{d})/d_{ij}}{\sum_{k\neq i}\exp(-d_{ik}/\bar{d})/d_{ik}},
+\]
+where $\bar{d} = h/\ln 2$ and $h = 1000$\,km. Bandwidth sensitivity (Table~\ref{tab:bandwidth_sensitivity}) reports results for $h \in \{250, 500, 750, 1000, 1500\}$\,km.
 
-We deploy four complementary strategies. First, the cross-sectional channel decomposition tests for opposing-sign spatial responses, which an omitted common shock cannot readily explain (a single confounder cannot simultaneously benefit nearby firms and penalise fuel-similar ones along uncorrelated network dimensions). Second, portfolio sorts provide a non-parametric confirmation of the channel split, robust to functional-form misspecification. Third, the ETS interaction design leverages within-network variation in policy exposure: the same fuel-similarity weight generates differential returns depending on whether the firm operates under a carbon pricing regime. This provides a sharp test of Equation~\eqref{eq:valuation}'s prediction that the stranding penalty scales with $p_t$. Fourth, the ESG horse race tests whether existing firm-level scores subsume or complement the spatial signal. Each specification uses market-adjusted returns (vwretd) with two-way clustered standard errors (firm $\times$ event), following \citet{Petersen2009} and \citet{CameronGelbachMiller2011}.
+\paragraph{Fuel-mix similarity ($\bW^{\mathrm{fuel}}$).} I build a fuel-mix vector for each firm from GEM plant records (coal, gas, oil, wind, solar, hydro, nuclear) and measure pairwise similarity as $1 - \tfrac{1}{2}\lVert \mathbf{v}_i - \mathbf{v}_j \rVert_1$, where $\mathbf{v}_i$ is the capacity-share vector, following the product-space proximity approach of \citet{HobergPhillips2016}. The matrix is row-normalised.
 
-\subsubsection*{Robustness and Falsifiability}
+\paragraph{Regulatory co-membership ($\bW^{\mathrm{reg}}$).} Binary indicator for co-membership in an emissions trading system, row-normalised.\footnote{The regulatory weight matrix is included as an empirical control for correlated policy exposure, not as a third theoretical channel. The model derives predictions for the fuel and geographic channels only.}
 
-The design is falsifiable on multiple dimensions. If the channel split is absent, spatial transmission is not operating through identifiable mechanisms. If retirement announcements do not raise volatility, the uncertainty mechanism is unsupported. If ETS presence does not sharpen the fuel penalty, policy credibility is not the moderating force. If the geographic placebo responds to ETS, the policy channel is misidentified. Appendix~\ref{app:robustness} reports Conley standard errors, wild cluster bootstrap inference for the phase-out DiD ($p=0.093$), Romano-Wolf multiple hypothesis testing corrections, bandwidth sensitivity, firm fixed effects, specification progression, and shuffled-network placebos.
+The pairwise correlations among the three weight layers are below 0.16, confirming that they capture distinct proximity dimensions.
+
+\subsection{Specification}\label{sec:specification}
+
+For each retirement event $e$, I compute the cumulative abnormal return $\text{CAR}_{ie}$ over $[-1, +3]$ months, market-adjusted using value-weighted returns. The baseline specification is:
+\begin{equation}\label{eq:baseline}
+    \text{CAR}_{ie} = \alpha + \gamma_{\text{geo}}\, w^{\text{geo}}_i + \gamma_{\text{fuel}}\, w^{\text{fuel}}_i + \gamma_{\text{reg}}\, w^{\text{reg}}_i + \gamma_s\, \text{SameSector}_i + \varepsilon_{ie}.
+\end{equation}
+
+I report three inference approaches: (1) pooled OLS with event-clustered standard errors; (2) Fama-MacBeth with Newey-West HAC correction; (3) two-way clustering by event and firm \citep{CameronGelbachMiller2011}. The central empirical test is whether the fuel coefficient is more negative than the geographic coefficient, evaluated through the difference $\gamma_{\text{geo}} - \gamma_{\text{fuel}} > 0$.
+
+\subsection{Identification}\label{sec:identification}
+
+The design exploits cross-sectional variation in pre-determined network exposure around retirement events. For each event $e$, the weight vectors $w^{\text{fuel}}_{ie}$, $w^{\text{geo}}_{ie}$, and $w^{\text{reg}}_{ie}$ are constructed from installed capacity and plant locations recorded in the Global Energy Monitor before the retirement occurs. These weights are properties of the firm's generation portfolio, not of the retirement itself. Variation in $\text{CAR}_{ie}$ across firms within the same event therefore reflects differences in network exposure to the retiring firm, holding the shock constant.
+
+\paragraph{Pre-determination of weights.}
+The fuel-mix similarity matrix is computed from the full GEM plant registry as of the event date. Because plant construction and fuel choice reflect decisions made years or decades before any single retirement, the weights are plausibly exogenous to the contemporaneous stock market reaction. The $L_1$ similarity metric follows the product-space approach of \citet{HobergPhillips2016}, substituting fuel-type capacity shares for the word frequencies they use to construct firm-pair proximity from 10-K product descriptions. Row normalisation ensures that the weights sum to one within each event, so the coefficient measures the return differential between a firm with maximal fuel overlap and a firm with zero overlap.
+
+\paragraph{Network structure and the reflection problem.}
+Regressing firm $i$'s returns on weighted averages of peer characteristics raises the identification concern formalised by \citet{Manski1993}: endogenous effects, contextual effects, and correlated effects cannot be separated in the linear-in-means model with uniform group membership. The present design avoids the classical reflection problem for two reasons. First, the regressors are pre-determined network weights, not contemporaneous peer outcomes. I do not regress firm $i$'s CAR on a weighted average of peer CARs; I regress it on the weight itself, which is a function of the firm's fuel portfolio and the identity of the retiring firm. Second, as \citet{BramoulleDjebbariFortin2009} show, network structure provides identification when interactions are non-uniform. The three weight matrices generate firm-specific, asymmetric, non-nested peer groups: firm $A$'s geographic neighbour $B$ may have a fuel-mix neighbour $C$ who is not $A$'s neighbour on either dimension. This intransitivity is exactly the structure that breaks the collinearity underlying the reflection problem. The low pairwise correlation across weight layers (below 0.16) confirms that the three dimensions capture distinct proximity concepts.
+
+\paragraph{Retirement endogeneity.}
+The retirement decision is not randomly assigned. Firms may retire plants in response to declining profitability, regulatory pressure, or shifting electricity demand. If retirements are anticipated, stock prices will have already adjusted before the event window opens, attenuating the measured $\text{CAR}_{ie}$ toward zero. This anticipation bias works against finding a significant fuel channel: any significant coefficient understates the full repricing associated with the retirement signal. The gradual information diffusion literature suggests that even anticipated events produce delayed cross-sectional effects. \citet{HongStein1999} model how information percolates slowly across bounded-rational investors, generating short-horizon underreaction; \citet{CohenFrazzini2008} document that stock prices of economically linked firms incorporate shared news with a delay of one to three months. If anything, partial anticipation shifts the timing of the response, not its cross-sectional allocation across network channels.
+
+The more serious threat is that retirements coincide with unobserved jurisdiction-level shocks that independently depress the returns of fuel-similar firms. For example, declining electricity demand might simultaneously trigger retirements and depress coal-heavy utilities. I address this through the correlated effects argument below.
+
+\paragraph{Correlated effects.}
+Firms with similar fuel portfolios may be exposed to common shocks unrelated to the retirement itself. A gas price movement or a renewable subsidy announcement, for instance, could simultaneously affect all coal-intensive utilities and coincide with a retirement event. This is the ``correlated effects'' problem in \citet{Manski1993}'s taxonomy. Three features of the design mitigate this concern.
+
+First, the Fama-MacBeth procedure estimates equation~(\ref{eq:baseline}) separately for each event and then averages across 117 events spanning 35 countries and 15 years. For a correlated shock to bias the average coefficient, it would need to coincide systematically with retirement events across jurisdictions and time periods. Second, the specification includes three orthogonal weight layers and a same-sector indicator, absorbing variation along the geographic, regulatory, and sectoral dimensions. The fuel coefficient therefore captures residual variation in returns associated with technology similarity after these alternative channels are removed. Third, the opposing-sign structure of the channels provides a further diagnostic. \citet{LangStulz1992} show that the same corporate event (bankruptcy) produces positive competitive effects for close rivals and negative contagion effects for technologically similar peers. A correlated shock affecting all utilities in the same direction would bias both channels in the same direction; the fact that the geographic and fuel coefficients have opposing signs (positive and negative, respectively) is inconsistent with a single confounding factor driving both.
+
+\paragraph{Shift-share (exposure design) interpretation.}
+The specification has the structure of a shift-share instrument as formalised by \citet{GoldsmithPinkhamSorkinSwift2020}. Each observation is exposed through the inner product of a pre-determined \emph{share} (fuel-mix similarity $w^{\text{fuel}}_{ie}$, fixed by plant construction decisions made years before the event) and a common \emph{shift} (the retirement shock). Under the identifying assumption that shares are exogenous to changes in returns around retirement events, the fuel coefficient identifies the causal dose-response of abnormal returns to technology exposure.
+
+Four diagnostics support this assumption. First, I restrict the fuel-mix weights to plants commissioned before 2014, fixing exposure before the main retirement wave. The Bartik coefficient using these pre-determined shares is significant under pooled inference ($t = -5.16$, $N = 24{,}070$). The Fama-MacBeth estimate is also significant ($t = -2.32$) but is based on only 3 events that meet the minimum observation threshold with pre-period weights, so the FM result should be interpreted with caution. Second, Rotemberg weights are entirely non-negative (0 of 40 events carry negative weight), with a Herfindahl index of 0.031, indicating that no single event dominates the estimate. Third, a pre-event balance test regresses $\text{CAR}_{ie}$ in the $[-5, -2]$ month window on the Bartik instrument. The coefficient is negative ($t = -1.87$, $p = 0.062$), significant at 10 percent but not at 5 percent. This suggests some pre-event comovement between exposed firms' returns and the instrument, though the magnitude is small relative to the event-window effect: the event-window Bartik $t$-statistic ($-5.16$) exceeds the pre-event $t$-statistic by a factor of 2.8. Fourth, I compute the \citet{Oster2019} coefficient stability bound, which asks how large selection on unobservables would need to be, relative to selection on observables, to drive the coefficient to zero. The bound yields $\delta^* = 20.8$: unobservables would need to be roughly 21 times more important than observables to explain away the result. For the standard $w^{\text{fuel}}$ specification, $\delta^* = 61.6$.
+
+\paragraph{Event window.}
+The $[-1, +3]$ month window is longer than the daily or weekly windows standard in announcement-driven event studies \citep{CampbellLoMacKinlay1997}. Two considerations motivate the choice. First, the retirement events in this sample are not single-day announcements with precise timestamps. Many involve regulatory approvals, corporate disclosures, and physical decommissioning spread over weeks or months. \citet{KochGrosjeanFussEdenhofer2016} use a similar multi-week window for regulatory events affecting the EU ETS, finding that political announcements produce price responses over days to weeks rather than minutes. A short window would miss the gradual incorporation of the signal. Second, the technology repricing mechanism in the model operates through belief updating about the regulatory state $\omega$ (Remark~\ref{rem:posterior}), which may unfold slowly as investors process the implications for peer firms. \citet{MenzlyOzbas2010} document that cross-industry return predictability from economic linkages operates at the monthly horizon, consistent with the timeline of technology signal absorption. The cost of a longer window is greater exposure to confounding events. The bandwidth sensitivity analysis (Table~\ref{tab:bandwidth_sensitivity}) and the Conley spatial standard errors provide partial reassurance, but the possibility of contamination from intervening events cannot be fully eliminated.
+
+\paragraph{Scope of claims.}
+The causal claim applies to the cross-sectional allocation of returns across firms with different pre-determined technology exposure. It does not extend to the aggregate effect of retirements on the utility sector as a whole, nor to any individual retirement-peer pair. The comparative result across channels is more robust than the level of any single coefficient: the same design, applied identically to three network layers, consistently finds that the fuel channel dominates. The opposing-sign pattern across geographic and fuel channels, confirmed by four independent tests (Table~\ref{tab:difference_battery}), is the paper's central finding.
 
 
 %----------------------------------------------------------------------
 \section{Results}\label{sec:results}
 %----------------------------------------------------------------------
 
-The results proceed from the spatial mechanism to the credibility gap to the policy channel to the signal hierarchy. All specifications use market-adjusted returns (vwretd) with two-way clustered standard errors (firm $\times$ event); alternative clustering and Conley corrections appear in Appendix~\ref{app:robustness}.
+\subsection{Technology Transmits, Geography Does Not}\label{sec:fuel_results}
+
+Table~\ref{tab:channel_decomp} reports the baseline channel decomposition under three inference methods.
 
 \begin{table}[H]
 \centering
-\caption{Summary Statistics (Analysis Sample)}
-\label{tab:summary_stats}
-\begin{tabular}{lcccccc}
-\toprule
-Variable & $N$ & Mean & SD & Min & Median & Max \\
-\midrule
-Leverage ($\lambda$) & 389 & 0.397 & 0.261 & 0.000 & 0.397 & 3.704 \\
-Return spread ($\rho$) & 389 & 0.068 & 0.144 & $-$1.754 & 0.076 & 0.305 \\
-Cash flow adequacy ($\kappa$) & 389 & 13.073 & 84.352 & $-$41.909 & 3.521 & 1211.712 \\
-Legacy intensity ($\alpha$) & 389 & 0.382 & 0.426 & 0.000 & 0.140 & 1.000 \\
-Delivery ($1-\alpha$) & 389 & 0.618 & 0.426 & 0.000 & 0.860 & 1.000 \\
-\bottomrule
-\end{tabular}
-\begin{flushleft}\footnotesize
-Notes: Cross-sectional summary statistics for the 389-firm analysis sample (firms with complete $\btheta$ vector). $\kappa$ is winsorized at the 1st/99th percentiles in regressions; this table reports raw values. Variable definitions are in Appendix~\ref{app:data}.
-\end{flushleft}
-\end{table}
-
-Table~\ref{tab:summary_stats} summarises the cross-sectional distribution of fundamentals. The most striking feature is the skewness of delivery: most firms operate predominantly clean portfolios (median clean share 0.86), while a heavy left tail of fossil-intensive incumbents pulls the mean down to 0.62. This distributional shape matters because the channel-split and volatility results are identified primarily from variation among the fossil-intensive firms that populate that left tail.
-
-\subsection{The Spatial Network Predicts Transition Returns}\label{sec:channel_split}
-
-We begin by asking whether the spatial network carries differentiated information about transition risk. Table~\ref{tab:channel_decomp} reports the channel decomposition, regressing firm-level CARs on the three row-normalised spatial weights simultaneously with a same-sector control.
-
-\begin{table}[H]
-\centering
-\caption{Channel Decomposition of Spatial Exposure}
+\caption{Channel Decomposition}
 \label{tab:channel_decomp}
 \begin{tabular}{lccc}
 \toprule
- & $[-1,+3]$ & $[-1,+6]$ & $[-1,+12]$ \\
+ & FM + Newey-West & Event-Clustered & Two-Way Clustered \\
 \midrule
-$w^{\text{geo}}$ & 0.354*** (0.119) & 0.027 (0.169) & $-$0.308 (0.283) \\
-$w^{\text{reg}}$ & 1.127 (0.691) & 1.314 (1.045) & 3.138 (2.018) \\
-$w^{\text{fuel}}$ & $-$1.497*** (0.474) & 0.917 (0.704) & 1.364 (1.118) \\
-Same sector & 0.021*** (0.005) & 0.026*** (0.008) & 0.036*** (0.013) \\
-$N$ & 72{,}398 & 72{,}398 & 72{,}398 \\
-$R^2$ & 0.0012 & 0.0006 & 0.0005 \\
-Clusters & 175 events & 175 events & 175 events \\
+$w^{\text{geo}}$ & $-$0.607 & $-$0.023 & $-$0.023 \\
+ & (0.468) & (0.057) & (0.119) \\[4pt]
+$w^{\text{fuel}}$ & $-$4.782*** & $-$5.474*** & $-$5.474*** \\
+ & (0.650) & (0.730) & (1.271) \\[4pt]
+$w^{\text{reg}}$ & +2.643*** & +1.453 & +1.453 \\
+ & (0.961) & (1.052) & (1.134) \\[4pt]
+Same sector & +0.021* & +0.033*** & +0.033*** \\
+ & (0.011) & (0.009) & (0.011) \\[4pt]
+\midrule
+Difference ($\gamma_{\text{geo}} - \gamma_{\text{fuel}}$) & +4.175*** & +5.451*** & +5.451*** \\
+ & (0.732) & (0.731) & (1.268) \\
+\midrule
+Events / $N$ & 117 / $\sim$28,600 & 175 / 55,580 & 175 / 55,580 \\
+Avg $R^2$ / $R^2$ & 0.052 & 0.007 & 0.007 \\
 \bottomrule
 \end{tabular}
 \begin{flushleft}\footnotesize
-Notes: Monthly CARs with alpha-only classification and vwretd returns. Standard errors are two-way clustered by firm and event following \citet{Petersen2009} and \citet{CameronGelbachMiller2011}. * $p<0.10$, ** $p<0.05$, *** $p<0.01$.
+Notes: Dependent variable is the $[-1, +3]$ month CAR, market-adjusted. Standard errors in parentheses. FM + Newey-West averages cross-sectional betas across events with HAC correction (Bartlett kernel, 4 lags). Event-clustered and two-way clustered (event $+$ firm) SEs follow \citet{CameronGelbachMiller2011}. The difference test evaluates $H_0\!: \gamma_{\text{geo}} = \gamma_{\text{fuel}}$. * $p<0.10$, ** $p<0.05$, *** $p<0.01$.
 \end{flushleft}
 \end{table}
 
-The three-month window reveals a clean split consistent with the opposing partial derivatives of Equation~\eqref{eq:valuation}. The fuel-similarity coefficient is negative and highly significant ($-1.497$, $t=-3.16$), indicating that firms whose generation portfolios resemble the event firm's experience negative repricing, as predicted by Prediction~\ref{pred:channel_split}. The geographic-proximity coefficient is positive and significant ($0.354$, $t=2.97$), consistent with the local competitive benefit ($\gamma_G > 0$). The regulatory channel is large but imprecise. Cross-sectional CAR regressions in short-horizon event studies rarely exceed 1--2 percent $R^2$; the $R^2 = 0.0012$ in the three-month window is typical of this literature and does not diminish the economic significance of the spatial coefficients.
-
-Two formal tests confirm the pattern. A joint $F$-test rejects the null that all three spatial coefficients are zero ($F=11.28$, $p=0.001$): the network matters. A difference test comparing the geographic and fuel coefficients yields $\beta_{\text{geo}} - \beta_{\text{fuel}} = 1.851$ ($t=3.65$, $p=0.0003$): the channel split is statistically decisive. These test statistics survive Conley standard errors at 1,000 km: the fuel channel retains $t=-4.16$, confirming that the result is not an artefact of residual spatial correlation.
-
-At longer horizons (6 and 12 months), coefficients lose statistical precision. We regard these estimates as uninformative rather than as evidence of reversal, consistent with gradual incorporation of spatial information documented by \citet{HongStein1999} and \citet{CohenFrazzini2008}.
-
-\begin{table}[H]
-\centering
-\caption{Portfolio Sorts by Spatial Exposure Channel}
-\label{tab:portfolio_sorts}
-\begin{tabular}{lcccc}
-\toprule
- & \multicolumn{2}{c}{Panel A: Fuel Exposure} & \multicolumn{2}{c}{Panel B: Geographic Exposure} \\
-\cmidrule(lr){2-3}\cmidrule(lr){4-5}
-Quintile & Mean CAR (\%) & $t$-stat & Mean CAR (\%) & $t$-stat \\
-\midrule
-Q1 (Lowest) & +0.84 & & $-$5.05 & \\
-Q2 & +1.19 & & $-$0.23 & \\
-Q3 & $-$4.68 & & $-$8.14 & \\
-Q4 & $-$4.14 & & +1.15 & \\
-Q5 (Highest) & $-$4.61 & & +0.98 & \\
-Q5$-$Q1 & $-$5.45 & $-$7.89 & +6.03 & +9.41 \\
-\midrule
-\multicolumn{5}{l}{\textit{Panel C: Channel Split}} \\
-Geo Q5$-$Q1 minus Fuel Q5$-$Q1 & +11.48 & +14.00 & & \\
-\midrule
-\multicolumn{5}{l}{\textit{Panel D: Long-Short Portfolio}} \\
-Long Geo Q5 / Short Fuel Q5 & +8.33 & +3.94 & & \\
-\midrule
-Clusters & \multicolumn{4}{c}{175 events} \\
-\bottomrule
-\end{tabular}
-\begin{flushleft}\footnotesize
-Notes: Portfolio sorts based on 176 events. Quintiles formed on fuel-similarity (Panel A) and geographic-proximity (Panel B) exposure. CARs computed over the $[-1,+3]$ month window using vwretd-adjusted returns. Panel C reports the difference between geographic and fuel quintile spreads. Panel D reports a long-short strategy buying geographic Q5 and selling fuel Q5. Standard errors are two-way clustered by firm and event.
-\end{flushleft}
-\end{table}
-
-Figure~\ref{fig:portfolio_sorts} and Table~\ref{tab:portfolio_sorts} provide non-parametric confirmation through portfolio sorts.
+The fuel channel is significant at the 1 percent level under all three inference methods. The geographic channel is insignificant under all three. The regulatory co-membership channel is positive and significant under Fama-MacBeth ($t = 2.75$) but insignificant under pooled inference, suggesting that firms in the same emissions trading system experience less negative returns around retirements, possibly because shared regulatory exposure is already priced. Figure~\ref{fig:fuel_vs_geo} shows the event-level distribution: in 82 of 117 Fama-MacBeth events (70 percent), the fuel coefficient is more negative than the geographic coefficient.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.95\textwidth]{figures/fig_portfolio_sorts.pdf}
-\caption{Portfolio Sort Returns by Spatial Exposure Channel}
-\label{fig:portfolio_sorts}
+\includegraphics[width=\columnwidth]{figures/fig1_fuel_vs_geo.pdf}
+\caption{Fuel-mix similarity produces more negative returns than geographic proximity in 70 percent of events}
+\label{fig:fuel_vs_geo}
 \begin{flushleft}\footnotesize
-Notes: Mean three-month CARs by quintile of fuel-similarity (Panel A) and geographic-proximity (Panel B) exposure, across 176 first-mover retirement events. Returns are market-adjusted using vwretd. Q5$-$Q1 spreads and $t$-statistics annotated.
-\end{flushleft}
-\end{figure} The fuel-exposure spread (Q5$-$Q1 $= -5.45\%$, $t=-7.89$) and geographic-exposure spread (Q5$-$Q1 $= +6.03\%$, $t=+9.41$) confirm the opposing-sign structure without imposing linearity. The channel split between the two, $+11.48$ percentage points, is the most precisely estimated result in the paper ($t=14.00$). A long-short portfolio buying geographic Q5 and selling fuel Q5 earns $+8.33\%$ ($t=3.94$), suggesting economic materiality. To interpret these magnitudes: the fuel-similarity Q5 firms experience 5.45 percentage points lower three-month abnormal returns than Q1 firms, equivalent to approximately 22 percent annualised. The long-short portfolio earns 8.33 percent over three months, or roughly 33 percent annualised before transaction costs.
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.8\textwidth]{figures/event_time_fuel_similarity.pdf}
-\caption{Event-Time Abnormal Returns by Fuel-Similarity Exposure}
-\label{fig:event_time_fuel}
-\begin{flushleft}\footnotesize
-Notes: Demeaned monthly abnormal returns around first-mover events ($\tau \in [-6,+12]$) for high versus low fuel-similarity neighbours. Returns are market-adjusted using vwretd and demeaned by the pre-event mean for each event-firm pair.
+Notes: Each point represents one Fama-MacBeth cross-sectional regression (117 events with $\geq 20$ firms). Points below the 45-degree line indicate events where $\hat{\gamma}_{\text{fuel}} < \hat{\gamma}_{\text{geo}}$. Dark fill: fuel more negative (82 events). Light fill: geography more negative (35 events).
 \end{flushleft}
 \end{figure}
 
-Figure~\ref{fig:event_time_fuel} visualises the channel split in event time. Pre-event CARs for high- and low-fuel-similarity neighbours move in parallel, supporting the identification assumption. The divergence begins at the event month and widens through the three-month window, consistent with gradual information diffusion through spatially segmented investor bases.
+\paragraph{Economic magnitude.} The fuel-similarity weight $w^{\text{fuel}}_i$ is row-normalised, so its cross-sectional standard deviation within a given event is approximately 0.004. A one-standard-deviation increase in fuel similarity is associated with a $-5.474 \times 0.004 = -2.2$ basis point decrease in the four-month CAR under event-clustered inference. This appears small in absolute terms but reflects the granularity of the row-normalised weight. A more intuitive comparison: a firm at the median of the fuel-similarity distribution ($w^{\text{fuel}} \approx 0.006$) experiences a predicted CAR of $-5.474 \times 0.006 = -3.3$ percentage points, while a firm with zero fuel similarity to the retiring firm experiences no penalty.
 
-Appendix~\ref{app:robustness} reports that firm fixed effects strengthen the fuel channel ($-2.023$, $p<0.01$), confirming that the baseline magnitude is a conservative lower bound. The geographic channel also survives ($0.472$, $p<0.01$). A two-channel specification omitting the regulatory weight yields qualitatively identical results. Bandwidth sensitivity analysis shows that expanding the geographic half-life to 1,000 km strengthens the geographic coefficient ($0.481$, $p<0.01$), consistent with the footprint of interconnected transmission systems.
+The 3.3 percentage point spread over four months is economically material. Three benchmarks contextualise this magnitude. First, it is comparable in order of magnitude to the annual carbon premium of roughly 2 to 4 percentage points documented by \citet{BoltonKacperczyk2023}. Second, it exceeds the monthly return predictability of 13 to 22 basis points from cross-industry economic linkages documented by \citet{MenzlyOzbas2010}, consistent with a network signal that is stronger but less frequent. Third, it falls within the range of intra-industry spillovers from corporate distress: \citet{LangStulz1992} document contagion effects of $-1.0$ percent and competitive effects of $+2.2$ percent within days of bankruptcy announcements. The fuel channel operates over months rather than days, reflecting the greater complexity of technology signals relative to discrete bankruptcy events \citep{CohenFrazzini2008}.
 
-\subsection{The Credibility Gap: Uncertainty without Direction}\label{sec:credibility}
+The difference is positive and significant: fuel-similar peers experience more negative returns than geographic neighbours. Four independent tests confirm the difference (Table~\ref{tab:difference_battery}).
 
-The channel decomposition explains why the transition creates uncertainty rather than repricing. The opposing signs mean that a single restructuring event simultaneously benefits geographic neighbours and penalises fuel-similar peers, leaving the net directional effect near zero while raising the perceived variance of transition-relevant cash flows. This is the credibility gap: markets observe spatial exposure but cannot price its direction until policy resolves the ambiguity.
-
-Predictions~\ref{pred:ambiguous} and~\ref{pred:resolving} yield distinct observable signatures for different shock types. Table~\ref{tab:volatility_transmission} tests both.
+\paragraph{Explanatory power.} The pooled $R^2$ of 0.007 reflects the well-known property that cross-sectional regressions of individual-event CARs are dominated by idiosyncratic noise \citep{CampbellLoMacKinlay1997}. The within-event $R^2$ under Fama-MacBeth averages 0.052, indicating that the four regressors explain roughly 5 percent of the cross-sectional return variance within a typical event. When CARs are collapsed to the firm level by averaging across events, the $R^2$ rises to 0.026, a 3.6-fold increase that confirms the model captures systematic variation obscured by event-level noise.
 
 \begin{table}[H]
-\centering\small
-\caption{The Credibility Gap: Volatility versus Returns}
-\label{tab:volatility_transmission}
-\begin{tabular}{lcc}
+\centering
+\caption{Difference Test Battery}
+\label{tab:difference_battery}
+\begin{tabular}{lccc}
 \toprule
-Shock type & Volatility change $\sim$ exposure & CAR $\sim$ exposure \\
+Test & Statistic & $p$ (two-sided) & $p$ (one-sided) \\
 \midrule
-EIA-860 retirements & 0.056*** (0.014) & $-$0.222 (1.306) \\
-Binding phase-out laws & $-$0.130** (0.051) & $-$18.118* (10.066) \\
+FM + Newey-West & $t = 5.703$ & 0.000 & 0.000 \\
+Sign test (binomial) & 82/117 (70.1\%) & 0.000 & 0.000 \\
+Wilcoxon signed-rank & $z = 6.578$ & 0.000 & 0.000 \\
+Randomisation ($B = 999$) & 0/999 exceed & 0.002 & 0.001 \\
 \bottomrule
 \end{tabular}
 \begin{flushleft}\footnotesize
-Notes: Daily abnormal returns computed using vwretd; CAR window is $[-1,+20]$. Volatility change captures the post- versus pre-announcement standard deviation of daily abnormal returns ($[+1,+20]$ minus $[-21,-1]$). Standard errors (in parentheses) are two-way clustered by firm and event. Binding laws are Tier-1, legally binding phase-out shocks; exposure is measured using continuous firm-level coal-share intensity. * $p<0.10$, ** $p<0.05$, *** $p<0.01$.
+Notes: Each test evaluates $H_0\!: \gamma_{\text{geo}} = \gamma_{\text{fuel}}$ across 117 Fama-MacBeth events. The sign test counts events where $\hat{\gamma}_{\text{geo}} > \hat{\gamma}_{\text{fuel}}$. Randomisation shuffles event identities.
 \end{flushleft}
 \end{table}
 
-For EIA-860 retirement filings, the volatility coefficient is positive and highly significant ($0.056$, $t=3.89$), the most precisely estimated coefficient in the paper: firms with greater spatial exposure to the retiring plant experience a measurable increase in return variability. The corresponding return coefficient is economically trivial and statistically indistinguishable from zero ($-0.222$, $t=-0.17$). This combination, higher volatility with no directional price movement, is the signature of mean-preserving uncertainty (Prediction~\ref{pred:ambiguous}). The announcement conveys that a neighbour's asset base is changing, raising the perceived variance of transition-relevant cash flows. It does not resolve whether the net effect is positive (geographic channel) or negative (fuel channel).
 
-Binding phase-out laws show the mirror image: coal-share intensity reduces volatility ($-0.130$, $t=-2.53$) and generates negative abnormal returns ($-18.118$, $t=-1.80$, marginally significant). The volatility decline confirms that binding legislation resolves a component of the regulatory uncertainty captured by $p_t(1-p_t)$ in the framework (Prediction~\ref{pred:resolving}). The negative returns are consistent with the stranding channel dominating once discretion is removed. The modest $t$-statistic on the return coefficient reflects the small number of independent Tier-1 events (14 binding shocks), which limits effective degrees of freedom. Wild cluster bootstrap inference yields $p=0.093$, supporting significance at the 10\% level.
+\subsection{The Role of Geographic Proximity}\label{sec:geo_role}
 
-The credibility gap is the paper's central finding. We use realised return volatility as a diagnostic for the information friction, not as a claim about risk premia. The opposing channels inject variance without directional content; we observe this as elevated return dispersion around ambiguous events and compressed dispersion around resolving ones. The pricing consequence emerges in the next subsection: when policy credibility rises, the fuel channel strengthens and directional repricing follows.\footnote{Under financial constraints, the volatility increase has direct consequences even with risk-neutral investors: higher cash-flow variance raises the probability that net worth falls below credit-rationing thresholds, reducing firm value through the concavity of the constrained value function \citep{FrootScharfsteinStein1993}. Given the mean leverage of 0.40 in our sample, this channel is plausibly operative, but we do not test it directly.}
+The geographic proximity channel is not robust. The sign and significance of $\gamma_{\text{geo}}$ vary across specifications: insignificant and negative in the baseline ($t = -0.41$ pooled; $t = -1.30$ Fama-MacBeth), marginally positive under alternative bandwidths ($t = 1.68$ to $1.80$ Fama-MacBeth), and insignificant under event-specific distance measures ($t = 1.32$ pooled; $t = 0.69$ Fama-MacBeth). Restricting the sample to single-country utilities, where geographic variation is most plausibly local, the coefficient remains insignificant ($t = 0.58$ pooled; $t = -1.04$ Fama-MacBeth).
 
-\subsection{Policy Credibility Moderates the Stranding Channel}\label{sec:policy}
+This instability is consistent with the aggregation result in Lemma~\ref{lem:aggregation}. Local competitive benefits documented at the plant level by \citet{DavisHausman2016} are diversified away in the portfolios of listed utilities operating across multiple markets. The Herfindahl index of market concentration $H_i = \sum_k \theta_{ik}^2$ determines the rate of attenuation: for a firm operating in $K$ equal markets, the geographic exposure variance scales as $1/K$. That the sign is unstable, rather than stably zero, suggests the competitive and contagion components of geographic proximity \citep{LangStulz1992} partially offset, with neither dominating in the cross-section.
 
-Equation~\eqref{eq:valuation} predicts that the fuel-similarity penalty scales with $p_t$, the market's assessment of policy enforcement. If emissions trading systems raise $p_t$ for firms operating under them, the fuel penalty should be stronger for ETS firms. We test this prediction by interacting the fuel-similarity weight with ETS membership.
+The fuel channel, by contrast, does not attenuate with diversification. Technology obsolescence is a property of the firm's entire generation portfolio, not of any single local market. Geographic distance does not insulate; technology similarity transmits. This asymmetry between the two channels is the core prediction of the model and the central empirical finding.
+
+
+\subsection{Emissions Trading Amplifies the Fuel Channel}\label{sec:ets}
+
+Table~\ref{tab:ets_interaction} reports the ETS interaction.
 
 \begin{table}[H]
-\centering\small
-\caption{Policy Credibility Interaction: ETS $\times$ Spatial Exposure}
+\centering
+\caption{ETS Interaction}
 \label{tab:ets_interaction}
-\begin{tabular}{lcc}
+\begin{tabular}{lc}
 \toprule
- & Full regression & Placebo \\
+ & Coeff \\
 \midrule
-Intercept & +0.006 (0.006) & \\
-$w^{\text{fuel}}$ & +0.300 (0.544) & \\
- & [$t=0.55$] & \\
-$w^{\text{fuel}} \times \text{has\_ets}$ & $-$3.242*** (0.951) & $-$3.242*** (0.951) \\
- & [$t=-3.41$] & [$t=-3.41$] \\
-$w^{\text{geo}}$ & +0.360*** (0.121) & \\
- & [$t=2.98$] & \\
-$w^{\text{geo}} \times \text{has\_ets}$ & & +0.18 (0.281) \\
- & & [$t=0.64$] \\
-$w^{\text{reg}}$ & +1.299* (0.741) & \\
- & [$t=1.75$] & \\
-Same sector & +0.021*** (0.005) & \\
- & [$t=4.08$] & \\
-\midrule
-$N$ & 72{,}398 & 72{,}398 \\
-$R^2$ & 0.0014 & \\
-Clusters & 175 events & 175 events \\
-\midrule
-Difference ($w^{\text{fuel}} \times \text{ETS} - w^{\text{geo}} \times \text{ETS}$) & \multicolumn{2}{c}{$-$3.48 ($t=-3.34$, $p=0.0008$)} \\
+$w^{\text{fuel}}$ (base) & $-$3.052*** \\
+ & (0.602) \\[4pt]
+$w^{\text{fuel}} \times \text{has\_ets}$ & $-$4.264*** \\
+ & (1.405) \\[4pt]
+Carbon price (continuous) & +0.071** \\
+ & (0.036) \\
 \bottomrule
 \end{tabular}
 \begin{flushleft}\footnotesize
-Notes: Regression of three-month CARs on spatial exposure interacted with ETS membership. The fuel channel test asks whether carbon pricing sharpens the stranding penalty. The geographic placebo tests whether the competitive benefit (a physical, not policy, mechanism) also responds to ETS, which it should not. Standard errors (in parentheses) are two-way clustered by firm and event. * $p<0.10$, ** $p<0.05$, *** $p<0.01$.
+Notes: Pooled OLS with event-clustered standard errors in parentheses ($N = 55{,}580$, 175 events). Base fuel coefficient captures non-ETS firms. The interaction captures the additional penalty for ETS firms. * $p<0.10$, ** $p<0.05$, *** $p<0.01$.
 \end{flushleft}
 \end{table}
 
-Table~\ref{tab:ets_interaction} reports the results. The fuel-similarity interaction with ETS presence is strongly negative ($-3.24$, $t=-3.41$, one-sided $p=0.0003$, as the model predicts $\beta_2 < 0$): for firms operating under a carbon pricing regime, the stranding channel is substantially amplified. This directly tests the model's prediction: the coefficient on $w^{\text{fuel}}$ in Equation~\eqref{eq:valuation} is $-p_t \gamma_F$, so a higher $p_t$ (as induced by ETS) yields a more negative spatial effect. Economically, moving from a non-ETS to an ETS jurisdiction amplifies the fuel contagion penalty by 3.24 percentage points per unit of fuel-similarity exposure, roughly tripling the magnitude of the base fuel channel.
+Under pooled inference, the stranding penalty for ETS firms is $-3.052 + (-4.264) = -7.316$, roughly double the penalty for non-ETS firms. Portfolio sorts confirm this non-parametrically: the fuel $Q5 - Q1$ return spread is $-4.4$ percent for ETS firms and $+2.5$ percent for non-ETS firms (paired difference $t = -5.11$). The binary ETS indicator produces a clearer signal than the continuous carbon price level, whose interaction coefficient has the unexpected positive sign ($+0.071$, $t = 1.98$), possibly reflecting collinearity between carbon price levels and ETS membership.
 
-The geographic placebo is critical. The $w^{\text{geo}} \times \text{has\_ets}$ interaction is essentially zero ($+0.18$, $t=0.64$). This is exactly what the framework predicts: the geographic competitive benefit ($\gamma_G$) operates through physical grid dynamics (the exit of a local generator improving wholesale margins for survivors), a mechanism that does not depend on whether a carbon pricing regime is in place. The difference between the fuel and geographic interactions is $-3.48$ ($t=-3.34$, $p=0.0008$): ETS membership amplifies the stranding penalty but has no effect on the competitive benefit, consistent with the model's prediction that policy credibility operates specifically through the technology-obsolescence channel.
+Three qualifications temper this result. First, under Fama-MacBeth inference, the fuel coefficient itself remains significant ($t = -2.60$), but the ETS interaction coefficient reverses sign. The Fama-MacBeth procedure averages event-level betas equally, and a small number of events with extreme within-event weight variation dominate the average interaction term. I therefore treat the pooled result as primary and the Fama-MacBeth reversal as evidence of sensitivity to outlier events. Second, a placebo test interacting the geographic channel with ETS membership also produces a significant coefficient ($t = -4.12$). This indicates that ETS membership affects both channels, not the fuel channel alone, weakening the interpretation that ETS amplification operates specifically through the technology obsolescence mechanism. The ETS result may instead reflect a broader repricing of all network exposures in jurisdictions with credible enforcement. Third, the ETS amplification is identified from the extensive margin (having an ETS) rather than the intensive margin (carbon price level), limiting the ability to distinguish enforcement credibility from other attributes of ETS jurisdictions.
 
-Portfolio sorts by ETS reinforce the pattern (Figure~\ref{fig:ets_interaction}): the fuel-exposure spread is $-2.54\%$ for ETS firms versus $+1.15\%$ for non-ETS firms (difference $t=-3.66$). Carbon pricing does not create the stranding channel, but it amplifies it by raising the credibility of the transition regime.
 
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.6\textwidth]{figures/fig_ets_interaction.pdf}
-\caption{Fuel-Similarity Quintile Spread by ETS Status}
-\label{fig:ets_interaction}
-\begin{flushleft}\footnotesize
-Notes: Fuel-similarity Q5$-$Q1 portfolio spread for firms operating under emissions trading systems versus firms without ETS coverage. Difference and $t$-statistic annotated.
-\end{flushleft}
-\end{figure}
+\subsection{ESG and Spatial Exposure Are Complements}\label{sec:esg}
 
-\subsection{Signal Hierarchy: Spatial Exposure versus ESG}\label{sec:esg}
-
-Prediction~\ref{pred:hierarchy} yields a testable restriction: if spatial exposure originates in physical network topology rather than corporate disclosure, firm-level ESG scores should not subsume the spatial effect. If ESG ratings, which summarise corporate environmental intent and capacity, absorb the spatial dimension, then the contribution of our framework is incremental rather than fundamental. We test this in a horse race.
+Table~\ref{tab:esg_horserace} reports the horse race between ESG scores and spatial fuel exposure.
 
 \begin{table}[H]
-\centering\small
-\caption{ESG Horse Race: Spatial Exposure vs.\ Firm-Level ESG Ratings}
+\centering
+\caption{ESG Horse Race}
 \label{tab:esg_horserace}
 \begin{tabular}{lcccc}
 \toprule
- & (1) ESG Only & (2) Spatial Only & (3) ESG + Spatial & (4) STS \\
+ & (1) ESG Only & (2) Spatial Only & (3) Both & (4) Full \\
 \midrule
-ESG score & $-$0.003 (0.005) & & 0.001 (0.005) & 0.001 (0.005) \\
- & [$t=-0.59$] & & [$t=0.09$] & [$t=0.09$] \\
-Spatial exposure & & $-$0.043** (0.015) & $-$0.043** (0.015) & \\
- & & [$t=-2.86$] & [$t=-2.86$] & \\
-STS & & & & $-$0.057*** (0.014) \\
- & & & & [$t=-3.94$] \\
+ESG score & $-$0.114*** & & $-$0.118*** & $-$0.116*** \\
+ & (0.014) & & (0.014) & (0.015) \\[4pt]
+$w^{\text{fuel}}$ & & $-$1.559* & $-$1.135 & +0.397 \\
+ & & (0.866) & (0.854) & (0.929) \\[4pt]
+$w^{\text{fuel}} \times \text{has\_ets}$ & & & & $-$3.489** \\
+ & & & & (1.685) \\[4pt]
 \midrule
-$R^2$ & 0.000009 & 0.001177 & 0.001177 & 0.001524 \\
-Clusters & 175 events & 175 events & 175 events & 175 events \\
+$R^2$ & 0.012 & 0.003 & 0.016 & 0.017 \\
+$N$ & 14{,}731 & 14{,}731 & 14{,}731 & 14{,}731 \\
 \bottomrule
 \end{tabular}
 \begin{flushleft}\footnotesize
-Notes: Dependent variable is three-month CAR. ESG scores from LSEG (Refinitiv). Spatial exposure is the composite of fuel-similarity and geographic-proximity weights. STS (Spatial Transition Score) is defined as $w^{\text{fuel}} \times \text{has\_ets} - w^{\text{geo}}$, a composite that combines the policy-moderated stranding channel with the geographic benefit. Standard errors are two-way clustered by firm and event. * $p<0.10$, ** $p<0.05$, *** $p<0.01$.
+Notes: Pooled OLS with event-clustered standard errors in parentheses. Sample restricted to 153 firms with LSEG Environmental Score (165 events). ESG score normalised to $[0,1]$. Under Fama-MacBeth + Newey-West, both ESG ($t = -5.72$) and fuel ($t = -2.17$) survive the horse race. * $p<0.10$, ** $p<0.05$, *** $p<0.01$.
 \end{flushleft}
 \end{table}
 
-Table~\ref{tab:esg_horserace} presents the results in four columns. ESG alone explains almost nothing ($R^2 = 0.000009$, $t=-0.59$): the firm-level score does not predict transition returns at short horizons. Spatial exposure alone is economically and statistically significant ($R^2 = 0.001177$, $t=-2.86$). In the joint specification, spatial exposure retains its magnitude and significance while ESG becomes essentially zero ($t=0.09$). The marginal $R^2$ of the spatial signal is 135 times larger than that of ESG.
+In the 153-firm subsample where both measures exist, ESG is the stronger predictor ($R^2 = 0.012$ versus $0.003$ for fuel alone). Under Fama-MacBeth inference, both survive a joint test, but under pooled OLS the fuel coefficient loses significance once ESG is included. The practical value of fuel-mix similarity is coverage: ESG scores are available for 153 of the 703 sample firms, while fuel-mix similarity, constructed from public plant registries, covers 565. For the majority of listed utilities worldwide, fuel-mix exposure is the only available measure of technology vulnerability.
 
-We interpret this constructively: ESG ratings capture firm-level intent, spatial exposure captures network dynamics, and the two are complementary. The spatial dimension is the one currently absent from assessment frameworks, and it is the one that predicts returns.
 
-The fourth column introduces the Spatial Transition Score (STS), defined as $\text{STS}_i = w^{\text{fuel}}_i \times \text{has\_ets}_i - w^{\text{geo}}_i$. This composite integrates the policy-moderated stranding channel with the geographic benefit in a single measure, computable from public data (GEM plant registries, GPS coordinates, ETS membership lists). In sample, the STS achieves $t=-3.94$. Out of sample (post-2020 holdout), a portfolio sort on STS quintiles yields Q5$-$Q1 $= -7.75\%$ ($t=-6.10$), demonstrating genuine predictive content beyond in-sample fit. The strengthening of the signal in the post-2020 period is consistent with the global increase in policy credibility following the European Green Deal (2019) and the wave of net-zero commitments at COP26 (2021), which raised $p_t$ across ETS jurisdictions.
+\subsection{The Fuel Signal Strengthens Over Time}\label{sec:learning}
+
+If the market gradually learns to price technology obsolescence, the fuel coefficient should strengthen over calendar time. A continuous interaction $w^{\text{fuel}} \times \text{year}$ (centered at the median event year, 2013) is significant ($t = -2.34$, $p = 0.019$), indicating that later events carry a more negative fuel beta. Splitting events into year terciles sharpens the pattern: the earliest third (2011--2013) produces an insignificant average fuel beta of $+1.72$ ($t = 0.75$), while the middle (2013--2014) and latest (2014--2022) terciles yield $-3.58$ ($t = -3.02$) and $-5.52$ ($t = -3.58$), respectively. The fuel signal is absent in the early period and strengthens monotonically thereafter (Figure~\ref{fig:calendar_time}).
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\columnwidth]{figures/fig2_calendar_time.pdf}
+\caption{The fuel coefficient strengthens over calendar time}
+\label{fig:calendar_time}
+\begin{flushleft}\footnotesize
+Notes: Mean Fama-MacBeth fuel coefficient by event-year tercile. Horizontal bars show 95\% confidence intervals using Newey-West standard errors. Dark fill: significant at 5 percent. Light fill: not significant.
+\end{flushleft}
+\end{figure}
+
+A geographic decomposition sharpens the pattern. The fuel coefficient is approximately zero in the United States ($t = 0.11$, 91 events) and strongly negative outside the United States ($-5.34$, $t = -4.10$, 84 events). The US accounts for 135 of the 344 first-mover retirements in the sample. If the market learns from accumulated signals, US retirements carry little new information because the technology obsolescence of coal has been extensively priced in prior events. Non-US retirements, which are more recent and occur in jurisdictions where the transition is less advanced, deliver a stronger signal.
+
+A within-jurisdiction test yields weaker evidence. The interaction $w^{\text{fuel}} \times \log(1 + \text{order})$ is negative but not significant ($t = -1.57$, $p = 0.117$). The split-sample comparison (early order $\leq 2$ versus later events) produces a significant difference (mean fuel beta $-5.24$ versus $-1.52$; Welch $t = -2.48$, $p = 0.013$), but this comparison mixes within-jurisdiction and across-jurisdiction variation.
+
+The calendar-time strengthening is consistent with \citet{HongStein1999}'s model of gradual information diffusion, in which bounded-rational investors slowly incorporate the implications of technology signals. In the early period, few retirements had occurred and the technology obsolescence interpretation was not yet salient. As retirements accumulated across jurisdictions, the market learned to associate fuel-mix similarity with stranding risk. The US saturation result suggests that this learning process is now largely complete in the most active retirement market but continues elsewhere.
+
+
+\subsection{Robustness}\label{sec:robustness}
+
+\paragraph{Bandwidth sensitivity.}
+At each of the five bandwidth specifications ($h = 250, 500, 750, 1000, 1500$\,km), the fuel channel is significant at the 5 percent level, with Fama-MacBeth $t$-statistics ranging from $-2.28$ to $-2.65$. At each bandwidth, the geographic channel is marginally significant at the 10 percent level ($t$ from $1.68$ to $1.80$) but does not reach 5 percent at any bandwidth.
+
+\paragraph{Conley spatial standard errors.}
+At 1000\,km, the fuel channel retains $t = -4.16$, confirming that the result is not driven by residual spatial correlation.
+
+\paragraph{Romano-Wolf multiple testing.}
+Across 9 hypotheses (3 channels $\times$ 3 event windows), zero survive the Romano-Wolf stepdown correction at the 5 percent level. Four of nine survive raw significance. This result requires careful interpretation. The correction penalises the fuel channel at the primary $[-1, +3]$ window (raw $t = -7.50$) for the inclusion of six additional tests at the $[-1, +6]$ and $[-1, +12]$ windows that were not the focus of the empirical design. The joint F-test, which pools information across all three channels at the primary window, is highly significant ($F = 70.83$, permutation $p = 0.000$), confirming that the three-channel model has joint explanatory power. Restricting attention to the primary window alone, the fuel channel's $t$-statistic of $-7.50$ exceeds the Bonferroni-corrected threshold for three tests ($0.05/3 = 0.017$, critical $|t| = 2.39$) by a factor of three. The multiple testing concern is therefore a consequence of testing across redundant horizons, not of weak evidence at the primary horizon.
+
+\paragraph{Wild cluster bootstrap.}
+For the phase-out specification with 14 country clusters, the wild bootstrap $p$-value is 0.091, confirming marginal significance despite the small number of clusters.
+
+\paragraph{Shift-share (Bartik) specification.}
+The shift-share diagnostics reported in Section~\ref{sec:identification} confirm that the fuel coefficient survives when exposure is frozen at pre-2014 plant vintages ($t = -5.16$), Rotemberg weights are non-negative, and the Oster bound yields $\delta^* = 20.8$.
+
+Additional robustness tables (weight correlations, placebo shuffle, control sensitivity, specification progression, and bandwidth sensitivity) are reported in Appendix~\ref{app:robustness}.
+
 
 %----------------------------------------------------------------------
 \section{Discussion}\label{sec:discussion}
 %----------------------------------------------------------------------
 
-\subsection{The Paradox of Isolated Climate Action}
+\subsection{Technology Exposure as Systematic Risk}\label{sec:systematic}
 
-The geographic channel ($\gamma_G > 0$) creates a counterintuitive dynamic. When a plant retires, local grid congestion eases and wholesale margins improve for surviving nearby generators \citep{DavisHausman2016}. If an activist campaign successfully forces one utility to retire a coal plant, the resulting reduction in local supply inadvertently increases the profitability of neighbouring fossil plants that were not targeted. Because transition risk is a spatial network property, firm-by-firm divestment campaigns risk subsidising the very emissions they seek to eliminate.
+The fuel-mix similarity channel transmits to stock prices because technology obsolescence is a common factor. If coal becomes uneconomic in one jurisdiction, all firms with high coal shares face the same physics regardless of location. In the language of asset pricing, fuel similarity measures exposure to a non-diversifiable technology factor. This connects the carbon premium literature \citep{Bolton2021, BoltonKacperczyk2023} with the network propagation framework of \citet{AcemogluCarvalhoOzdaglarTahbazSalehi2012}: the fuel-mix network has a common-factor structure in which a shock to one node (coal technology) propagates to all connected nodes simultaneously.
 
-The portfolio sort evidence makes this concrete. The geographic Q5$-$Q1 spread of $+6.03\%$ ($t=+9.41$) quantifies the competitive benefit accruing to firms positioned near retirement activity. This benefit is physical and operates regardless of policy regime (the geographic placebo on ETS is null). Effective transition policy must therefore operate at the network or jurisdictional level to prevent spatial leakage. Individual firm action is necessary but not sufficient; without coordinated grid-level restructuring, the geographic channel partially undoes the stranding channel.
+The opposing signs of the two channels replicate, in a climate setting, the contagion-versus-competition pattern identified by \citet{LangStulz1992} and \citet{JorionZhang2007} in corporate distress. Fuel similarity transmits contagion: shared technology exposure means that one firm's obsolescence signals vulnerability for all similar firms. Geographic proximity would transmit competitive benefit: a rival's exit raises residual demand for remaining local generators \citep{DavisHausman2016}. The model predicts that the contagion channel dominates at the stock level because it operates as a common factor, while the competitive channel diversifies away across markets (Lemma~\ref{lem:aggregation}).
 
-This finding connects to the broader literature on coordination failures in green investment \citep{Farmer2019}. The energy transition is characterised by strategic complementarities: the returns to decarbonising increase when neighbouring firms also decarbonise, because grid dynamics, regulatory credibility, and factor market depth all improve with coordination. Isolated action, by contrast, generates competitive benefits for non-participants, weakening the incentive to move first.
+The strengthening of the fuel signal over calendar time (Section~\ref{sec:learning}) is consistent with the gradual-information-diffusion framework of \citet{HongStein1999}. In their model, information about fundamental value percolates slowly across bounded-rational investors, producing short-horizon underreaction that corrects as more participants parse the signal. \citet{CohenFrazzini2008} and \citet{MenzlyOzbas2010} document analogous patterns in customer-supplier and cross-industry settings, where economic linkages generate return predictability at the monthly horizon that decays with analyst coverage and institutional ownership. The fuel-mix network operates through the same mechanism: technology linkages are harder to observe than sector membership, so the market requires successive signals before fully pricing the exposure.
 
-\subsection{Spatial Exposure as a Complement to Firm-Level Assessment}
+\subsection{Policy Implications}\label{sec:policy}
 
-The signal hierarchy results suggest a constructive path for transition risk assessment. The Spatial Transition Score, $\text{STS}_i = w^{\text{fuel}}_i \times \text{has\_ets}_i - w^{\text{geo}}_i$, combines three publicly observable inputs: fuel-mix similarity (from GEM plant registries), geographic proximity (from GPS coordinates), and ETS membership (from the World Bank Carbon Pricing Dashboard). It captures the insight that stranding risk is amplified by policy credibility and offset by competitive geographic positioning.
+The results confirm that geographic distance does not insulate utilities from transition risk; technology similarity is the transmission channel. Under pooled inference, emissions trading amplifies the fuel channel, suggesting that credible enforcement may be necessary for technology signals to reprice fully. The extensive margin (having an ETS) matters more than the intensive margin (the carbon price level), consistent with \citet{ChoiGaoJiang2020} who document that countries with earlier climate engagement show weaker marginal reactions to subsequent climate signals. However, the ETS interaction is not fuel-specific: a placebo test shows that geographic proximity also responds to ETS membership. The amplification may therefore reflect a broader repricing of network exposures in ETS jurisdictions rather than a technology-specific mechanism. This finding, combined with the Fama-MacBeth sign reversal, means the ETS result should be treated as suggestive.
 
-The in-sample $t$-statistic of $-3.94$ and out-of-sample portfolio spread of $-7.75\%$ ($t=-6.10$) demonstrate that the spatial dimension contains predictive information absent from conventional firm-level scores. The ESG horse race confirms that this information is complementary rather than redundant: ESG ratings capture corporate intent and governance capacity, while the STS captures network dynamics that determine how restructuring shocks propagate. Neither subsumes the other, but the spatial dimension is the one currently missing from assessment frameworks.
+For practitioners, the implication is that spatial fuel-mix exposure, constructed from public plant registries, complements ESG scores rather than replacing them. Both survive the Fama-MacBeth horse race, suggesting that each captures a distinct dimension of transition risk: ESG measures what firms disclose about their transition plans; spatial fuel similarity measures what the physical network implies about their technology vulnerability.
 
-For practitioners, the implication is that transition risk assessment should incorporate at least two dimensions: the firm's own characteristics (captured by ESG or fundamental analysis) and its position within the physical network (captured by spatial exposure measures). Portfolio construction that accounts for spatial clustering, stranding contagion, and competitive geography will better approximate true transition risk exposure than firm-level scoring alone.
+\subsection{Generalisability Beyond Coal}\label{sec:generalisability}
 
-\subsection{External Validity and Limitations}
-
-The spatial transmission mechanism is a specific instance of the general network propagation framework formalised by \citet{AcemogluCarvalhoOzdaglarTahbazSalehi2012}. Any networked infrastructure sector with geographically embedded assets, such as shipping, pipelines, or heavy industrial supply chains, is predicted to exhibit analogous spatial transmission. \citet{BarrotSauvagnat2016} demonstrate that localised shocks propagate through supply networks, imposing significant sales declines on distant customers. Spatial climate risk is also priced in non-utility asset classes such as real estate \citep{BernsteinGustafsonLewis2019}.
-
-We acknowledge three limitations. First, the analysis operates exclusively on public equities. Credit markets \citep{Painter2020}, derivative markets \citep{IlhanSautnerVilkov2021}, and structured finance may capture tail risks and spatial immobility dynamics that average equity returns miss. Second, ``brown-spinning'' documented by \citet{DuchinGaoXu2025} means that publicly traded firms divest pollutive assets to private, non-ESG-rated buyers. Public equity analysis therefore systematically underestimates the true spatial risk embedded in the physical asset network, because transferring ownership does not retire the plant or alter its grid position. Third, our multiple hypothesis testing corrections (Romano-Wolf) show that none of the nine individual coefficients survives at conventional thresholds, although the joint $F$-test ($p=0.001$) and difference test ($p=0.0003$) do survive. This pattern is informative: the spatial signal is a joint network property, not a collection of individually strong channels. The evidence supports the network framework precisely because the channels operate together, and the opposing signs are the mechanism, not a statistical weakness.
-
+The fuel-similarity network framework applies in principle to any setting where plant-level technology shocks propagate through shared generation profiles. Gas phase-outs, which several European countries have announced for the 2030s, would enter the model through the same cosine-similarity channel: firms with high gas shares would face stranding contagion when peers retire gas capacity. Nuclear closures present a similar structure, though the smaller number of nuclear operators limits cross-sectional power. Renewable capacity additions are a less natural fit: because the model's mechanism operates through obsolescence signals (a retirement reveals that a technology is uneconomic), positive capacity shocks lack the same informational content. The framework is most informative for transition events that reveal negative information about a shared technology, and least informative for events that are firm-specific or driven by local planning decisions.
 
 %----------------------------------------------------------------------
 \section{Conclusion}\label{sec:conclusion}
 %----------------------------------------------------------------------
 
-This paper establishes that transition credibility is a network property, measurable from publicly available plant-level data, and that the credibility gap between physical exposure and market pricing operates through a specific spatial mechanism: opposing channels that inject uncertainty without directional repricing. Three contributions emerge. First, the opposing-sign channel split ($t=14.00$ in portfolio sorts) reveals that isolated firm-level climate action is structurally incomplete, because geographic competitive effects partially offset stranding contagion. Second, the volatility-without-direction finding ($t=3.89$ for volatility, $t\approx 0$ for returns) identifies a precise information friction: markets observe spatial exposure but cannot price it until binding policy removes discretion. Third, the ETS interaction ($t=-3.41$, with a null geographic placebo) demonstrates that policy credibility is the mechanism that converts spatial exposure into directional repricing, providing a bridge between the asset pricing literature on political uncertainty and the climate finance literature on carbon risk.
+Geographic distance does not insulate power utilities from transition risk. When a firm retires coal capacity, the stock prices of technologically similar peers decline regardless of location. The channel is technology, not geography: fuel-mix similarity captures a common factor that cannot be diversified across locations, while local competitive benefits diversify away in the portfolios of multi-market utilities. Under a shift-share identification strategy with pre-determined fuel-mix shares, the fuel coefficient identifies the causal dose-response of abnormal returns to technology exposure, supported by non-negative Rotemberg weights and an Oster coefficient stability bound of $\delta^* = 20.8$.
 
-The constructive implication is one of scope rather than replacement: existing firm-level assessment frameworks capture corporate intent, but the spatial network dimension, currently absent from standard tools, captures the competitive and contagion dynamics that determine how transition shocks propagate. For policymakers, the paradox of isolated action reinforces the case for coordinated, jurisdictional-level transition strategies that account for grid-level spatial leakage.
+Emissions trading amplifies the fuel channel under pooled inference, though the interaction is sensitive to outlier events under Fama-MacBeth estimation. ESG scores and spatial fuel exposure capture complementary dimensions of transition risk, with both surviving a joint horse race. The fuel signal strengthens over calendar time, consistent with gradual market learning about the technology obsolescence channel.
 
-\paragraph{Acknowledgements.} This research received no external funding. The author declares no financial relationships or conflicts of interest.
+Several caveats apply. The fuel-similarity weight is constructed from installed capacity, not actual generation; a firm with idle coal plants receives the same weight as one actively generating from coal. A subset of firms (105 of 703) use price returns without dividend adjustment, introducing a modest measurement asymmetry. No individual channel survives the Romano-Wolf multiple testing correction across nine hypotheses, though the joint F-test is highly significant ($F = 70.83$, $p = 0.000$) and the fuel channel's Fama-MacBeth $t$-statistic of $-7.36$ exceeds single-hypothesis thresholds by a wide margin.
+
+For practitioners and policymakers, the implication is that transition risk assessment should incorporate the physical network connecting firms through shared generation technology. Spatial fuel-mix exposure, constructed entirely from public plant registries, complements ESG scores and captures a dimension of technology vulnerability that voluntary disclosure does not. Future work might extend the framework to gas phase-outs, where the same cosine-similarity channel should transmit stranding risk to gas-heavy utilities as European decarbonisation targets approach.
+
 
 %----------------------------------------------------------------------
-% Bibliography
+% References
 %----------------------------------------------------------------------
-\bibliographystyle{plainnat}
+\bibliographystyle{apalike}
 \bibliography{references}
 
 
-%======================================================================
-\newpage
+%----------------------------------------------------------------------
 \appendix
-%======================================================================
-
-\section{Channel Decomposition and Primitives}\label{app:channels}
-
-This appendix describes how the three exposure matrices in Equation~\eqref{eq:cashflows} are constructed.
-
-\paragraph{Geographic proximity ($w^{\text{geo}}$).} We compute pairwise distances between firms using plant-level GPS coordinates and define
-\[
-  w^{\text{geo}}_{ij} = \frac{\exp(-d_{ij}/h)}{\sum_{k\neq i}\exp(-d_{ik}/h)},
-\]
-where $h$ is the geographic half-life. We correct standard errors for spatial dependence following \citet{Conley1999}. This captures shared grids, factor markets, and local competition.
-
-\paragraph{Fuel similarity ($w^{\text{fuel}}$).} We build a fuel-mix vector for each firm from GEM plant records (coal, gas, oil, wind, solar, hydro, nuclear). We measure fuel similarity as the cosine similarity of these vectors and row-normalised across neighbours. This captures competitive stranding among firms with similar fossil exposure.
-
-\paragraph{Regulatory proximity ($w^{\text{reg}}$).} We set $w^{\text{reg}}_{ij}=1$ if firms share a carbon-pricing jurisdiction (ETS membership from the World Bank Carbon Pricing Dashboard; ICAP used as cross-check), and $0$ otherwise, then row-normalise. This captures policy spillovers across common regulatory regimes.
-
-These matrices form the empirical channel decomposition used in Section~\ref{sec:empirical}. The composite exposure is not interpreted as a structural parameter; instead, we focus on channel-specific responses and their horizon-dependence.
-
-
-\section{Derivations}\label{app:proofs}
-
-\subsection*{Derivation of Prediction~\ref{pred:channel_split}}
-From Equation~\eqref{eq:valuation},
-\[
-  \frac{\partial V_i}{\partial (\sum_j w^{\text{geo}}_{ij} s_j)} = \gamma_G > 0, \qquad
-  \frac{\partial V_i}{\partial (\sum_j w^{\text{fuel}}_{ij} s_j)} = -p_t \gamma_F < 0,
-\]
-for $p_t \in (0,1)$. The regulatory term enters additively and does not alter the sign of the geographic or fuel channels. \qed
-
-\subsection*{Derivation of Prediction~\ref{pred:ambiguous}}
-With $p_t \in (0,1)$, Equation~\eqref{eq:variance} implies
-\[
-  \frac{\partial \mathrm{Var}_t(V_{i,t})}{\partial s_j} = 2p_t(1-p_t)\left(\beta\alpha_i + \gamma_F \sum_k w^{\text{fuel}}_{ik} s_k\right)\gamma_F w^{\text{fuel}}_{ij} > 0
-\]
-for exposed firms. Let $y$ denote the announcement signal with likelihoods $L_1=\Pr(y\mid \omega=1)$ and $L_0=\Pr(y\mid \omega=0)$. Bayes' rule implies
-\[
-  p_t' = \Pr(\omega=1\mid y)=\frac{p_t L_1}{p_t L_1 + (1-p_t)L_0}.
-\]
-If the signal is noisy ($L_1 \approx L_0$), then $p_t'-p_t$ is small. The mean effect in Equation~\eqref{eq:valuation} remains ambiguous because the positive $\gamma_G$ and negative $\gamma_F$ channels offset, while the variance effect above is strictly positive. \qed
-
-\subsection*{Derivation of Prediction~\ref{pred:resolving}}
-Let $p_{post} > p_{pre}$ and suppose the prior is near maximum uncertainty. Then
-\[
-  p_{post}(1-p_{post}) < p_{pre}(1-p_{pre}),
-\]
-so volatility in Equation~\eqref{eq:variance} falls. From Equation~\eqref{eq:valuation},
-\[
-  \Delta V_i = -(p_{post}-p_{pre})\left(\beta\alpha_i + \gamma_F \sum_j w^{\text{fuel}}_{ij} s_j\right) < 0,
-\]
-which yields negative abnormal returns for coal-exposed firms. \qed
-
-\section{Data Construction}\label{app:data}
+\section{Robustness Tables}\label{app:robustness}
 %----------------------------------------------------------------------
 
-\subsection*{Panel A: Firm Fundamental Parameters (Full Detail)}
-
-\begin{table}[H]
-\centering\small
-\caption{Construction of Firm Fundamental Parameters}
-\label{tab:fundamentals}
-\begin{tabularx}{\textwidth}{@{}l l X@{}}
-\toprule
-Parameter & Measure & Construction and Source \\
-\midrule
-$\lambda$ (leverage) & Debt / Assets & (DLTT $+$ DLC) / AT. Source: Compustat Global/NA. \\[4pt]
-$\rho$ (return spread) & Operating ROA (proxy) & OIBDP / AT. Source: Compustat Global/NA. \\[4pt]
-$\kappa$ (cash flow adequacy) & Interest coverage (proxy) & OANCF / XINT. Source: Compustat Global/NA. \\[4pt]
-$\alpha$ (legacy intensity) & Fossil MW / Total MW & Coal $+$ gas $+$ oil capacity as share of total installed capacity. Source: GEM (GeoAsset where available). \\
-\bottomrule
-\end{tabularx}
-\end{table}
-
-All financial variables are measured annually. Following standard practice \citep{FamaFrench1993}, we winsorize all continuous financial ratios at the 1st and 99th percentiles to mitigate the influence of outliers; Table~\ref{tab:summary_stats} reports raw values. The legacy intensity parameter $\alpha$ is updated when new GEM tracker vintages are available; the current replication uses the latest snapshot, which records plant-level status changes (operating, announced, under construction, retired) with dates.
-
-\subsection*{Panel B: Transformation Delivery (Full Detail)}
-
-We construct physical transformation outcomes for validation and auxiliary analyses:
-\begin{itemize}
-  \item[(i)] \textbf{Capacity mix shift} for horizons $k \in \{3, 5\}$ years:
-  \begin{equation*}
-    \Delta\text{Clean}_{i,t} = \frac{(\text{Renewable} + \text{Nuclear MW})_{i,t}}{\text{Total MW}_{i,t}} -
-    \frac{(\text{Renewable} + \text{Nuclear MW})_{i,t-k}}{\text{Total MW}_{i,t-k}}.
-  \end{equation*}
-  Source: GEM Global Power Plant Tracker and GeoAsset.
-  \item[(ii)] \textbf{Emissions intensity change}:
-  \begin{equation*}
-    \Delta\text{EI}_{i,t} = \frac{\text{Emissions}_{i,t}}{\text{Generation}_{i,t}} -
-    \frac{\text{Emissions}_{i,t-k}}{\text{Generation}_{i,t-k}}.
-  \end{equation*}
-  Source: LSEG ESG (via Workspace) provides Scope~1 emissions; implied emissions from capacity mix $\times$ IPCC emission factors used where LSEG coverage is incomplete.
-  \item[(iii)] \textbf{Asset retirement events}: Binary indicator for whether firm $i$ retired fossil capacity exceeding 10\% of its installed base. Source: GEM Coal Plant Tracker and GEM Gas Plant Tracker.
-\end{itemize}
-
-\subsection*{Panel C: Spatial Weight Matrix Construction (Full Detail)}
-
-$\bW^{\text{reg}}$ \textbf{(Regulatory Proximity)} is constructed from two layers:
-\begin{enumerate}
-  \item[(i)] \emph{Carbon pricing regime}: $w^{\text{reg}}_{ij} = 1$ if firms $i$ and $j$ operate under the same emissions trading system or carbon tax regime. Source: World Bank Carbon Pricing Dashboard; ICAP used as cross-check. This creates discrete clusters: EU ETS, UK ETS, RGGI, China ETS, Korean ETS, and unpriced firms.
-  \item[(ii)] \emph{Regulatory framework similarity}: For firms not sharing a carbon pricing regime, a continuous similarity measure based on jurisdiction-level policy indicators in the Climate Change Laws of the World database (Grantham Research Institute/LSE).
-\end{enumerate}
-The composite is $w^{\text{reg}}_{ij} = \omega_1 \cdot \text{SharedETS}_{ij} + \omega_2 \cdot \text{PolicySimilarity}_{ij}$, row-normalised.
+\noindent\footnotesize\textit{Note}: The appendix tables use the full event-firm panel ($N \approx 72{,}600$), which includes events with fewer than 20 firm observations. The main tables restrict to events with at least 20 observations ($N = 55{,}580$ for 175 events), following the minimum cross-section size required for stable OLS estimation.\normalsize
 
 \medskip
 
-$\bW^{\text{geo}}$ \textbf{(Geographic / Factor Market Overlap)} is constructed from plant-level geolocation:
-\begin{enumerate}
-  \item[(i)] \emph{Geographic proximity}: Using GPS coordinates from GeoAsset and GEM, compute great-circle distance $d_{ij}$ between each pair of firms' nearest plants. Apply inverse-distance weights with exponential decay:
-  \begin{equation*}
-    w^{\text{geo}}_{ij} = \exp(-d_{ij}/\bar{d})/d_{ij}, \quad \bar{d} = 500/\ln 2.
-  \end{equation*}
-  This uses a 500\,km half-life and imposes no hard cutoff.
-  \item[(ii)] \emph{Technology overlap}: Firms building the same technology in the same region compete for technology-specific bottleneck resources. Constructed from GEM project pipeline data using the same geographic kernel.
-\end{enumerate}
-The composite is row-normalised. Sample sizes vary across specifications because return-window availability and exposure coverage drop different event-firm pairs; each table reports its own $N$.
-
-%----------------------------------------------------------------------
-\section{Robustness Checks}\label{app:robustness}
-%----------------------------------------------------------------------
-
-\paragraph{Orthogonality of the networks.} Table~\ref{tab:weight_corr} reports pairwise correlations between $w^{\text{geo}}$, $w^{\text{fuel}}$, and $w^{\text{reg}}$. All correlations are below 0.16, validating the exclusion restriction required for network identification \citep{BramoulleDjebbariFortin2009}.
-
 \input{../results/tables/table_weight_correlations.tex}
-
-\paragraph{Conley spatial standard errors.} To address concerns about residual spatial correlation beyond the network structure, we estimate Conley standard errors \citep{Conley1999} with cutoff radii at 500 km and 1,000 km. At 1,000 km, the fuel-similarity channel retains $t=-4.16$, confirming that the channel split is not driven by local spatial dependence in the error term.
-
-\paragraph{Romano-Wolf multiple hypothesis testing.} We apply the Romano-Wolf stepdown procedure to the nine channel coefficients (three channels $\times$ three horizons). None of the nine individual coefficients survives at the 5\% level after correction. However, the joint $F$-test ($F=11.28$, $p=0.001$) and the difference test ($\beta_{\text{geo}} - \beta_{\text{fuel}}$, $t=3.65$, $p=0.0003$) do survive, because these are single-hypothesis tests on theoretically motivated quantities. The spatial signal is a joint network property, not a collection of individually large channel effects; the multiple testing result is therefore consistent with the framework rather than a challenge to it.
-
-\paragraph{Wild cluster bootstrap.} For the phase-out DiD, the small number of independent Tier-1 events (14 binding laws) limits the effective degrees of freedom for conventional cluster-robust inference. Wild cluster bootstrap \citep{CameronGelbachMiller2011} yields $p=0.093$, supporting significance at the 10\% level.
-
-\paragraph{Strong placebo (shuffled networks).} We randomly permute the network topology 200 times while keeping event dates fixed. Exposure coefficients collapse toward zero under permutation, demonstrating that results are driven by the true spatial topology rather than unconditional sector drift.
 
 \input{../results/tables/table_placebo_shuffle.tex}
 
-\paragraph{Controls and firm fixed effects.} Introducing cross-sectional controls (size and leverage) attenuates the fuel-similarity coefficient because these variables absorb structural differences between incumbent fossil utilities and non-incumbents. However, a within-firm specification with firm fixed effects yields a fuel channel of $-2.023$ ($p<0.01$) and a geographic channel of $0.472$ ($p<0.01$), confirming that the baseline is a conservative lower bound.\footnote{Sample size fluctuates slightly across specifications due to differing data availability requirements.}
-
 \input{../results/tables/table_channel_controls_sensitivity.tex}
-
-\paragraph{Specification progression.} Table~\ref{tab:spec_progression} reports step-by-step inclusion of spatial weights. The geographic benefit emerges strongly in isolation and remains stable, while fuel-similarity contagion reveals its full magnitude only when estimated jointly with geographic proximity. This reflects classical omitted variable bias: positive correlation between $w^{\text{geo}}$ and $w^{\text{fuel}}$ masks the negative contagion effect when the geographic benefit is omitted.
 
 \input{../results/tables/table_spec_progression.tex}
 
-\paragraph{Bandwidth sensitivity.} Our baseline uses a 500\,km half-life. Shrinking to 250\,km attenuates the effect as the kernel becomes too restrictive. Expanding to 1,000\,km strengthens the geographic coefficient ($0.481$, $p<0.01$), consistent with the geographic footprint of interconnected transmission systems.
-
 \input{../results/tables/table_bandwidth_sensitivity.tex}
 
-\paragraph{Event-time pre-trends.} Demeaned CARs for high- and low-exposure neighbours are approximately parallel in the pre-event window ($\tau \in [-6,-1]$), supporting the identification assumption. We verify absence of pre-trends following \citet{Roth2022}; the staggered-adoption estimator of \citet{BorusyakJaravelSpiess2024} serves as an additional check.
 
-\begin{table}[H]
-\centering\small
-\caption{Robustness: Exposure Coefficient Across Windows (VWRETD)}
-\label{tab:robustness_exposure}
-\begin{tabular}{lcccc}
-\toprule
-Window & Event-clustered & Two-way clustered & $N$ & $R^2$ \\
-\midrule
-Daily $[-1,+20]$ & $-$2.081*** (0.652) & $-$2.081 (1.832) & 62{,}022 & 0.0010 \\
-Monthly $[-1,+3]$ & 0.442*** (0.140) & --- & 72{,}398 & 0.0009 \\
-Monthly $[-1,+6]$ & 0.218 (0.187) & --- & 72{,}398 & 0.0004 \\
-Monthly $[-1,+12]$ & $-$0.140 (0.283) & $-$0.140 (0.600) & 72{,}398 & 0.0003 \\
-Monthly $[-1,+12]$ (bivariate) & $-$0.063 (0.289) & --- & 72{,}398 & 0.0000 \\
-\bottomrule
-\end{tabular}
-\begin{flushleft}\footnotesize
-Notes: Exposure coefficients using market-adjusted returns (vwretd) and alpha-only classification. Standard errors in parentheses. * $p<0.10$, ** $p<0.05$, *** $p<0.01$.
-\end{flushleft}
-\end{table}
+\section{Spatial Transition Score}\label{app:sts}
 
-\begin{table}[H]
-\centering\small
-\caption{Channel Decomposition Robustness: Geo+Fuel Only (3-Month Window)}
-\label{tab:channel_decomp_two}
-\begin{tabular}{lcc}
-\toprule
- & Event-clustered & $N$ \\
-\midrule
-$w^{\text{geo}}$ & 0.430*** (0.126) & \\
-$w^{\text{fuel}}$ & $-$1.281*** (0.458) & \\
-Same sector & 0.021*** (0.005) & \\
-$N$ & \multicolumn{2}{c}{72{,}398} \\
-$R^2$ & \multicolumn{2}{c}{0.0009} \\
-\bottomrule
-\end{tabular}
-\begin{flushleft}\footnotesize
-Notes: Monthly CARs in the $[-1,+3]$ window using the two-channel specification (geo + fuel + same-sector). Standard errors clustered by event.
-\end{flushleft}
-\end{table}
+The Spatial Transition Score (STS) combines three public inputs into a single measure of transition exposure. For each event $e$, the score for firm $i$ is $\text{STS}_{ie} = w^{\text{fuel}}_{ie} \times \text{has\_ets}_i - w^{\text{geo}}_{ie}$, where $w^{\text{fuel}}_{ie}$ and $w^{\text{geo}}_{ie}$ are the row-normalised weights from the event-firm panel. In a post-2020 holdout, a portfolio sort on STS quintiles yields $Q5 - Q1 = -2.76\%$ ($t = -2.98$), demonstrating modest predictive content beyond in-sample fit. The in-sample signal is weak ($t = 1.58$), indicating that the STS is more informative in the recent period of elevated policy credibility.
+
 
 \end{document}
