@@ -27,7 +27,10 @@ Public data sources (included):
 # Step 1: Full pipeline (build derived data + all analysis)
 python src/run_all.py
 
-# Step 2: Generate figures (requires R)
+# Step 1b: Conley spatial standard errors (requires R + fixest)
+Rscript src/robustness_conley_se.R
+
+# Step 2: Generate figures (requires R + ggplot2 + sf)
 Rscript results/figures/generate_fig1.R
 Rscript results/figures/generate_fig2.R
 Rscript results/figures/generate_fig3.R
@@ -39,6 +42,8 @@ cp results/figures/fig*.pdf manuscript/figures/
 cd manuscript
 pdflatex main.tex && bibtex main && pdflatex main.tex && pdflatex main.tex
 ```
+
+**Note on R dependencies:** The Conley spatial standard errors (Section 4.6) are computed in R using the `fixest` package, which provides built-in Conley SE support via `vcov = conley()`. This is the only analysis step that requires R. All other analysis runs in stdlib Python. R packages needed: `fixest`, `ggplot2`, `showtext`, `sysfonts`, `sf`, `rnaturalearth`, `rnaturalearthdata`.
 
 ## Pipeline Structure
 
