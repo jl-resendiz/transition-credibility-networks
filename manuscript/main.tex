@@ -56,11 +56,11 @@
 {\singlespacing\maketitle}
 
 \begin{quotation}\small\singlespacing\noindent
-\textbf{Abstract.} Does geographic distance insulate power utilities from transition risk? I study how coal plant retirements propagate to the stock prices of 703 listed utilities across 80 countries. The channel is technology, not geography: peers with similar generation portfolios lose 3.3 percentage points of market value over four months, while geographic proximity has no robust effect. The mechanism is asymmetric aggregation. Local competitive effects diversify across markets; technology obsolescence does not. Emissions trading amplifies the signal. ESG scores and fuel-mix similarity both predict transition returns but measure different things: disclosure versus physical assets.
+\textbf{Abstract.} Does geographic distance insulate power utilities from transition risk? I study how coal plant retirements propagate to the stock prices of 703 listed utilities across 80 countries. The channel is technology, not geography: peers with similar generation portfolios lose 3.3 percentage points of market value over four months, while geographic proximity has no robust effect. The mechanism is asymmetric aggregation. Local competitive effects diversify across markets; technology obsolescence does not. ESG scores and fuel-mix similarity both predict transition returns but measure different things: disclosure versus physical assets.
 \end{quotation}
 
 \medskip\noindent\textit{JEL Classification:} G12, G14, Q54, L94.\\
-\noindent\textit{Keywords:} transition risk, stranded assets, fuel-mix similarity, technology networks, carbon pricing.
+\noindent\textit{Keywords:} transition risk, stranded assets, fuel-mix similarity, technology networks.
 
 %----------------------------------------------------------------------
 \section{Introduction}\label{sec:intro}
@@ -74,7 +74,7 @@ The mechanism is what I call asymmetric aggregation. A listed utility typically 
 
 I construct fuel-mix similarity as the $L_1$ similarity of capacity-share vectors from the Global Energy Monitor, following \citet{HobergPhillips2016}'s approach to measuring firm-pair proximity. The specification has the structure of a shift-share design \citep{GoldsmithPinkhamSorkinSwift2020}: fuel-mix shares, fixed by plant construction decisions made years before any retirement, serve as the pre-determined exposure; each retirement event serves as the shock. Four diagnostics support a causal reading: pre-determined shares using only pre-2014 plant vintages remain significant, Rotemberg weights are non-negative, and the \citet{Oster2019} coefficient stability bound indicates that unobservables would need to be 21 times more important than observables to explain away the result. The sample covers 703 listed utilities across 80 countries and 175 first-mover retirement events spanning 35 countries.
 
-Two additional findings emerge. First, emissions trading amplifies the technology channel: the stranding penalty roughly doubles for firms in jurisdictions with an emissions trading system. Second, ESG environmental scores and fuel-mix similarity both predict transition returns, but they measure different things. ESG reflects what firms disclose about their transition plans. Fuel-mix similarity reflects the physical generation assets they actually operate. Both survive a joint test, meaning that knowing one does not make the other redundant.
+An additional finding emerges. ESG environmental scores and fuel-mix similarity both predict transition returns, but they measure different things. ESG reflects what firms disclose about their transition plans. Fuel-mix similarity reflects the physical generation assets they actually operate. Both survive a joint test, meaning that knowing one does not make the other redundant.
 
 These results speak to a question that arises whenever climate policy is unilateral. If only some countries retire fossil capacity, are the others insulated? The asset pricing evidence says no. The market penalises coal-heavy utilities in proportion to their fuel-mix similarity to the retiring firm, regardless of jurisdiction. Coal retirements send technology signals whose financial reach extends well beyond the country where the retirement occurs. The paper documents this pattern; it does not assess whether the retirements themselves are desirable.
 
@@ -214,18 +214,11 @@ The logic parallels the diversification argument in production networks \citep{A
     \end{equation}
 \end{corollary}
 
-\begin{proposition}[Policy Amplification]\label{prop:ets}
-    The fuel coefficient $-Ap_1\phi$ is increasing in absolute value in the posterior belief $p_1$. Since $p_1$ depends on the prior $p_0$ through equation~(\ref{eq:bayes}), jurisdictions with higher prior probability of strict enforcement produce a more negative fuel coefficient. In particular, if $p_0^{\mathrm{high}} > p_0^{\mathrm{low}}$, then $p_1^{\mathrm{high}} > p_1^{\mathrm{low}}$ for any common shock $\mathbf{s}$, and:
-    \begin{equation}
-        \left|\frac{\partial V_{i,1}}{\partial (\sum_j w^{\mathrm{fuel}}_{ij}s_j)}\right|_{p_0^{\mathrm{high}}} > \left|\frac{\partial V_{i,1}}{\partial (\sum_j w^{\mathrm{fuel}}_{ij}s_j)}\right|_{p_0^{\mathrm{low}}}.
-    \end{equation}
-\end{proposition}
+\begin{remark}[Policy Amplification]\label{prop:ets}
+    The fuel coefficient $-Ap_1\phi$ is increasing in absolute value in the posterior belief $p_1$. Since $p_1$ depends on the prior $p_0$ through equation~(\ref{eq:bayes}), jurisdictions with higher prior probability of strict enforcement produce a more negative fuel coefficient. This observation follows directly from the monotonicity of $p_1$ in $p_0$: a higher prior produces a higher posterior for any realisation of $\mathbf{s}$, so the fuel coefficient is more negative when $p_0$ is higher. The empirical relevance of this channel is examined in the robustness section.
+\end{remark}
 
-\begin{proof}
-    The fuel coefficient is $-Ap_1\phi$, where $p_1 = p_0 L / (p_0 L + 1 - p_0)$ from equation~(\ref{eq:bayes}). Since $\partial p_1 / \partial p_0 = L / (p_0 L + 1 - p_0)^2 > 0$, a higher prior produces a higher posterior for any realisation of $\mathbf{s}$. The fuel coefficient is linear in $p_1$, so it is more negative when $p_0$ is higher. \qed
-\end{proof}
-
-The model generates three testable predictions.
+The model generates two testable predictions.
 
 \begin{prediction}\label{pred:fuel}
 The fuel-similarity coefficient is negative. The geographic coefficient is attenuated for firms operating across many markets.
@@ -235,9 +228,6 @@ The fuel-similarity coefficient is negative. The geographic coefficient is atten
 The fuel coefficient dominates the geographic coefficient in the cross-section: the technology channel is systematic, the competitive channel is idiosyncratic.
 \end{prediction}
 
-\begin{prediction}\label{pred:policy}
-The fuel penalty is larger in jurisdictions where investors assign higher prior probability to strict enforcement of transition policy.
-\end{prediction}
 
 
 %----------------------------------------------------------------------
@@ -389,36 +379,6 @@ This instability is consistent with the aggregation result in Lemma~\ref{lem:agg
 The fuel channel, by contrast, does not attenuate with diversification. Technology obsolescence is a property of the firm's entire generation portfolio, not of any single local market. Geographic distance does not insulate; technology similarity transmits. This asymmetry between the two channels is the core prediction of the model and the central empirical finding.
 
 
-\subsection{Emissions Trading Amplifies the Fuel Channel}\label{sec:ets}
-
-Table~\ref{tab:ets_interaction} reports the ETS interaction.
-
-\begin{table}[H]
-\centering
-\caption{ETS Interaction}
-\label{tab:ets_interaction}
-\begin{tabular}{lc}
-\toprule
- & Coeff \\
-\midrule
-$w^{\text{fuel}}$ (base) & $-$3.052*** \\
- & (0.602) \\[4pt]
-$w^{\text{fuel}} \times \text{has\_ets}$ & $-$4.264*** \\
- & (1.405) \\[4pt]
-Carbon price (continuous) & +0.071** \\
- & (0.036) \\
-\bottomrule
-\end{tabular}
-\begin{flushleft}\footnotesize
-Notes: Pooled OLS with event-clustered standard errors in parentheses ($N = 55{,}580$, 175 events). Base fuel coefficient captures non-ETS firms. The interaction captures the additional penalty for ETS firms. * $p<0.10$, ** $p<0.05$, *** $p<0.01$.
-\end{flushleft}
-\end{table}
-
-Under pooled inference, the stranding penalty for ETS firms is $-3.052 + (-4.264) = -7.316$, roughly double the penalty for non-ETS firms. Portfolio sorts confirm this non-parametrically: the fuel $Q5 - Q1$ return spread is $-3.6$ percent for ETS firms and $+2.6$ percent for non-ETS firms (paired difference $t = -5.87$). The binary ETS indicator produces a clearer signal than the continuous carbon price level, whose interaction coefficient has the unexpected positive sign ($+0.071$, $t = 1.98$), possibly reflecting collinearity between carbon price levels and ETS membership.
-
-Three qualifications temper this result. First, under Fama-MacBeth inference, the fuel coefficient itself remains significant ($t = -2.60$), but the ETS interaction coefficient reverses sign. The Fama-MacBeth procedure averages event-level betas equally, and a small number of events with extreme within-event weight variation dominate the average interaction term. I therefore treat the pooled result as primary and the Fama-MacBeth reversal as evidence of sensitivity to outlier events. Second, a placebo test interacting the geographic channel with ETS membership also produces a significant coefficient ($t = -4.12$). This indicates that ETS membership affects both channels, not the fuel channel alone, weakening the interpretation that ETS amplification operates specifically through the technology obsolescence mechanism. The ETS result may instead reflect a broader repricing of all network exposures in jurisdictions with credible enforcement. Third, the ETS amplification is identified from the extensive margin (having an ETS) rather than the intensive margin (carbon price level), limiting the ability to distinguish enforcement credibility from other attributes of ETS jurisdictions.
-
-
 \subsection{ESG and Spatial Exposure Are Complements}\label{sec:esg}
 
 Table~\ref{tab:esg_horserace} reports the horse race between ESG scores and spatial fuel exposure.
@@ -427,19 +387,17 @@ Table~\ref{tab:esg_horserace} reports the horse race between ESG scores and spat
 \centering
 \caption{ESG Horse Race}
 \label{tab:esg_horserace}
-\begin{tabular}{lcccc}
+\begin{tabular}{lccc}
 \toprule
- & (1) ESG Only & (2) Spatial Only & (3) Both & (4) Full \\
+ & (1) ESG Only & (2) Spatial Only & (3) Both \\
 \midrule
-ESG score & $-$0.114*** & & $-$0.118*** & $-$0.116*** \\
- & (0.014) & & (0.014) & (0.015) \\[4pt]
-$w^{\text{fuel}}$ & & $-$1.559* & $-$1.135 & +0.397 \\
- & & (0.866) & (0.854) & (0.929) \\[4pt]
-$w^{\text{fuel}} \times \text{has\_ets}$ & & & & $-$3.489** \\
- & & & & (1.685) \\[4pt]
+ESG score & $-$0.114*** & & $-$0.118*** \\
+ & (0.014) & & (0.014) \\[4pt]
+$w^{\text{fuel}}$ & & $-$1.559* & $-$1.135 \\
+ & & (0.866) & (0.854) \\[4pt]
 \midrule
-$R^2$ & 0.012 & 0.003 & 0.016 & 0.017 \\
-$N$ & 14{,}731 & 14{,}731 & 14{,}731 & 14{,}731 \\
+$R^2$ & 0.012 & 0.003 & 0.016 \\
+$N$ & 14{,}731 & 14{,}731 & 14{,}731 \\
 \bottomrule
 \end{tabular}
 \begin{flushleft}\footnotesize
@@ -485,6 +443,8 @@ Across 9 hypotheses (3 channels $\times$ 3 event windows), zero survive the Roma
 \paragraph{Shift-share (Bartik) specification.}
 The shift-share diagnostics reported in Section~\ref{sec:identification} confirm that the fuel coefficient survives when exposure is frozen at pre-2014 plant vintages ($t = -5.16$), Rotemberg weights are non-negative, and the Oster bound yields $\delta^* = 20.8$.
 
+I also tested whether emissions trading system membership moderates the fuel channel; results are mixed across inference methods and are available upon request.
+
 Additional robustness tables (weight correlations, placebo shuffle, control sensitivity, specification progression, and bandwidth sensitivity) are reported in Appendix~\ref{app:robustness}.
 
 
@@ -502,7 +462,7 @@ The strengthening of the fuel signal over calendar time (Section~\ref{sec:learni
 
 \subsection{Policy Implications}\label{sec:policy}
 
-The results confirm that geographic distance does not insulate utilities from transition risk; technology similarity is the transmission channel. Under pooled inference, emissions trading amplifies the fuel channel, suggesting that credible enforcement may be necessary for technology signals to reprice fully. The extensive margin (having an ETS) matters more than the intensive margin (the carbon price level), consistent with \citet{ChoiGaoJiang2020} who document that countries with earlier climate engagement show weaker marginal reactions to subsequent climate signals. However, the ETS interaction is not fuel-specific: a placebo test shows that geographic proximity also responds to ETS membership. The amplification may therefore reflect a broader repricing of network exposures in ETS jurisdictions rather than a technology-specific mechanism. This finding, combined with the Fama-MacBeth sign reversal, means the ETS result should be treated as suggestive.
+The results confirm that geographic distance does not insulate utilities from transition risk; technology similarity is the transmission channel.
 
 For practitioners, the implication is that spatial fuel-mix exposure, constructed from public plant registries, complements ESG scores rather than replacing them. Both survive the Fama-MacBeth horse race, suggesting that each captures a distinct dimension of transition risk: ESG measures what firms disclose about their transition plans; spatial fuel similarity measures what the physical network implies about their technology vulnerability.
 
@@ -516,7 +476,7 @@ The fuel-similarity network framework applies in principle to any setting where 
 
 Geographic distance does not insulate power utilities from transition risk. When a firm retires coal capacity, the stock prices of technologically similar peers decline regardless of location. The channel is technology, not geography: fuel-mix similarity captures a common factor that cannot be diversified across locations, while local competitive benefits diversify away in the portfolios of multi-market utilities. Under a shift-share identification strategy with pre-determined fuel-mix shares, the fuel coefficient identifies the causal dose-response of abnormal returns to technology exposure, supported by non-negative Rotemberg weights and an Oster coefficient stability bound of $\delta^* = 20.8$.
 
-Emissions trading amplifies the fuel channel under pooled inference, though the interaction is sensitive to outlier events under Fama-MacBeth estimation. ESG scores and spatial fuel exposure capture complementary dimensions of transition risk, with both surviving a joint horse race. The fuel signal strengthens over calendar time, consistent with gradual market learning about the technology obsolescence channel.
+ESG scores and spatial fuel exposure capture complementary dimensions of transition risk, with both surviving a joint horse race. The fuel signal strengthens over calendar time, consistent with gradual market learning about the technology obsolescence channel.
 
 Several caveats apply. The fuel-similarity weight is constructed from installed capacity, not actual generation; a firm with idle coal plants receives the same weight as one actively generating from coal. A subset of firms use Compustat Global Security price returns (without dividend adjustment) rather than Eikon total returns, introducing a modest measurement asymmetry.\footnote{The exact count depends on the pipeline run and Eikon coverage at the time of data extraction. The return hierarchy is: CRSP total returns (US firms), Eikon TR.TotalReturn (non-US with coverage), Compustat Global Security price returns (non-US fallback). See \texttt{src/compute\_returns.py} for the source-priority logic.} No individual channel survives the Romano-Wolf multiple testing correction across nine hypotheses, though the joint F-test is highly significant ($F = 70.83$, $p = 0.000$) and the fuel channel's Fama-MacBeth $t$-statistic of $-7.36$ exceeds single-hypothesis thresholds by a wide margin.
 
