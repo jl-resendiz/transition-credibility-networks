@@ -26,17 +26,17 @@ Methods:
 
 | Variable | Window | Beta | SE | Raw t | Raw p | Bonferroni p | Max-t p | RW p |
 |---|---|---:|---:|---:|---:|---:|---:|---:|
-| w_geo | [-1,+3] | -0.022960 | 0.056598 | -0.406 | 0.6850 | 1.0000 | 1.0000 | 0.7347 |
-| w_fuel | [-1,+3] | -5.474254 | 0.730054 | -7.498 | 0.0000*** | 0.0000 | 0.5135 | 0.5135 |
-| w_reg | [-1,+3] | +1.452522 | 1.051538 | 1.381 | 0.1672 | 0.5015 | 1.0000 | 0.5896 |
+| w_geo | [-1,+3] | -0.022960 | 0.056598 | -0.406 | 0.6850 | 1.0000 | 0.9750 | 0.7027 |
+| w_fuel | [-1,+3] | -5.474254 | 0.730054 | -7.498 | 0.0000*** | 0.0000 | 0.0000 | 0.0000*** |
+| w_reg | [-1,+3] | +1.452522 | 1.051538 | 1.381 | 0.1672 | 0.5015 | 0.4404 | 0.3273 |
 
 ## Interpretation
 
 Rejections at 5% level:
 - Raw: 1/3
 - Bonferroni: 1/3
-- Max-t (Westfall-Young): 0/3
-- Romano-Wolf stepdown: 0/3
+- Max-t (Westfall-Young): 1/3
+- Romano-Wolf stepdown: 1/3
 
 Without correction, testing 3 hypotheses at 5% yields a
 family-wise error rate of 1 - (1-0.05)^3 = 14.3%.

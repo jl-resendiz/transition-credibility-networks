@@ -175,12 +175,15 @@ def ols(data, y_var, x_vars, cluster_var=None):
     }
 
 
-def bootstrap_t_stats(y_star, X, inv_XtX, cluster_map, x_vars, k, n):
-    """Compute t-stats from a bootstrap y* vector, reusing precomputed inv_XtX.
+def bootstrap_t_stats(y_star, X, inv_XtX, cluster_map, x_vars, k, n,
+                      beta_obs=None, se_obs=None):
+    """Compute centred bootstrap t-stats: t*_j = (beta*_j - beta_j) / se_j.
 
-    Since X does not change across bootstrap draws, (X'X)^{-1} is constant.
-    Only X'y* differs, so beta* = (X'X)^{-1} X'y* is cheap. The cluster-robust
-    SE requires recomputation of the meat matrix with new residuals.
+    Uses the OBSERVED betas and SEs as centering and scaling, following
+    Cameron, Gelbach & Miller (2008). This ensures the bootstrap distribution
+    is centred at zero under H0 and uses the correct scale.
+
+    If beta_obs/se_obs are None, falls back to beta*/se* (uncorrected).
     """
     # X'y*
     Xty = [0.0] * k
@@ -193,14 +196,27 @@ def bootstrap_t_stats(y_star, X, inv_XtX, cluster_map, x_vars, k, n):
     # beta* = inv_XtX @ X'y*
     beta = [sum(inv_XtX[a][b] * Xty[b] for b in range(k)) for a in range(k)]
 
-    # residuals
+    names = ['intercept'] + x_vars
+
+    if beta_obs is not None and se_obs is not None:
+        # Centred t*: (beta* - beta_obs) / se_obs
+        t_stats = []
+        for a in range(k):
+            se_a = se_obs.get(names[a], 0.0) if isinstance(se_obs, dict) else se_obs[a]
+            b_a = beta_obs.get(names[a], 0.0) if isinstance(beta_obs, dict) else beta_obs[a]
+            if se_a > 1e-15:
+                t_stats.append((beta[a] - b_a) / se_a)
+            else:
+                t_stats.append(0.0)
+        return dict(zip(names, t_stats))
+
+    # Fallback: uncorrected beta*/se*
     resid = [0.0] * n
     for i in range(n):
         Xi = X[i]
         fitted = sum(Xi[a] * beta[a] for a in range(k))
         resid[i] = y_star[i] - fitted
 
-    # Clustered meat
     S = _cluster_cov(X, resid, cluster_map, k)
     V = mat_mul(mat_mul(inv_XtX, S), inv_XtX)
     G = len(cluster_map)
@@ -213,7 +229,6 @@ def bootstrap_t_stats(y_star, X, inv_XtX, cluster_map, x_vars, k, n):
     se = [math.sqrt(V[a][a]) if V[a][a] > 0 else 0.0 for a in range(k)]
     t_stats = [beta[a] / se[a] if se[a] > 1e-15 else 0.0 for a in range(k)]
 
-    names = ['intercept'] + x_vars
     return dict(zip(names, t_stats))
 
 
@@ -571,6 +586,8 @@ for post in MONTH_POSTS:
         'spec_vars': spec_vars,
         'n': res['n'],
         'k': len(spec_vars) + 1,
+        'beta_obs': res['beta'],   # observed betas for centred bootstrap
+        'se_obs': res['se'],       # observed SEs for centred bootstrap
     }
 
 
@@ -627,6 +644,18 @@ def _export_for_julia(tmpdir):
         with open(os.path.join(data_dir, f'spec_vars_{post}.txt'), 'w') as f:
             for v in sv:
                 f.write(v + '\n')
+
+        # Observed betas and SEs for centred bootstrap
+        beta_obs = wc['beta_obs']
+        se_obs = wc['se_obs']
+        names = ['intercept'] + sv
+        with open(os.path.join(data_dir, f'obs_beta_se_{post}.csv'), 'w', newline='') as f:
+            w = csv.writer(f)
+            w.writerow(['beta_obs', 'se_obs'])
+            for name in names:
+                b = beta_obs.get(name, 0.0) if isinstance(beta_obs, dict) else 0.0
+                s = se_obs.get(name, 0.0) if isinstance(se_obs, dict) else 0.0
+                w.writerow([b, s])
 
     return data_dir
 
@@ -754,7 +783,8 @@ def _python_bootstrap():
 
             t_dict = bootstrap_t_stats(
                 buf, wc['X'], wc['inv_XtX'], wc['cluster_map'],
-                wc['spec_vars'], wc['k'], n
+                wc['spec_vars'], wc['k'], n,
+                beta_obs=wc['beta_obs'], se_obs=wc['se_obs']
             )
             if t_dict is None:
                 col += len(CHANNEL_VARS)

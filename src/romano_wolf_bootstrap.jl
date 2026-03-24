@@ -33,6 +33,8 @@ struct WindowData
     k::Int
     spec_vars::Vector{String}
     cluster_map::Dict{Int, Vector{Int}}
+    beta_obs::Vector{Float64}
+    se_obs::Vector{Float64}
 end
 
 function load_window(post::Int)::Union{WindowData, Nothing}
@@ -66,8 +68,19 @@ function load_window(post::Int)::Union{WindowData, Nothing}
         end
     end
 
+    # Observed betas and SEs for centred bootstrap
+    obs_path = joinpath(DATA_DIR, "obs_beta_se_$post.csv")
+    if isfile(obs_path)
+        obs_raw = readdlm(obs_path, ',', Float64; header=true)[1]
+        beta_obs = obs_raw[:, 1]
+        se_obs = obs_raw[:, 2]
+    else
+        beta_obs = zeros(k)
+        se_obs = ones(k)
+    end
+
     return WindowData(X_raw, y_hat, resid, cluster_ids, inv_raw,
-                      n, k, spec_vars, cmap)
+                      n, k, spec_vars, cmap, beta_obs, se_obs)
 end
 
 # ── Clustered covariance and bootstrap t-stats ──
@@ -142,10 +155,18 @@ function bootstrap_t_stats!(t_out::Vector{Float64}, y_star::Vector{Float64},
         V .*= scale
     end
 
-    # t-stats
-    @inbounds for a in 1:k
-        se = V[a, a] > 0 ? sqrt(V[a, a]) : 0.0
-        t_out[a] = se > 1e-15 ? beta_buf[a] / se : 0.0
+    # Centred t-stats: (beta* - beta_obs) / se_obs
+    # If beta_obs/se_obs available in wd, use them; otherwise fallback to beta*/se*
+    if isdefined(wd, :beta_obs) && isdefined(wd, :se_obs)
+        @inbounds for a in 1:k
+            se_a = wd.se_obs[a]
+            t_out[a] = se_a > 1e-15 ? (beta_buf[a] - wd.beta_obs[a]) / se_a : 0.0
+        end
+    else
+        @inbounds for a in 1:k
+            se = V[a, a] > 0 ? sqrt(V[a, a]) : 0.0
+            t_out[a] = se > 1e-15 ? beta_buf[a] / se : 0.0
+        end
     end
 end
 
