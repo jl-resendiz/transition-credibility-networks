@@ -116,7 +116,8 @@ def main():
         'strategy2_geo_diversification.py',
         'strategy2_learning_alternatives.py',
 
-        # Output generation
+        # Output generation (compute exports JSON; tables reads it)
+        'strategy2_referee_compute.py',
         'strategy2_referee_tables.py',
     ]
 
