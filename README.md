@@ -7,7 +7,7 @@ Smith School of Enterprise and the Environment, University of Oxford
 
 ## Overview
 
-This repository contains the replication package for the paper. Using plant-level data for 703 listed power utilities across 80 countries, I show that fuel-mix similarity is the dominant channel through which coal plant retirements transmit to stock prices. Geographic proximity, despite its theoretical appeal through local competition, does not transmit to equity valuations. The fuel channel is robust across all inference methods (Fama-MacBeth, event-clustered, two-way clustered, randomization), while emissions trading amplifies the stranding signal. ESG scores and spatial exposure capture complementary dimensions of transition risk.
+This repository contains the replication package for the paper. Using plant-level data for 703 listed power utilities across 80 countries, I show that fuel-mix similarity is the dominant channel through which coal plant retirements transmit to stock prices. Geographic proximity, despite its theoretical appeal through local competition, does not transmit to equity valuations. The fuel channel is robust across all inference methods (Fama-MacBeth, event-clustered, two-way clustered, Conley spatial) and survives all multiple testing corrections (Bonferroni, max-t, Romano-Wolf). ESG scores dominate fuel-mix similarity where both exist but cover only 153 of 703 firms; fuel-mix similarity extends transition risk measurement to the remainder.
 
 ---
 
@@ -69,7 +69,7 @@ Stage 4: build_retirement_events.py      (coal retirement events)
          build_coal_phaseout_events.py   (phase-out policy events)
          build_eia860_announcement_events.py
 Stage 5: summary_statistics.py
-Stage 6: 15 analysis scripts (see src/README.md for mapping to paper)
+Stage 6: 9 analysis scripts (see src/run_all.py for the DAG)
 ```
 
 ---

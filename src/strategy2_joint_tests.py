@@ -707,7 +707,7 @@ lines.append('## Comparison with individual tests')
 lines.append('')
 lines.append('| Test | Hypotheses tested | Correction needed | Result |')
 lines.append('|---|---|---|---|')
-lines.append('| Individual t-tests | 9 | Romano-Wolf | 0/9 significant |')
+lines.append('| Individual t-tests | 3 | Romano-Wolf | 1/3 significant (fuel) |')
 f_result = f'significant (p={p_f_perm:.4f})' if p_f_perm < 0.05 else f'not significant (p={p_f_perm:.4f})'
 d_result = f'significant (p={p_diff:.4f})' if p_diff < 0.05 else f'not significant (p={p_diff:.4f})'
 lines.append(f'| Joint F-test | 1 | None | {f_result} |')

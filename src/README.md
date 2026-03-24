@@ -46,25 +46,19 @@ Filters per Ince & Porter (2006): price >= $1, daily volume >= 1000, monthly ret
 
 ## Analysis Scripts (Stage 6)
 
-Each script maps to a specific takeaway (T1-T10) from the paper.
+9 scripts, each addressing a specific identification threat or result.
 
-| Script | Takeaway | Purpose |
-|---|---|---|
-| `strategy2_robust_inference.py` | T1, T8 | FM+NW, event-clustered, two-way clustered inference |
-| `strategy2_difference_test_summary.py` | T8 | Difference tests: FM, sign, Wilcoxon, randomization |
-| `strategy2_bandwidth_fmb.py` | T1 | Bandwidth sensitivity (250-1500km) |
-| `strategy2_joint_tests.py` | T1, T8 | Joint F-test, pooled event-clustered coefficients |
-| `strategy2_firm_level_test.py` | T1 | Two-way clustered (firm + event) |
-| `strategy2_event_specific_geo.py` | T2 | Event-specific w_geo (minimum distance, not centroid) |
-| `strategy2_geo_diversification.py` | T2 | Single-country subsample + diversification interaction |
-| `strategy2_credibility_interaction.py` | T3, T4 | ETS binary and carbon price continuous interactions |
-| `strategy2_esg_ets_fmb.py` | T5 | ESG horse race under FM+NW inference |
-| `strategy2_esg_horse_race.py` | T5 | ESG horse race, event-clustered |
-| `strategy2_learning_alternatives.py` | T6 | Learning order test (Bayesian vs cascading) |
-| `strategy2_spatial_score.py` | T7 | STS in-sample and out-of-sample holdout |
-| `strategy3_phaseout_wild_bootstrap.py` | T9 | Wild cluster bootstrap (14 clusters) |
-| `strategy2_romano_wolf.py` | T10 | Romano-Wolf stepdown correction |
-| `strategy2_referee_tables.py` | Appendix | Robustness tables (correlations, placebo, progression) |
+| Script | Purpose |
+|---|---|
+| `strategy2_robust_inference.py` | Main results: FM+NW, event-clustered, two-way clustered, window sensitivity |
+| `strategy2_joint_tests.jl` | Joint F-test + difference test (Julia; falls back to .py) |
+| `strategy2_esg_horse_race.py` | ESG vs fuel horse race on 153-firm subsample |
+| `strategy2_bartik_shiftshare.py` | Shift-share causal diagnostics (GPS 2020, Oster bounds) |
+| `strategy2_romano_wolf.py` | Romano-Wolf stepdown correction (3 hypotheses, hybrid Julia bootstrap) |
+| `strategy2_geo_diversification.py` | Aggregation lemma test (HHI + multi-country interaction) |
+| `strategy2_learning_alternatives.py` | Geographic heterogeneity (US vs non-US, calendar time) |
+| `strategy2_referee_compute.py` | Heavy computation for appendix tables (exports JSON) |
+| `strategy2_referee_tables.py` | LaTeX table formatting from JSON (< 1 second) |
 
 ## Data Pull Scripts (not in pipeline)
 
