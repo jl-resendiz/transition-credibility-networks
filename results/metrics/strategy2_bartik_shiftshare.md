@@ -158,6 +158,33 @@ N = 24070, R2 = 0.001351
 
 **PASS**: Bartik t = -1.870, p = 0.0615
 
+### Pre-Balance Sensitivity (cutoff = 2010)
+
+Repeats the pre-event balance test using only plants commissioned before 2010.
+More pre-determined shares strengthen the causal claim if the test still passes.
+
+Firms with pre-2010 fuel shares: 331 (vs 348 at pre-2014)
+Pre-2010 fuel matrix: 331 firms, 88206 edges
+
+N = 24070
+
+| Variable | beta | SE(cl) | t | p |
+|---|---:|---:|---:|---:|
+| intercept | +0.010859 | 0.006187 | 1.755 | 0.0792* |
+| bartik | -0.725037 | 0.314402 | -2.306 | 0.0211** |
+| w_geo | +0.173359 | 0.046216 | 3.751 | 0.0002*** |
+| w_reg | -0.247398 | 0.333389 | -0.742 | 0.4580 |
+| same_sector | +0.011418 | 0.005717 | 1.997 | 0.0458** |
+
+**FAIL**: Bartik (pre-2010) t = -2.306, p = 0.0211
+
+#### Pre-Balance Comparison
+
+| Cutoff | Bartik t | Bartik p | Verdict |
+|---:|---:|---:|---|
+| 2014 | -1.870 | 0.0615 | PASS |
+| 2010 | -2.306 | 0.0211 | FAIL |
+
 ### Oster (2019) Coefficient Stability Bounds
 
 Tests how much selection on unobservables (delta) would be needed to explain

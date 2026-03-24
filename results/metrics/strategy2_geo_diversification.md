@@ -14,6 +14,7 @@ Single-country definition: >=90% of MW in one country
 - Firms with plant data: 414
 - Single-country firms: 301
 - Multi-country firms: 113
+- HHI (geographic concentration): mean = 0.8516, median = 1.0000
 
 | n_countries | Firms |
 |---:|---:|
@@ -110,6 +111,26 @@ N = 55580, Events = 117, R2(pooled) = 0.0071, R2(FM avg) = 0.0567
 | same_sector            | +0.0332 | (0.0089) | 3.74 | 0.000*** | +0.0219 | (0.0113) | 1.94 | 0.053* |
 | w_geo_x_log_nc         | -0.0106 | (0.0700) | -0.15 | 0.880 | -12.6477 | (12.5792) | -1.01 | 0.315 |
 
+## Specification 3c: Diversification Interaction (HHI)
+
+CAR = b1 w_fuel + b2 w_geo + b3 w_reg + b4 same_sector + b5 (w_geo x HHI) + e
+
+HHI = sum(share_k^2) where share_k = MW_in_country_k / total_MW.
+HHI = 1 for single-country firms; HHI close to 0 for diversified firms.
+
+Prediction (Lemma 2): b5 > 0 (higher concentration = stronger geo effect).
+Equivalently: b_coeff on w_geo x (1 - HHI) should be negative.
+
+N = 55580, Events = 117, R2(pooled) = 0.0071, R2(FM avg) = 0.0562
+
+| Variable | beta(OLS) | SE(cl) | t | p | beta(FM) | SE(NW) | t | p |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| w_fuel                 | -5.4902 | (0.7292) | -7.53 | 0.000*** | -4.7535 | (0.6453) | -7.37 | 0.000*** |
+| w_geo                  | -0.2068 | (0.1129) | -1.83 | 0.067* | +195.4096 | (201.1883) | 0.97 | 0.331 |
+| w_reg                  | +1.4409 | (1.0536) | 1.37 | 0.171 | +2.6553 | (0.9967) | 2.66 | 0.008*** |
+| same_sector            | +0.0332 | (0.0089) | 3.75 | 0.000*** | +0.0223 | (0.0113) | 1.97 | 0.048** |
+| w_geo_x_hhi            | +0.2335 | (0.1788) | 1.31 | 0.191 | -196.3137 | (201.1911) | -0.98 | 0.329 |
+
 ## Interpretation
 
 - Full sample w_geo: beta = -0.607185, t = -1.297, p = 0.1945
@@ -117,6 +138,8 @@ N = 55580, Events = 117, R2(pooled) = 0.0071, R2(FM avg) = 0.0567
 - w_geo is NOT stronger in the single-country subsample.
 - Interaction (w_geo x n_countries): beta = -49.575980, t = -1.010, p = 0.3126
 - Interaction (w_geo x log(n_countries)): beta = -12.647735, t = -1.005, p = 0.3147
+- Interaction (w_geo x HHI): beta = -196.313680, t = -0.976, p = 0.3292
+  Pattern: negative HHI interaction -> geo effect does NOT strengthen with concentration (inconsistent with Lemma 2).
 
 ## Diagnostics
 
@@ -125,3 +148,6 @@ N = 55580, Events = 117, R2(pooled) = 0.0071, R2(FM avg) = 0.0567
 - Mean CAR (single-country): 0.054167
 - Mean CAR (multi-country): 0.053966
 - Mean n_countries across obs: 2.07
+- Mean HHI across obs: 0.9389
+- HHI range: [0.0788, 1.0000]
+- HHI = 1 (single-country): 45412 obs (81.7%)
