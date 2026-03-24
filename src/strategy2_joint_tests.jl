@@ -1,8 +1,8 @@
 #=
 Focused hypothesis tests for the channel split claim (Julia port).
 
-Instead of testing 9 individual hypotheses (3 channels x 3 horizons) that
-fail Romano-Wolf correction, this script performs TWO tests that directly
+Complementing the Romano-Wolf correction (3 hypotheses at the primary
+window; fuel survives), this script performs TWO tests that directly
 address the paper's core claim: spatial channels have opposite signs.
 
 Test 1 — Joint F-test: H0: beta_geo = beta_fuel = beta_reg = 0
@@ -861,7 +861,7 @@ function main()
     push!(lines, "")
     push!(lines, "| Test | Hypotheses tested | Correction needed | Result |")
     push!(lines, "|---|---|---|---|")
-    push!(lines, "| Individual t-tests | 9 | Romano-Wolf | 0/9 significant |")
+    push!(lines, "| Individual t-tests | 3 | Romano-Wolf | 1/3 significant (fuel) |")
     f_result = p_f_perm < 0.05 ?
         @sprintf("significant (p=%.4f)", p_f_perm) :
         @sprintf("not significant (p=%.4f)", p_f_perm)
