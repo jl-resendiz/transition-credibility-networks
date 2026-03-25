@@ -50,6 +50,8 @@ experiments/
 # Literature review (internal working notes, not for public repo)
 literature/
 
-# Audit reports (development artifacts)
-prompts/audit_*.md
-prompts/pipeline_optimization_report.md
+# Audit reports and referee correspondence (development artifacts)
+prompts/
+manuscript/response_to_*.md
+manuscript/referee_*.md
+manuscript/audit_*.md
