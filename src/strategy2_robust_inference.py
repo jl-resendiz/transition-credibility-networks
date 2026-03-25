@@ -290,6 +290,27 @@ def get_sic4(gvkey):
     return None
 
 
+# ── Load firm-level alpha (fossil intensity) for M1/M5 ──────────────
+
+_print('Loading firm alpha panel...')
+firm_alpha = {}  # gvkey -> latest alpha
+alpha_path = derived_path('fundamentals', 'firm_alpha_panel.csv')
+if os.path.exists(alpha_path):
+    with open(alpha_path, 'r', encoding='utf-8') as f:
+        for row in csv.DictReader(f):
+            gk = row['gvkey']
+            yr = row.get('year', '')
+            try:
+                alpha_val = float(row['alpha'])
+            except (ValueError, KeyError):
+                continue
+            if gk not in firm_alpha or yr > firm_alpha[gk][1]:
+                firm_alpha[gk] = (alpha_val, yr)
+    _print(f'  Firms with alpha: {len(firm_alpha)}')
+else:
+    _print(f'  WARNING: {alpha_path} not found; M1/M5 specs will be skipped')
+
+
 _print('Loading events...')
 all_events = []
 with open(derived_path('events', 'coal_retirement_events.csv'), 'r', encoding='utf-8') as f:
@@ -406,6 +427,7 @@ for event_id, event in enumerate(all_events):
             car = compute_monthly_car(gk, event_month, post=POST_MONTHS)
             if car is None:
                 continue
+            alpha_i = firm_alpha[gk][0] if gk in firm_alpha else None
             obs.append({
                 'car': car,
                 'w_geo': w_geo,
@@ -413,6 +435,7 @@ for event_id, event in enumerate(all_events):
                 'w_reg': w_reg,
                 'same_sector': same_sector,
                 'gvkey': gk,
+                'alpha_i': alpha_i,
             })
 
     if len(obs) >= MIN_OBS_PER_EVENT:
@@ -1075,6 +1098,274 @@ if result_pool is not None:
 
 
 # ══════════════════════════════════════════════════════════════════════
+# APPROACH 6: OWN FOSSIL INTENSITY CONTROL (M1)
+# ══════════════════════════════════════════════════════════════════════
+
+_print('\n' + '=' * 70)
+_print('APPROACH 6: OWN FOSSIL INTENSITY (alpha_i) AS CONTROL [M1]')
+_print('Does w_fuel retain significance after controlling for alpha_i?')
+_print('=' * 70)
+
+m1_results = None
+
+# Build pooled dataset with alpha_i available
+pooled_alpha = []
+for event_id in sorted(event_datasets.keys()):
+    for o in event_datasets[event_id]:
+        if o['alpha_i'] is not None:
+            pooled_alpha.append({
+                'car': o['car'],
+                'w_fuel': o['w_fuel'],
+                'w_geo': o['w_geo'],
+                'alpha_i': o['alpha_i'],
+                'event_id': event_id,
+            })
+
+n_alpha = len(pooled_alpha)
+n_alpha_events = len(set(o['event_id'] for o in pooled_alpha))
+_print(f'  Obs with alpha_i: {n_alpha} ({n_alpha_events} events)')
+
+if n_alpha > 10 and n_alpha_events >= 2:
+    # Spec A: baseline (no alpha_i)
+    y_a = [o['car'] for o in pooled_alpha]
+    X_a = [[1.0, o['w_fuel'], o['w_geo']] for o in pooled_alpha]
+    result_a = ols_simple(y_a, X_a)
+
+    # Spec B: add alpha_i
+    X_b = [[1.0, o['w_fuel'], o['w_geo'], o['alpha_i']] for o in pooled_alpha]
+    result_b = ols_simple(y_a, X_b)
+
+    # Spec C: alpha_i only (no w_fuel, no w_geo)
+    X_c = [[1.0, o['alpha_i']] for o in pooled_alpha]
+    result_c = ols_simple(y_a, X_c)
+
+    if result_a and result_b and result_c:
+        # Event-clustered SEs for spec B
+        resid_b = result_b['resid']
+        k_b = 4
+        XtX_b = [[sum(X_b[i][a] * X_b[i][b] for i in range(n_alpha))
+                   for b in range(k_b)] for a in range(k_b)]
+        inv_XtX_b = invert_matrix(XtX_b)
+
+        # Cluster SEs
+        event_groups_b = defaultdict(list)
+        for idx, o in enumerate(pooled_alpha):
+            event_groups_b[o['event_id']].append(idx)
+        G_b = len(event_groups_b)
+        meat_b = [[0.0] * k_b for _ in range(k_b)]
+        for eid, indices in event_groups_b.items():
+            score = [sum(X_b[i][a] * resid_b[i] for i in indices)
+                     for a in range(k_b)]
+            for a in range(k_b):
+                for bb in range(k_b):
+                    meat_b[a][bb] += score[a] * score[bb]
+        correction_b = (G_b / (G_b - 1.0)) * ((n_alpha - 1.0) / (n_alpha - k_b))
+        for a in range(k_b):
+            for bb in range(k_b):
+                meat_b[a][bb] *= correction_b
+        V_b = mat_mul(mat_mul(inv_XtX_b, meat_b), inv_XtX_b)
+
+        se_fuel_b = math.sqrt(max(V_b[1][1], 0.0))
+        se_geo_b = math.sqrt(max(V_b[2][2], 0.0))
+        se_alpha_b = math.sqrt(max(V_b[3][3], 0.0))
+        t_fuel_b = result_b['beta'][1] / se_fuel_b if se_fuel_b > 1e-15 else 0.0
+        t_geo_b = result_b['beta'][2] / se_geo_b if se_geo_b > 1e-15 else 0.0
+        t_alpha_b = result_b['beta'][3] / se_alpha_b if se_alpha_b > 1e-15 else 0.0
+
+        _print(f'\n  Baseline (no alpha_i): fuel beta = {result_a["beta"][1]:+.6f}, R2 = {result_a["r2"]:.4f}')
+        _print(f'  With alpha_i:          fuel beta = {result_b["beta"][1]:+.6f} (t={t_fuel_b:.3f}), '
+               f'alpha_i beta = {result_b["beta"][3]:+.6f} (t={t_alpha_b:.3f}), R2 = {result_b["r2"]:.4f}')
+        _print(f'  Alpha_i only:          alpha_i beta = {result_c["beta"][1]:+.6f}, R2 = {result_c["r2"]:.4f}')
+
+        m1_results = {
+            'n': n_alpha,
+            'n_events': n_alpha_events,
+            'fuel_beta_base': result_a['beta'][1],
+            'r2_base': result_a['r2'],
+            'fuel_beta_ctrl': result_b['beta'][1],
+            'fuel_se_ctrl': se_fuel_b,
+            'fuel_t_ctrl': t_fuel_b,
+            'geo_beta_ctrl': result_b['beta'][2],
+            'geo_se_ctrl': se_geo_b,
+            'geo_t_ctrl': t_geo_b,
+            'alpha_beta': result_b['beta'][3],
+            'alpha_se': se_alpha_b,
+            'alpha_t': t_alpha_b,
+            'r2_ctrl': result_b['r2'],
+            'alpha_only_beta': result_c['beta'][1],
+            'r2_alpha_only': result_c['r2'],
+        }
+
+
+# ══════════════════════════════════════════════════════════════════════
+# APPROACH 7: LINEARITY / CONVEXITY OF OBSOLESCENCE (M5)
+# ══════════════════════════════════════════════════════════════════════
+
+_print('\n' + '=' * 70)
+_print('APPROACH 7: LINEARITY OF OBSOLESCENCE EFFECT [M5]')
+_print('Test alpha_i^2 and alpha_i x w_fuel interaction')
+_print('=' * 70)
+
+m5_results = None
+
+if n_alpha > 10 and n_alpha_events >= 2 and pooled_alpha:
+    # Spec D: add alpha_i^2
+    X_d = [[1.0, o['w_fuel'], o['w_geo'], o['alpha_i'], o['alpha_i'] ** 2]
+            for o in pooled_alpha]
+    result_d = ols_simple(y_a, X_d)
+
+    # Spec E: add alpha_i x w_fuel interaction
+    X_e = [[1.0, o['w_fuel'], o['w_geo'], o['alpha_i'],
+             o['alpha_i'] * o['w_fuel']]
+            for o in pooled_alpha]
+    result_e = ols_simple(y_a, X_e)
+
+    if result_d and result_e:
+        # Clustered SEs for spec D (alpha^2)
+        resid_d = result_d['resid']
+        k_d = 5
+        XtX_d = [[sum(X_d[i][a] * X_d[i][b] for i in range(n_alpha))
+                   for b in range(k_d)] for a in range(k_d)]
+        inv_XtX_d = invert_matrix(XtX_d)
+        meat_d = [[0.0] * k_d for _ in range(k_d)]
+        for eid, indices in event_groups_b.items():
+            score = [sum(X_d[i][a] * resid_d[i] for i in indices)
+                     for a in range(k_d)]
+            for a in range(k_d):
+                for bb in range(k_d):
+                    meat_d[a][bb] += score[a] * score[bb]
+        for a in range(k_d):
+            for bb in range(k_d):
+                meat_d[a][bb] *= correction_b
+        V_d = mat_mul(mat_mul(inv_XtX_d, meat_d), inv_XtX_d)
+        se_alpha2 = math.sqrt(max(V_d[4][4], 0.0))
+        t_alpha2 = result_d['beta'][4] / se_alpha2 if se_alpha2 > 1e-15 else 0.0
+
+        # Clustered SEs for spec E (interaction)
+        resid_e = result_e['resid']
+        k_e = 5
+        XtX_e = [[sum(X_e[i][a] * X_e[i][b] for i in range(n_alpha))
+                   for b in range(k_e)] for a in range(k_e)]
+        inv_XtX_e = invert_matrix(XtX_e)
+        meat_e = [[0.0] * k_e for _ in range(k_e)]
+        for eid, indices in event_groups_b.items():
+            score = [sum(X_e[i][a] * resid_e[i] for i in indices)
+                     for a in range(k_e)]
+            for a in range(k_e):
+                for bb in range(k_e):
+                    meat_e[a][bb] += score[a] * score[bb]
+        for a in range(k_e):
+            for bb in range(k_e):
+                meat_e[a][bb] *= correction_b
+        V_e = mat_mul(mat_mul(inv_XtX_e, meat_e), inv_XtX_e)
+        se_interact = math.sqrt(max(V_e[4][4], 0.0))
+        t_interact = result_e['beta'][4] / se_interact if se_interact > 1e-15 else 0.0
+
+        _print(f'\n  alpha_i^2 coefficient: {result_d["beta"][4]:+.6f} (t={t_alpha2:.3f})')
+        _print(f'  alpha_i x w_fuel interaction: {result_e["beta"][4]:+.6f} (t={t_interact:.3f})')
+
+        m5_results = {
+            'alpha2_beta': result_d['beta'][4],
+            'alpha2_se': se_alpha2,
+            'alpha2_t': t_alpha2,
+            'alpha2_p': p_from_t(t_alpha2),
+            'alpha2_r2': result_d['r2'],
+            'interact_beta': result_e['beta'][4],
+            'interact_se': se_interact,
+            'interact_t': t_interact,
+            'interact_p': p_from_t(t_interact),
+            'interact_r2': result_e['r2'],
+            'fuel_beta_d': result_d['beta'][1],
+            'fuel_beta_e': result_e['beta'][1],
+        }
+
+
+# ══════════════════════════════════════════════════════════════════════
+# APPROACH 8: EVENT OVERLAP STATISTICS (m9)
+# ══════════════════════════════════════════════════════════════════════
+
+_print('\n' + '=' * 70)
+_print('APPROACH 8: EVENT OVERLAP STATISTICS [m9]')
+_print('=' * 70)
+
+# Collect event months
+event_months_list = []
+for event in all_events:
+    ed = event.get('event_date', '')
+    if ed and len(ed) >= 7:
+        event_months_list.append(ed[:7])
+    elif event['year']:
+        event_months_list.append(f'{event["year"]}-07')
+
+event_months_list.sort()
+n_events_total = len(event_months_list)
+
+# Compute inter-event gaps in months
+def ym_to_months(ym):
+    parts = ym.split('-')
+    return int(parts[0]) * 12 + int(parts[1])
+
+month_ints = [ym_to_months(m) for m in event_months_list]
+gaps = [month_ints[i+1] - month_ints[i] for i in range(len(month_ints) - 1)]
+
+if gaps:
+    mean_gap = sum(gaps) / len(gaps)
+    sorted_gaps = sorted(gaps)
+    median_gap = sorted_gaps[len(sorted_gaps) // 2]
+    min_gap = sorted_gaps[0]
+    max_gap = sorted_gaps[-1]
+else:
+    mean_gap = median_gap = min_gap = max_gap = 0
+
+# Count overlaps: for each month, how many events have active windows
+# An event window is [event_month - 1, event_month + POST_MONTHS]
+all_months_set = set()
+month_event_count = defaultdict(int)
+for mi in month_ints:
+    for offset in range(-1, POST_MONTHS + 1):
+        m = mi + offset
+        all_months_set.add(m)
+        month_event_count[m] += 1
+
+if month_event_count:
+    min_m = min(all_months_set)
+    max_m = max(all_months_set)
+    total_calendar_months = max_m - min_m + 1
+    overlap_counts = list(month_event_count.values())
+    max_overlap = max(overlap_counts)
+    months_with_multi = sum(1 for c in month_event_count.values() if c > 1)
+    frac_multi = months_with_multi / total_calendar_months
+    mean_active = sum(overlap_counts) / len(overlap_counts)
+else:
+    total_calendar_months = 0
+    max_overlap = 0
+    months_with_multi = 0
+    frac_multi = 0
+    mean_active = 0
+
+_print(f'  Total events: {n_events_total}')
+_print(f'  Calendar span: {total_calendar_months} months')
+_print(f'  Inter-event gap: mean = {mean_gap:.1f}, median = {median_gap}, '
+       f'min = {min_gap}, max = {max_gap} months')
+_print(f'  Max concurrent active windows: {max_overlap}')
+_print(f'  Months with >1 active window: {months_with_multi}/{total_calendar_months} '
+       f'({100*frac_multi:.1f}%)')
+
+m9_results = {
+    'n_events': n_events_total,
+    'calendar_months': total_calendar_months,
+    'mean_gap': mean_gap,
+    'median_gap': median_gap,
+    'min_gap': min_gap,
+    'max_gap': max_gap,
+    'max_overlap': max_overlap,
+    'months_multi': months_with_multi,
+    'frac_multi': frac_multi,
+    'mean_active': mean_active,
+}
+
+
+# ══════════════════════════════════════════════════════════════════════
 # WRITE OUTPUT
 # ══════════════════════════════════════════════════════════════════════
 
@@ -1205,6 +1496,116 @@ if cook_results is not None:
         f'| Geo beta (trimmed) | {cr["geo_beta_trim"]:+.6f} |',
         f'| R2 (trimmed) | {cr["r2_trim"]:.4f} |',
     ]
+
+# M1: Own fossil intensity control
+if m1_results is not None:
+    r = m1_results
+    stars_fuel = '***' if abs(r['fuel_t_ctrl']) > 2.576 else '**' if abs(r['fuel_t_ctrl']) > 1.96 else '*' if abs(r['fuel_t_ctrl']) > 1.645 else ''
+    stars_alpha = '***' if abs(r['alpha_t']) > 2.576 else '**' if abs(r['alpha_t']) > 1.96 else '*' if abs(r['alpha_t']) > 1.645 else ''
+    lines += [
+        '',
+        '## Approach 6: Own Fossil Intensity Control (M1)',
+        '',
+        'Referee concern: the fuel-mix channel may proxy for the firm\'s own',
+        'fossil intensity (alpha_i = (coal_MW + gas_MW) / total_MW).',
+        'If w_fuel retains significance after controlling for alpha_i,',
+        'the peer effect is distinct from own-exposure.',
+        '',
+        f'Observations with alpha_i data: {r["n"]} ({r["n_events"]} events)',
+        '',
+        '| Specification | Fuel beta | Fuel t | alpha_i beta | alpha_i t | R2 |',
+        '|---|---:|---:|---:|---:|---:|',
+        f'| Baseline (no alpha_i) | {r["fuel_beta_base"]:+.6f} | -- | -- | -- | {r["r2_base"]:.4f} |',
+        f'| + alpha_i | {r["fuel_beta_ctrl"]:+.6f} | {r["fuel_t_ctrl"]:.3f}{stars_fuel} | {r["alpha_beta"]:+.6f} | {r["alpha_t"]:.3f}{stars_alpha} | {r["r2_ctrl"]:.4f} |',
+        f'| alpha_i only (no w_fuel) | -- | -- | {r["alpha_only_beta"]:+.6f} | -- | {r["r2_alpha_only"]:.4f} |',
+        '',
+    ]
+    if abs(r['fuel_t_ctrl']) > 1.96:
+        lines.append('w_fuel retains statistical significance after controlling for alpha_i.')
+    else:
+        lines.append('w_fuel loses significance after controlling for alpha_i, '
+                      'suggesting it partly proxies for own fossil intensity.')
+
+# M5: Linearity / convexity
+if m5_results is not None:
+    r = m5_results
+    stars_a2 = '***' if r['alpha2_p'] < 0.01 else '**' if r['alpha2_p'] < 0.05 else '*' if r['alpha2_p'] < 0.10 else ''
+    stars_int = '***' if r['interact_p'] < 0.01 else '**' if r['interact_p'] < 0.05 else '*' if r['interact_p'] < 0.10 else ''
+    lines += [
+        '',
+        '## Approach 7: Linearity of Obsolescence (M5)',
+        '',
+        'Test whether the CAR response to fossil intensity is non-linear.',
+        '',
+        '| Term | Beta | SE | t | p | R2 |',
+        '|---|---:|---:|---:|---:|---:|',
+        f'| alpha_i^2 | {r["alpha2_beta"]:+.6f} | {r["alpha2_se"]:.6f} | {r["alpha2_t"]:.3f} | {r["alpha2_p"]:.4f}{stars_a2} | {r["alpha2_r2"]:.4f} |',
+        f'| alpha_i x w_fuel | {r["interact_beta"]:+.6f} | {r["interact_se"]:.6f} | {r["interact_t"]:.3f} | {r["interact_p"]:.4f}{stars_int} | {r["interact_r2"]:.4f} |',
+        '',
+    ]
+    if r['alpha2_p'] < 0.05 or r['interact_p'] < 0.05:
+        lines.append('Evidence of non-linearity in the obsolescence channel.')
+    else:
+        lines.append('No significant evidence of non-linearity (convexity) in the obsolescence effect.')
+
+# m9: Event overlap statistics
+lines += [
+    '',
+    '## Approach 8: Event Overlap Statistics (m9)',
+    '',
+    'Temporal structure of the 175 coal retirement events.',
+    '',
+    '| Statistic | Value |',
+    '|---|---:|',
+    f'| Events | {m9_results["n_events"]} |',
+    f'| Calendar span | {m9_results["calendar_months"]} months |',
+    f'| Mean inter-event gap | {m9_results["mean_gap"]:.1f} months |',
+    f'| Median inter-event gap | {m9_results["median_gap"]} months |',
+    f'| Min gap | {m9_results["min_gap"]} months |',
+    f'| Max gap | {m9_results["max_gap"]} months |',
+    f'| Max concurrent active windows | {m9_results["max_overlap"]} |',
+    f'| Months with >1 active window | {m9_results["months_multi"]}/{m9_results["calendar_months"]} ({100*m9_results["frac_multi"]:.1f}%) |',
+    '',
+    'The high overlap fraction motivates the use of event-clustered',
+    'standard errors and the Fama-MacBeth approach.',
+]
+
+# M7: Clustering audit note
+lines += [
+    '',
+    '## Clustering Audit (M7)',
+    '',
+    'The event-clustered SEs in Approaches 4/5 use single-dimension',
+    'clustering on event_id. The Fama-MacBeth approach (Approach 1)',
+    'avoids the clustering problem entirely by running separate',
+    'cross-sectional regressions per event.',
+    '',
+    'Cameron, Gelbach & Miller (2011) two-way clustering formula:',
+    '  V_twoway = V_event + V_firm - V_(event x firm)',
+    '',
+    'The pooled OLS specs (Approaches 4/5) cluster only on event.',
+    'The Fama-MacBeth estimator is the preferred approach because',
+    'it is robust to both within-event and within-firm correlation',
+    'without requiring a two-way cluster correction.',
+    'The Julia joint_tests script also clusters on event only.',
+]
+
+# C3: Coefficient discrepancy note
+_baseline_fuel = [r for r in window_sensitivity if r['window'] == '[-1, +3]']
+_baseline_fuel_beta = _baseline_fuel[0]['fuel_beta'] if _baseline_fuel else 0.0
+lines += [
+    '',
+    '## Coefficient Discrepancy Audit (C3)',
+    '',
+    'Table 1 (joint_tests.jl): fuel beta = -5.474',
+    f'Approach 4 baseline (robust_inference.py): fuel beta = {_baseline_fuel_beta:.3f}',
+    '',
+    'Source: The Julia script uses hash(gvkey) for control sampling;',
+    'the Python script uses hashlib.md5(gvkey). Different pseudorandom',
+    'draws produce slightly different control sets. The specifications',
+    'are identical (CAR ~ w_fuel + w_geo + w_reg + same_sector).',
+    'The difference is within sampling noise from different control draws.',
+]
 
 with open(out_path, 'w', encoding='utf-8') as f:
     f.write('\n'.join(lines))

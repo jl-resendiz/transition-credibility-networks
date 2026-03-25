@@ -94,8 +94,12 @@ print(f'Firms with valid centroids: {len(centroids)}')
 # 4. Build distance matrix and geographic weight matrix
 gvkeys = sorted(centroids.keys())
 n = len(gvkeys)
-# Exponential decay scale. We set the half-life to 500 km to avoid a hard cutoff.
-DECAY_KM = 500 / math.log(2)
+# Exponential decay scale.  Half-life h = 1000 km (manuscript Section 3.1).
+# d_bar = h / ln(2) so that w(h) = 0.5 * w(0) at distance h.
+# NOTE (C1 audit): Previously set to 500 / ln(2) ≈ 721 km.  The manuscript
+#   has always stated h = 1000 km and the bandwidth sensitivity table
+#   (Table 4) treats 1000 km as the baseline.  Fixed 2026-03-25.
+DECAY_KM = 1000 / math.log(2)
 REG_WEIGHT = 1.0    # weight on regulatory component (if available)
 
 # Compute pairwise distances and inverse-distance weights
@@ -161,7 +165,7 @@ max_neighbors = max(len(W.get(gi, {})) for gi in gvkeys) if gvkeys else 0
 
 print(f'\n=== WEIGHT MATRIX W ===')
 print(f'Firms: {n}')
-print(f'Decay scale: {DECAY_KM:.1f} km (half-life = 500 km)')
+print(f'Decay scale: {DECAY_KM:.1f} km (half-life = {DECAY_KM * math.log(2):.0f} km)')
 print(f'Regulatory weight: {REG_WEIGHT}')
 print(f'Connected firms: {n_connected} ({100*n_connected/n:.1f}%)')
 print(f'Avg neighbors: {avg_neighbors:.1f}')
