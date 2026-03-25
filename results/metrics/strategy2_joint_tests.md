@@ -11,8 +11,8 @@ Unrestricted: CAR = alpha + beta_geo * w^geo + beta_fuel * w^fuel + beta_reg * w
 Restricted:   CAR = alpha + beta_s * SameSector
 
 SSR_restricted:   3946.450094
-SSR_unrestricted: 3931.417645
-F-statistic: 70.8335
+SSR_unrestricted: 3931.422831
+F-statistic: 70.8090
 df: (3, 55575)
 p-value (permutation, B=999): 0.0000***
 N: 55580
@@ -21,30 +21,30 @@ Reject H0 at 5%. The spatial network channels jointly predict CARs around coal r
 
 ## Test 2: Difference test (H0: beta_geo = beta_fuel)
 
-beta_geo:  -0.022960 (SE 0.056598)
-beta_fuel: -5.474254 (SE 0.730054)
-Difference (beta_geo - beta_fuel): +5.451294
-SE of difference: 0.730684
-t-statistic: 7.461
+beta_geo:  +0.017592 (SE 0.100693)
+beta_fuel: -5.488354 (SE 0.727851)
+Difference (beta_geo - beta_fuel): +5.505946
+SE of difference: 0.728539
+t-statistic: 7.558
 p-value: 0.0000***
-Cov(beta_geo, beta_fuel): +0.0011419292
+Cov(beta_geo, beta_fuel): +0.0045687476
 
-Interpretation: The opposing-sign channel split is statistically significant in a single test (t = 7.461, p = 0.0000).
+Interpretation: The opposing-sign channel split is statistically significant in a single test (t = 7.558, p = 0.0000).
 
 ## Full regression coefficients
 
 | Variable | Beta | SE | t | p |
 |---|---:|---:|---:|---:|
-| intercept | +0.035796 | 0.007657 | 4.675 | 0.0000*** |
-| w_geo | -0.022960 | 0.056598 | -0.406 | 0.6850 |
-| w_fuel | -5.474254 | 0.730054 | -7.498 | 0.0000*** |
-| w_reg | +1.452522 | 1.051538 | 1.381 | 0.1672 |
-| same_sector | +0.033201 | 0.008872 | 3.742 | 0.0002*** |
+| intercept | +0.035757 | 0.007665 | 4.665 | 0.0000*** |
+| w_geo | +0.017592 | 0.100693 | 0.175 | 0.8613 |
+| w_fuel | -5.488354 | 0.727851 | -7.540 | 0.0000*** |
+| w_reg | +1.441175 | 1.050350 | 1.372 | 0.1700 |
+| same_sector | +0.033207 | 0.008873 | 3.743 | 0.0002*** |
 
 ## Comparison with individual tests
 
 | Test | Hypotheses tested | Correction needed | Result |
 |---|---|---|---|
-| Individual t-tests | 9 | Romano-Wolf | 0/9 significant |
+| Individual t-tests | 3 | Romano-Wolf | 1/3 significant (fuel) |
 | Joint F-test | 1 | None | significant (p=0.0000) |
 | Difference test | 1 | None | significant (p=0.0000) |
