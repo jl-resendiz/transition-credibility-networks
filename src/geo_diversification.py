@@ -14,7 +14,7 @@ Each specification reports:
   - Pooled OLS with event-clustered SEs
   - Fama-MacBeth + Newey-West
 
-Output: results/metrics/strategy2_geo_diversification.md
+Output: results/metrics/geo_diversification.md
 """
 import csv
 import os
@@ -871,7 +871,7 @@ if all_hhi:
 # WRITE OUTPUT
 # ══════════════════════════════════════════════════════════════════════
 
-out_path = results_path('metrics', 'strategy2_geo_diversification.md')
+out_path = results_path('metrics', 'geo_diversification.md')
 os.makedirs(os.path.dirname(out_path), exist_ok=True)
 
 

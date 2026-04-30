@@ -852,7 +852,7 @@ for j, (ch, post) in enumerate(hypothesis_labels):
            f'{bonf_p[j]:>8.4f} {maxt_p[j]:>8.4f} {rw_p[j]:>8.4f}')
 
 # Write markdown output
-out_path = results_path('metrics', 'strategy2_romano_wolf.md')
+out_path = results_path('metrics', 'romano_wolf.md')
 os.makedirs(os.path.dirname(out_path), exist_ok=True)
 
 lines = [

@@ -1,8 +1,8 @@
 """Check that all strategy*.py and build*.py in src/ are in run_all.py DAG.
 
 Allowlist: _paths.py, run_all.py, romano_wolf_bootstrap.jl, pull_*.py, 
-update_*.py, check_orphans.py, strategy2_referee_compute.py (called by run_all
-via referee_tables dependency), strategy2_joint_tests.py (Julia fallback).
+update_*.py, check_orphans.py, referee_compute.py (called by run_all
+via referee_tables dependency), joint_tests.py (Julia fallback).
 
 Usage: python src/check_orphans.py
 Exit code 0 = clean, 1 = orphans found.

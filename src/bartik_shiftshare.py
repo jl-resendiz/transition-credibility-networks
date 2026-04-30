@@ -17,7 +17,7 @@ Reports Fama-MacBeth + Newey-West and pooled event-clustered results,
 plus diagnostics on pre-period share coverage and correlation with
 current shares.
 
-Output: results/metrics/strategy2_bartik_shiftshare.md
+Output: results/metrics/bartik_shiftshare.md
 """
 import csv
 import os
@@ -568,7 +568,7 @@ for y in sorted(retirement_mw_by_year):
 
 
 # ══════════════════════════════════════════════════════════════════════
-# STEP 3: LOAD DATA (same pattern as strategy2_robust_inference.py)
+# STEP 3: LOAD DATA (same pattern as robust_inference.py)
 # ══════════════════════════════════════════════════════════════════════
 
 _print('\nLoading monthly returns...')
@@ -1518,7 +1518,7 @@ else:
 # WRITE OUTPUT
 # ══════════════════════════════════════════════════════════════════════
 
-out_path = results_path('metrics', 'strategy2_bartik_shiftshare.md')
+out_path = results_path('metrics', 'bartik_shiftshare.md')
 os.makedirs(os.path.dirname(out_path), exist_ok=True)
 
 lines = [

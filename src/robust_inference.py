@@ -14,7 +14,7 @@ that properly account for within-firm correlation:
 3. Portfolio sorts with proper inference: Shanken (1992) / Newey-West
    corrected t-stats on the time series of event-level portfolio spreads.
 
-Output: results/metrics/strategy2_robust_inference.md
+Output: results/metrics/robust_inference.md
 """
 import csv
 import os
@@ -1369,7 +1369,7 @@ m9_results = {
 # WRITE OUTPUT
 # ══════════════════════════════════════════════════════════════════════
 
-out_path = results_path('metrics', 'strategy2_robust_inference.md')
+out_path = results_path('metrics', 'robust_inference.md')
 os.makedirs(os.path.dirname(out_path), exist_ok=True)
 
 lines = [

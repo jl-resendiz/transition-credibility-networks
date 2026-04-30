@@ -50,15 +50,15 @@ Filters per Ince & Porter (2006): price >= $1, daily volume >= 1000, monthly ret
 
 | Script | Purpose |
 |---|---|
-| `strategy2_robust_inference.py` | Main results: FM+NW, event-clustered, two-way clustered, window sensitivity |
-| `strategy2_joint_tests.jl` | Joint F-test + difference test (Julia; falls back to .py) |
-| `strategy2_esg_horse_race.py` | ESG vs fuel horse race on 153-firm subsample |
-| `strategy2_bartik_shiftshare.py` | Shift-share causal diagnostics (GPS 2020, Oster bounds) |
-| `strategy2_romano_wolf.py` | Romano-Wolf stepdown correction (3 hypotheses, hybrid Julia bootstrap) |
-| `strategy2_geo_diversification.py` | Aggregation lemma test (HHI + multi-country interaction) |
-| `strategy2_learning_alternatives.py` | Geographic heterogeneity (US vs non-US, calendar time) |
-| `strategy2_referee_compute.py` | Heavy computation for appendix tables (exports JSON) |
-| `strategy2_referee_tables.py` | LaTeX table formatting from JSON (< 1 second) |
+| `robust_inference.py` | Main results: FM+NW, event-clustered, two-way clustered, window sensitivity |
+| `joint_tests.jl` | Joint F-test + difference test (Julia; falls back to .py) |
+| `esg_horse_race.py` | ESG vs fuel horse race on 153-firm subsample |
+| `bartik_shiftshare.py` | Shift-share causal diagnostics (GPS 2020, Oster bounds) |
+| `romano_wolf.py` | Romano-Wolf stepdown correction (3 hypotheses, hybrid Julia bootstrap) |
+| `geo_diversification.py` | Aggregation lemma test (HHI + multi-country interaction) |
+| `learning_alternatives.py` | Geographic heterogeneity (US vs non-US, calendar time) |
+| `referee_compute.py` | Heavy computation for appendix tables (exports JSON) |
+| `referee_tables.py` | LaTeX table formatting from JSON (< 1 second) |
 
 ## Data Pull Scripts (not in pipeline)
 

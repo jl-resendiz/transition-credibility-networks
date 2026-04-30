@@ -113,6 +113,58 @@ out(f'- Countries (analysis sample): {len(analysis_countries)}')
 out(f'- Total installed capacity (analysis sample): {total_capacity_mw:,.0f} MW = {total_capacity_tw:.1f} TW')
 out()
 
+# ── Event-study sample chain (the firms that actually enter the regressions) ──
+returns_firms = set()
+ret_path = derived_path('returns', 'monthly_returns.csv')
+if os.path.exists(ret_path):
+    with open(ret_path, 'r', encoding='utf-8') as f:
+        for row in csv.DictReader(f):
+            returns_firms.add(row['gvkey'])
+
+def _firms_in_network(path):
+    """Count unique firms that appear as either side of any pair in a weight CSV."""
+    out = set()
+    if not os.path.exists(path):
+        return out
+    with open(path, 'r', encoding='utf-8') as f:
+        for row in csv.DictReader(f):
+            out.add(row['gvkey_i'])
+            out.add(row['gvkey_j'])
+    return out
+
+network_firms = _firms_in_network(derived_path('networks', 'weight_matrix_W_geo.csv'))
+fuel_firms = _firms_in_network(derived_path('networks', 'weight_matrix_W_fuel.csv'))
+reg_firms = _firms_in_network(derived_path('networks', 'weight_matrix_W_regulatory.csv'))
+
+three_layer_firms = network_firms & fuel_firms & reg_firms
+returns_three_layer = returns_firms & three_layer_firms
+
+esg_firms = set()
+esg_path = raw_path('refinitiv', 'refinitiv_esg.csv')
+if os.path.exists(esg_path):
+    with open(esg_path, 'r', encoding='utf-8') as f:
+        for row in csv.DictReader(f):
+            score = row.get('env_score') or row.get('environmental_score')
+            if score and score.strip() not in ('', 'NA'):
+                esg_firms.add(row['gvkey'].zfill(6))
+returns_esg = {g.zfill(6) for g in returns_firms} & esg_firms
+
+out('### Event-study sample (chain to manuscript abstract)')
+out()
+out('| Stage | Sample | N firms |')
+out('|---|---|---:|')
+out(f'| 1 | Firms with monthly returns coverage (manuscript: "703 listed utilities") | {len(returns_firms)} |')
+out(f'| 2 | Firms in the GEM-derived weight matrices (W_geo / W_fuel) | {len(network_firms)} |')
+out(f'| 3 | Firms in the regulatory weight matrix (W_reg) | {len(reg_firms)} |')
+out(f'| 4 | Returns AND ESG coverage (manuscript: "153 also have ESG environmental scores") | {len(returns_esg)} |')
+out()
+out('Note: the "565 firms" cited in the abstract is the unique-firm count in the event-firm regression panel '
+    '(neighbours of retiring firms PLUS random controls drawn from the SIC universe), not a strict subset of '
+    'the network-coverage firms. It is reported by `joint_tests.py` as the firm-cluster count when '
+    'two-way clustering by (event, firm). The three-network intersection above is more restrictive than the '
+    'operational regression sample because the latter includes random controls.')
+out()
+
 # ── Panel A: Analysis sample ──
 out(f'## Panel A: Analysis Sample (N = {len(analysis_sample)} firms, latest fiscal year)')
 out()

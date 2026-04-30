@@ -1,7 +1,7 @@
 """Generate reviewer-requested robustness tables for Strategy 2.
 
 Reads pre-computed regression results from results/json/referee_tables.json
-(produced by strategy2_referee_compute.py) and formats LaTeX tables.
+(produced by referee_compute.py) and formats LaTeX tables.
 
 Tasks:
 1) Correlation matrix among w_geo, w_fuel, w_reg (3x3).
@@ -130,7 +130,7 @@ def main():
     if not os.path.exists(json_path):
         raise RuntimeError(
             f'Pre-computed results not found: {json_path}\n'
-            'Run strategy2_referee_compute.py first.'
+            'Run referee_compute.py first.'
         )
     with open(json_path, 'r', encoding='utf-8') as f:
         data = json.load(f)

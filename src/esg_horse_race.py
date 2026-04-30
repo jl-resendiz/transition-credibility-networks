@@ -714,7 +714,7 @@ if abs(spatial_adds_to_esg) > 10 * abs(esg_adds_to_spatial):
 # ── Write output ─────────────────────────────────────────────────────
 
 _print('\nWriting results...')
-out_path = results_path('metrics', 'strategy2_esg_horse_race.md')
+out_path = results_path('metrics', 'esg_horse_race.md')
 os.makedirs(os.path.dirname(out_path), exist_ok=True)
 
 lines = []

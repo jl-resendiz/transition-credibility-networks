@@ -2,7 +2,7 @@
 
 This is a proxy builder that filters to US firms (fic=USA) and retains
 only events with announcement dates. Output is compatible with
-strategy2_panel_did.py via EVENTS_PATH.
+panel_did.py via EVENTS_PATH.
 """
 import csv
 from _paths import derived_path

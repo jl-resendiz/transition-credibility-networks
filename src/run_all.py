@@ -12,6 +12,10 @@ Analysis scripts are independent and run in any order.
 Julia (.jl) scripts are used for computationally intensive bootstrap
 procedures where they provide >10x speedup over Python. If Julia is
 not installed, the pipeline falls back to equivalent Python scripts.
+
+R (.R) scripts are used for spatial-econometric standard errors that
+have no stdlib-Python equivalent (Conley SEs via fixest::conley()). If
+Rscript is not on PATH, those steps are skipped with a warning.
 """
 import os
 import sys
@@ -29,9 +33,12 @@ if not JULIA:
     if os.path.exists(_julia_winapp):
         JULIA = _julia_winapp
 
+# Locate Rscript binary (optional; R-only steps skipped if absent)
+RSCRIPT = shutil.which('Rscript')
+
 # Fallback map: Julia script -> Python equivalent
 _FALLBACK = {
-    'strategy2_joint_tests.jl': 'strategy2_joint_tests.py',
+    'joint_tests.jl': 'joint_tests.py',
 }
 
 
@@ -52,6 +59,12 @@ def run(script_name):
             cmd = [sys.executable, os.path.join(SRC, fb)]
         else:
             print(f'  SKIP (Julia not found, no fallback): {script_name}')
+            return
+    elif script_name.endswith('.R'):
+        if RSCRIPT:
+            cmd = [RSCRIPT, path]
+        else:
+            print(f'  SKIP (Rscript not found): {script_name}')
             return
     else:
         cmd = [sys.executable, path]
@@ -104,19 +117,48 @@ def main():
     #
     analysis_scripts = [
         # Main results
-        'strategy2_robust_inference.py',
-        'strategy2_joint_tests.jl',        # ~42s Julia vs ~268s Python
-        'strategy2_esg_horse_race.py',
+        'robust_inference.py',
+        'joint_tests.jl',        # ~42s Julia vs ~268s Python
+        'esg_horse_race.py',
 
         # Identification and robustness
-        'strategy2_bartik_shiftshare.py',
-        'strategy2_romano_wolf.py',
-        'strategy2_geo_diversification.py',
-        'strategy2_learning_alternatives.py',
+        'bartik_shiftshare.py',
+        'romano_wolf.py',
+        'geo_diversification.py',
+        'learning_alternatives.py',
+
+        # Phase 2: pre-trend transparency (event-time path + Honest DID)
+        'event_time_path.py',
+        'honest_did.py',
+
+        # Phase 2: NW lag sensitivity (depends on event_level_betas.csv)
+        'lag_sensitivity.py',
+
+        # Phase 2: multi-factor abnormal returns (FF3 + sample utility industry)
+        'multifactor_inference.py',
+        'honest_did_mf.py',
+
+        # Phase 2: bridge interaction (Section 2.5 augmented spec)
+        'bridge_interaction.py',
+
+        # Phase 2: announcement vs physical retirement robustness
+        'announcement_robustness.py',
+
+        # Phase 3: heterogeneity tests (US split, ESG joint, country robustness)
+        'us_regulation_split.py',
+        'esg_fm_joint.py',
+        'country_robustness.py',
+
+        # Post-units-fix: identification + anomaly-vs-risk demarcation
+        'fisher_ri.py',
+        'anomaly_vs_risk.py',
+
+        # Conley spatial standard errors (skipped if Rscript not on PATH)
+        'robustness_conley_se.R',
 
         # Output generation (compute exports JSON; tables reads it)
-        'strategy2_referee_compute.py',
-        'strategy2_referee_tables.py',
+        'referee_compute.py',
+        'referee_tables.py',
     ]
 
     for s in analysis_scripts:

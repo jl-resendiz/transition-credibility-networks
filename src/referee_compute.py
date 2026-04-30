@@ -3,7 +3,7 @@
 This is the heavy-computation step. It loads raw data, runs all OLS
 regressions, the placebo permutation test, VIF diagnostics, and
 bandwidth sensitivity. Results are exported to results/json/referee_tables.json
-for fast table generation by strategy2_referee_tables.py.
+for fast table generation by referee_tables.py.
 
 Tasks:
 1) Correlation matrix among w_geo, w_fuel, w_reg (3x3).

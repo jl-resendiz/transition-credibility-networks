@@ -1,6 +1,6 @@
 """Alternative specifications for the cascading revelation finding.
 
-The baseline test (strategy2_learning_order_test.py) finds that fuel
+The baseline test (learning_order_test.py) finds that fuel
 contagion STRENGTHENS with successive retirements — opposite to the
 Bayesian learning prediction — but the result is not statistically
 significant (FM+NW t=-1.57, p=0.117).
@@ -15,7 +15,7 @@ whether the weak significance reflects:
 All use Fama-MacBeth event-by-event cross-sectional regressions with
 Newey-West HAC standard errors, matching the baseline methodology.
 
-Output: results/metrics/strategy2_learning_alternatives.md
+Output: results/metrics/learning_alternatives.md
 """
 import csv
 import os
@@ -212,7 +212,7 @@ def ks_two_sample(x, y):
 
 
 # ═══════════════════════════════════════════════════════════════════
-# LOAD DATA (same as strategy2_learning_order_test.py)
+# LOAD DATA (same as learning_order_test.py)
 # ═══════════════════════════════════════════════════════════════════
 
 _print('Loading monthly returns...')
@@ -1102,7 +1102,7 @@ else:
 
 _print('\nWriting results...')
 
-out_path = results_path('metrics', 'strategy2_learning_alternatives.md')
+out_path = results_path('metrics', 'learning_alternatives.md')
 os.makedirs(os.path.dirname(out_path), exist_ok=True)
 
 L = []  # output lines

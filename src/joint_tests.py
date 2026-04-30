@@ -182,6 +182,52 @@ def ols_full(data, y_var, x_vars, cluster_var=None):
     }
 
 
+# ── Two-way (Cameron-Gelbach-Miller) clustered covariance ───────────
+
+def _cluster_meat(X, resid, cluster_assignment, k):
+    """Compute Σ_g (X_g' u_g)(u_g' X_g) for given cluster vector."""
+    cluster_map = {}
+    for i, c in enumerate(cluster_assignment):
+        cluster_map.setdefault(c, []).append(i)
+    return _cluster_cov(X, resid, cluster_map, k), len(cluster_map)
+
+
+def twoway_cgm_vcov(X, resid, event_ids, firm_ids, inv_XtX, k, n):
+    """Cameron, Gelbach & Miller (2011) two-way clustered vcov:
+    V_twoway = V_event + V_firm - V_(event x firm).
+    The (event x firm) cluster is the intersection (each obs is its own cell
+    when (event, firm) is unique), which makes V_(e x f) the HC0-equivalent
+    clustered covariance with one observation per cluster.
+    """
+    S_event, G_event = _cluster_meat(X, resid, event_ids, k)
+    S_firm, G_firm = _cluster_meat(X, resid, firm_ids, k)
+    S_ef, G_ef = _cluster_meat(X, resid, list(zip(event_ids, firm_ids)), k)
+
+    def vmat(S, G):
+        if G < 2:
+            return [[0.0] * k for _ in range(k)]
+        V = mat_mul(mat_mul(inv_XtX, S), inv_XtX)
+        scale = (G / (G - 1)) * ((n - 1) / (n - k))
+        for a in range(k):
+            for b_idx in range(k):
+                V[a][b_idx] *= scale
+        return V
+
+    V_event = vmat(S_event, G_event)
+    V_firm = vmat(S_firm, G_firm)
+    V_ef = vmat(S_ef, G_ef)
+
+    V_tw = [[V_event[a][b_idx] + V_firm[a][b_idx] - V_ef[a][b_idx]
+             for b_idx in range(k)] for a in range(k)]
+    # Eigenvalue clip for positive-semi-definiteness is overkill for k=5;
+    # in pathological cases V_tw[a][a] can dip below zero, in which case we
+    # fall back to the larger of V_event or V_firm for that diagonal entry.
+    for a in range(k):
+        if V_tw[a][a] <= 0:
+            V_tw[a][a] = max(V_event[a][a], V_firm[a][a])
+    return V_tw, G_event, G_firm
+
+
 # ── p-value from t-statistic (two-sided, normal approximation) ──────
 
 def _normal_cdf(x):
@@ -487,6 +533,25 @@ for v in spec_vars:
     _print(f'  {v}: beta = {res_full["beta"][v]:+.6f}, '
            f'se = {res_full["se"][v]:.6f}, t = {res_full["t"][v]:.3f}')
 
+# Two-way clustering (event + firm) — Cameron, Gelbach & Miller (2011).
+event_ids_obs = [o['event_id'] for o in obs]
+firm_ids_obs = [o['gvkey'] for o in obs]
+k_full = len(spec_vars) + 1
+V_tw, G_event_tw, G_firm_tw = twoway_cgm_vcov(
+    res_full['X'], res_full['resid'],
+    event_ids_obs, firm_ids_obs,
+    res_full['inv_XtX'], k_full, res_full['n']
+)
+names_list_full = ['intercept'] + spec_vars
+se_tw = {names_list_full[a]: (math.sqrt(V_tw[a][a]) if V_tw[a][a] > 0 else 0.0)
+         for a in range(k_full)}
+t_tw = {n: (res_full['beta'][n] / se_tw[n] if se_tw[n] > 1e-15 else 0.0)
+        for n in names_list_full}
+_print(f'\nTwo-way clustered SEs (event clusters = {G_event_tw}, '
+       f'firm clusters = {G_firm_tw}):')
+for v in spec_vars:
+    _print(f'  {v}: SE_twoway = {se_tw[v]:.6f}, t_twoway = {t_tw[v]:.3f}')
+
 # Step 3: Estimate restricted model (same_sector only)
 restricted_vars = [v for v in spec_vars if v not in CHANNEL_VARS]
 _print('\nEstimating restricted model...')
@@ -617,6 +682,17 @@ _print(f'  SE of difference:        {se_diff:.6f}')
 _print(f'  t-statistic:             {t_diff:.3f}')
 _print(f'  p-value (two-sided):     {p_diff:.4f}')
 
+# Two-way clustered version of the difference test
+var_geo_tw = V_tw[idx_geo][idx_geo]
+var_fuel_tw = V_tw[idx_fuel][idx_fuel]
+cov_geo_fuel_tw = V_tw[idx_geo][idx_fuel]
+var_diff_tw = var_geo_tw + var_fuel_tw - 2.0 * cov_geo_fuel_tw
+se_diff_tw = math.sqrt(var_diff_tw) if var_diff_tw > 0 else 0.0
+t_diff_tw = diff / se_diff_tw if se_diff_tw > 1e-15 else 0.0
+p_diff_tw = p_from_t(t_diff_tw)
+_print(f'\n  [Two-way clustered] SE_diff = {se_diff_tw:.6f}, '
+       f't = {t_diff_tw:.3f}, p = {p_diff_tw:.4f}')
+
 diff_reject = 'REJECT H0' if p_diff < 0.05 else 'FAIL TO REJECT H0'
 _print(f'  Conclusion at 5%: {diff_reject}')
 
@@ -643,7 +719,7 @@ for name in all_names:
 
 # ── Write output ─────────────────────────────────────────────────────
 
-out_path = results_path('metrics', 'strategy2_joint_tests.md')
+out_path = results_path('metrics', 'joint_tests.md')
 os.makedirs(os.path.dirname(out_path), exist_ok=True)
 
 sig_stars_f = ('***' if p_f_perm < 0.01
@@ -680,9 +756,12 @@ lines = [
     f'beta_geo:  {beta_geo:+.6f} (SE {se_geo:.6f})',
     f'beta_fuel: {beta_fuel:+.6f} (SE {se_fuel:.6f})',
     f'Difference (beta_geo - beta_fuel): {diff:+.6f}',
-    f'SE of difference: {se_diff:.6f}',
-    f't-statistic: {t_diff:.3f}',
-    f'p-value: {p_diff:.4f}{sig_stars_diff}',
+    f'SE of difference (event-clustered): {se_diff:.6f}',
+    f't-statistic (event-clustered): {t_diff:.3f}',
+    f'p-value (event-clustered): {p_diff:.4f}{sig_stars_diff}',
+    f'SE of difference (two-way, CGM 2011): {se_diff_tw:.6f}',
+    f't-statistic (two-way clustered): {t_diff_tw:.3f}',
+    f'p-value (two-way clustered): {p_diff_tw:.4f}',
     f'Cov(beta_geo, beta_fuel): {cov_geo_fuel:+.10f}',
     '',
     f'Interpretation: The opposing-sign channel split is {diff_interp} '
@@ -690,17 +769,28 @@ lines = [
     '',
     '## Full regression coefficients',
     '',
-    '| Variable | Beta | SE | t | p |',
-    '|---|---:|---:|---:|---:|',
+    '| Variable | Beta | SE (event) | t (event) | SE (two-way CGM) | t (two-way) | p (two-way) |',
+    '|---|---:|---:|---:|---:|---:|---:|',
 ]
 
 for name in all_names:
     b = res_full['beta'][name]
-    s = res_full['se'][name]
-    t = res_full['t'][name]
-    p = p_from_t(t)
-    stars = '***' if p < 0.01 else '**' if p < 0.05 else '*' if p < 0.10 else ''
-    lines.append(f'| {name} | {b:+.6f} | {s:.6f} | {t:.3f} | {p:.4f}{stars} |')
+    s_ev = res_full['se'][name]
+    t_ev = res_full['t'][name]
+    s_tw = se_tw[name]
+    t_tw_n = t_tw[name]
+    p_tw = p_from_t(t_tw_n)
+    stars = '***' if p_tw < 0.01 else '**' if p_tw < 0.05 else '*' if p_tw < 0.10 else ''
+    lines.append(f'| {name} | {b:+.6f} | {s_ev:.6f} | {t_ev:.3f} | '
+                 f'{s_tw:.6f} | {t_tw_n:.3f} | {p_tw:.4f}{stars} |')
+
+lines.append('')
+lines.append('## Two-way clustered standard errors (Cameron-Gelbach-Miller 2011)')
+lines.append('')
+lines.append(f'Event clusters: {G_event_tw} | Firm clusters: {G_firm_tw}')
+lines.append('Formula: V_twoway = V_event + V_firm − V_(event×firm).')
+lines.append(f'Difference test (γ_geo − γ_fuel): SE = {se_diff_tw:.6f}, '
+             f't = {t_diff_tw:.3f}, p = {p_diff_tw:.4f}')
 
 lines.append('')
 lines.append('## Comparison with individual tests')

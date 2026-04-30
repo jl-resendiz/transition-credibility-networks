@@ -241,8 +241,8 @@ lines <- c(lines, "",
   "Market adjustment: vwretd from Fama-French factors.")
 
 dir.create(results, recursive = TRUE, showWarnings = FALSE)
-writeLines(lines, file.path(results, "strategy2_conley_se.md"))
+writeLines(lines, file.path(results, "conley_se.md"))
 
 cat("\n=== Results ===\n")
 cat(paste(lines, collapse = "\n"), "\n")
-cat(sprintf("\nWritten to: %s\n", file.path(results, "strategy2_conley_se.md")))
+cat(sprintf("\nWritten to: %s\n", file.path(results, "conley_se.md")))

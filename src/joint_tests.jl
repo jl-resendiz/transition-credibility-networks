@@ -797,7 +797,7 @@ function main()
 
     # ── Write markdown output ─────────────────────────────────────────
 
-    out_path = results_path("metrics", "strategy2_joint_tests.md")
+    out_path = results_path("metrics", "joint_tests.md")
     mkpath(dirname(out_path))
 
     sig_stars_f = sig_stars(p_f_perm)
