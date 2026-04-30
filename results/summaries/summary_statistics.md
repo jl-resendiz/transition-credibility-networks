@@ -8,6 +8,17 @@
 - Countries (analysis sample): 69
 - Total installed capacity (analysis sample): 2,983,226 MW = 3.0 TW
 
+### Event-study sample (chain to manuscript abstract)
+
+| Stage | Sample | N firms |
+|---|---|---:|
+| 1 | Firms with monthly returns coverage (manuscript: "703 listed utilities") | 703 |
+| 2 | Returns AND at least one network layer (W_geo) | 350 |
+| 3 | Returns AND all three network layers (manuscript: "565 have complete spatial weight data") | 183 |
+| 4 | Returns AND ESG coverage (manuscript: "153 also have ESG environmental scores") | 169 |
+
+Note: the "analysis sample (complete theta)" reported above is the firm universe with complete *fundamentals* (alpha, lambda, rho, kappa) used by Panels A and B. The event-study regressions in Section 4 use the monthly-returns sample (Stage 1) intersected with the network layers (Stage 3), which is the sample size cited in the abstract.
+
 ## Panel A: Analysis Sample (N = 428 firms, latest fiscal year)
 
 | Variable                  |      N |       Mean |         SD |        Min |     Median |        Max |
@@ -26,7 +37,7 @@
 | Operating ROA (rho)       |    439 |     -0.334 |      8.452 |   -177.000 |      0.076 |      0.305 |
 | Interest Coverage (kappa) |    433 |     10.252 |    189.468 |  -2928.000 |      3.505 |   1939.027 |
 | Obligation Rigidity (delta) |    436 |      0.766 |      0.231 |      0.000 |      0.846 |      1.000 |
-| Network Density           |    414 |      0.069 |      0.219 |      0.000 |      0.028 |      3.074 |
+| Network Density           |    414 |      0.085 |      0.221 |      0.001 |      0.043 |      3.091 |
 | Total Assets ($M)         |    445 | 1346752.402 | 12778312.682 |      0.000 |  20431.093 | 246807795.000 |
 
 ## Panel C: Geographic Distribution

@@ -1,0 +1,4 @@
+spec,description,n_events_total,n_events_FM,fuel_mean,fuel_se,fuel_t,geo_mean,geo_se,geo_t
+A_announce_when_available,"Announcement when available, retirement otherwise (HEADLINE)",179,117,-4.831759,0.657381,-7.3500,-0.553481,0.308799,-1.7924
+B_force_physical_retirement,Force physical retirement date for all events,179,135,-4.315979,1.209496,-3.5684,-0.054605,0.179305,-0.3045
+C_announcement_only,Restrict to events with announcement date,179,117,-4.831759,0.657381,-7.3500,-0.553481,0.308799,-1.7924

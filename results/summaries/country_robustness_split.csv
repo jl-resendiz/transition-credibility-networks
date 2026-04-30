@@ -1,0 +1,4 @@
+split,n_events,fuel_mean,fuel_se,fuel_t,geo_mean,geo_se,geo_t
+developed_ex_US,17,-9.631208,1.242208,-7.7533,-2.295519,1.497829,-1.5326
+emerging,17,-5.624084,1.367873,-4.1116,+1.480566,0.774782,+1.9109
+frontier_or_other,2,-10.040305,NA,NA,-3.407019,NA,NA

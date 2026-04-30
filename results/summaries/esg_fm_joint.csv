@@ -1,0 +1,10 @@
+spec,variable,mean,se_nw_lag4,t,n_events
+ESG only,intercept,+0.207521,0.044350,+4.6791,165
+ESG only,esg_score,-0.275973,0.053993,-5.1113,165
+Spatial only (fuel + geo),intercept,+0.040369,0.016089,+2.5091,165
+Spatial only (fuel + geo),w_fuel,-1.623132,1.995778,-0.8133,165
+Spatial only (fuel + geo),w_geo,-463.273159,207.377450,-2.2340,165
+Both (ESG + spatial),intercept,+0.237397,0.050685,+4.6837,165
+Both (ESG + spatial),esg_score,-0.286111,0.056923,-5.0262,165
+Both (ESG + spatial),w_fuel,-4.817077,2.313454,-2.0822,165
+Both (ESG + spatial),w_geo,-386.563785,168.917548,-2.2885,165

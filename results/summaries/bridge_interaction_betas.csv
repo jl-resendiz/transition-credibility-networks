@@ -1,0 +1,5 @@
+variable,mean,se_nw_lag4,t,n_events,predicted_sign
+w_fuel,-3.252257,1.270687,-2.5594,115,negative
+w_geo,-0.116191,0.481622,-0.2412,115,attenuated to zero
+w_reg,+3.919936,1.383818,+2.8327,115,positive
+w_fuel_x_alpha,+2.225896,2.063219,+1.0788,115,negative (theory)

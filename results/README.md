@@ -8,7 +8,7 @@ Outputs produced by `src/run_all.py`. Do not edit manually.
 |---|---|
 | `metrics/` | Pipeline output (one `.md` per analysis script) |
 | `tables/` | LaTeX table source files for the manuscript appendix |
-| `json/` | Machine-readable results for `strategy2_referee_tables.py` |
+| `json/` | Machine-readable results for `referee_tables.py` |
 | `summaries/` | Event-level betas and other CSV exports |
 | `figures/` | R scripts and PDF figures |
 

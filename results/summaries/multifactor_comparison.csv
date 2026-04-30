@@ -1,0 +1,9 @@
+channel,spec,mean,se_nw_lag4,t,n_events
+fuel,single_factor,-4.765600,0.650800,-7.3200,117
+fuel,multi_factor,-3.104304,0.689820,-4.5002,117
+geo,single_factor,-0.542700,0.309000,-1.7600,117
+geo,multi_factor,-0.067901,0.530591,-0.1280,117
+reg,single_factor,+2.697500,0.951800,+2.8300,117
+reg,multi_factor,+2.474906,0.824657,+3.0011,117
+diff_geo_fuel,single_factor,+4.222900,0.707600,+5.9700,117
+diff_geo_fuel,multi_factor,+3.036402,0.917576,+3.3092,117

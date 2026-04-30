@@ -1,0 +1,5 @@
+window_start,window_end,window_label,beta_fuel,se,t,n_events,role
+-12,-8,pre_early,+0.480153,0.791430,+0.6067,117,placebo
+-9,-5,pre_mid,-0.056408,0.508680,-0.1109,117,placebo
+-6,-2,pre_late,+2.770134,0.739315,+3.7469,117,placebo
+-1,3,headline,-4.765614,0.650788,-7.3228,117,headline
