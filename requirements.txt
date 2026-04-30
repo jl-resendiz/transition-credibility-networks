@@ -1,0 +1,7 @@
+# Python runtime requirements for the replication pipeline.
+# Tested on CPython 3.8, 3.11, and 3.13.
+#
+# The pipeline is otherwise stdlib-only by design — only one external
+# dependency is needed, and only because Pandas and openpyxl read GEM xlsx
+# files faster than the stdlib zipfile + xml parsers.
+openpyxl>=3.1,<4

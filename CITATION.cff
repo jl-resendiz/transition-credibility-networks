@@ -1,0 +1,35 @@
+cff-version: 1.2.0
+message: "If you use this software or replication package, please cite the working paper below."
+title: "When Coal Retires: The Propagation of Stranding Risk"
+authors:
+  - family-names: Resendiz
+    given-names: Jose Luis
+    affiliation: "Smith School of Enterprise and the Environment, University of Oxford"
+    email: joseluis.resendiz@smithschool.ox.ac.uk
+type: software
+version: "1.0"
+date-released: "2026-04-30"
+license: MIT
+abstract: >
+  Replication package for "When Coal Retires: The Propagation of Stranding Risk".
+  Plant-level data for 703 listed power utilities across 80 countries are combined
+  with 175 first-mover coal retirement events to identify the propagation channel
+  through which stranding risk transmits across firms. The fuel-mix similarity
+  channel transmits while geographic proximity does not. The package contains
+  the full Python pipeline (stdlib + openpyxl), Julia bootstrap routines, and R
+  scripts for figures and Conley spatial standard errors.
+keywords:
+  - transition risk
+  - stranded assets
+  - fuel-mix similarity
+  - technology networks
+  - asset pricing
+  - coal retirements
+preferred-citation:
+  type: article
+  title: "When Coal Retires: The Propagation of Stranding Risk"
+  authors:
+    - family-names: Resendiz
+      given-names: Jose Luis
+  year: 2026
+  notes: "Working paper, Smith School of Enterprise and the Environment, University of Oxford."

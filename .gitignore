@@ -54,4 +54,14 @@ literature/
 prompts/
 manuscript/response_to_*.md
 manuscript/referee_*.md
+manuscript/*_referee_*.md
 manuscript/audit_*.md
+
+# Internal working notes (phase reports, strategic decisions, audit logs)
+docs/
+
+# Public-facing exhibition / data viz site (lives outside the replication package)
+exhibition/
+
+# Claude session lock files
+.claude/scheduled_tasks.lock
