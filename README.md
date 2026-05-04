@@ -1,4 +1,4 @@
-# When Coal Retires: The Propagation of Stranding Risk
+# When Coal Retires: A Network Channel for the Carbon Premium
 
 **Jose Luis Resendiz**
 Smith School of Enterprise and the Environment, University of Oxford
@@ -76,7 +76,7 @@ Stage 6: 9 analysis scripts (see src/run_all.py for the DAG)
 
 ## Citation
 
-> Resendiz, J. L. (2026). When Coal Retires: The Propagation of Stranding Risk. Working paper, University of Oxford.
+> Resendiz, J. L. (2026). When Coal Retires: A Network Channel for the Carbon Premium. Working paper, University of Oxford.
 
 ---
 
