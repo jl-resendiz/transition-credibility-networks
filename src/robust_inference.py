@@ -1288,9 +1288,18 @@ _print('\n' + '=' * 70)
 _print('APPROACH 8: EVENT OVERLAP STATISTICS [m9]')
 _print('=' * 70)
 
-# Collect event months
+# Restrict to events that produced at least one valid firm-event observation
+# in the pooled-OLS panel — these are the 175 events the regression actually
+# uses, not the full first-mover-matched set (179) which includes events with
+# no usable CAR. The manuscript's "175 events over 132 calendar months" refers
+# to this restricted set.
+regression_event_ids = set(event_datasets.keys())
+
+# Collect event months — restricted to the regression-eligible event set
 event_months_list = []
-for event in all_events:
+for event_id, event in enumerate(all_events):
+    if event_id not in regression_event_ids:
+        continue
     ed = event.get('event_date', '')
     if ed and len(ed) >= 7:
         event_months_list.append(ed[:7])
@@ -1299,6 +1308,7 @@ for event in all_events:
 
 event_months_list.sort()
 n_events_total = len(event_months_list)
+n_first_mover_matched = len(all_events)
 
 # Compute inter-event gaps in months
 def ym_to_months(ym):
@@ -1379,7 +1389,8 @@ lines = [
     't-stats were inflated by within-firm correlation across events.',
     'These three approaches provide valid inference under this structure.',
     '',
-    f'Events: {len(all_events)} first-mover coal retirements',
+    f'Events: {len(all_events)} first-mover-matched (175 used in pooled regression; '
+    f'{T_fm} with ≥{MIN_OBS_PER_EVENT} firms qualify for FM)',
     f'Window: [-1, +{POST_MONTHS}] months, vwretd market-adjusted returns',
     '',
     '## Approach 1: Fama-MacBeth (1973) with Newey-West SEs',
@@ -1553,11 +1564,14 @@ lines += [
     '',
     '## Approach 8: Event Overlap Statistics (m9)',
     '',
-    'Temporal structure of the 175 coal retirement events.',
+    'Temporal structure of the regression-eligible coal retirement events',
+    f'(events with at least one valid firm-event observation in the pooled panel: '
+    f'{m9_results["n_events"]} of {n_first_mover_matched} first-mover-matched).',
     '',
     '| Statistic | Value |',
     '|---|---:|',
-    f'| Events | {m9_results["n_events"]} |',
+    f'| Events used in regression | {m9_results["n_events"]} |',
+    f'| First-mover-matched (full registry) | {n_first_mover_matched} |',
     f'| Calendar span | {m9_results["calendar_months"]} months |',
     f'| Mean inter-event gap | {m9_results["mean_gap"]:.1f} months |',
     f'| Median inter-event gap | {m9_results["median_gap"]} months |',

@@ -693,6 +693,17 @@ _print(f'  Pre-period fuel matrix: {len(W_fuel_pre)} firms, {n_pre_edges} edges'
 _print(f'  Current fuel matrix: {len(W_fuel)} firms, '
        f'{sum(len(v) for v in W_fuel.items())} edges')
 
+# Cache pre-2014 matrix for downstream consumers (e.g. bartik_threshold_sweep.py)
+import csv as _csv
+_pre_path = derived_path('networks', 'weight_matrix_W_fuel_pre2014.csv')
+with open(_pre_path, 'w', encoding='utf-8', newline='') as _f:
+    _w = _csv.writer(_f)
+    _w.writerow(['gvkey_i', 'gvkey_j', 'w_ij'])
+    for _gi in W_fuel_pre:
+        for _gj, _v in W_fuel_pre[_gi].items():
+            _w.writerow([_gi, _gj, f'{_v:.10f}'])
+_print(f'  Cached pre-2014 fuel matrix to {_pre_path}')
+
 
 # ══════════════════════════════════════════════════════════════════════
 # DIAGNOSTICS: Correlation between pre-period and current shares

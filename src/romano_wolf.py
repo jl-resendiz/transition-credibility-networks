@@ -868,7 +868,7 @@ lines = [
     '',
     f'Bootstrap replications: B = {B}',
     f'Seed: {SEED}',
-    f'Events: {len(all_events)} first-mover coal retirements',
+    f'Events: {len(all_events)} first-mover-matched (175 used in pooled regression below)',
     f'Return model: vwretd (market-adjusted, Fama-French)',
     '',
     'Methods:',

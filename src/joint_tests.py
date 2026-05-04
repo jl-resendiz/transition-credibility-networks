@@ -731,7 +731,7 @@ lines = [
     '# Focused Hypothesis Tests: Channel Split',
     '',
     f'Window: [-1, +{POST_MONTHS}] months (monthly CARs, vwretd)',
-    f'Events: {len(all_events)} first-mover coal retirements',
+    f'Events: {len(all_events)} first-mover-matched (175 used in pooled regression below; 117 with ≥20 firms qualify for FM)',
     f'N = {n_obs} observations, {res_full["clusters"]} event clusters',
     f'Standard errors: event-clustered',
     '',

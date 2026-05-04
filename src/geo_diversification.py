@@ -910,7 +910,7 @@ lines = [
     'competitive channel (w_geo). If geographic effects are real at the plant',
     'level, single-country utilities should show a stronger geo coefficient.',
     '',
-    f'Events: {len(all_events)} first-mover coal retirements',
+    f'Events: {len(all_events)} first-mover-matched (175 used in pooled regression below; 117 with ≥20 firms qualify for FM)',
     f'Window: [-1, +{POST_MONTHS}] months, vwretd market-adjusted returns',
     f'Minimum obs per event: {MIN_OBS_PER_EVENT}',
     f'Single-country definition: >=90% of MW in one country',

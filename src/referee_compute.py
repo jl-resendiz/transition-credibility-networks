@@ -10,7 +10,7 @@ Tasks:
 2) Channel decomposition with firm controls (Size, lambda, rho) for 3-month CARs.
 3) Strong placebo: shuffle exposure networks (permute gvkeys) for 3-month CARs.
 4) Specification progression (w_geo only, w_fuel only, both, full + controls).
-5) Bandwidth sensitivity: w_geo with half-life 250km and 1000km.
+5) Bandwidth sensitivity: w_geo at half-lives {250, 500, 750, 1000, 1500} km.
 6) Controls sensitivity: size-only, leverage-only, firm FE.
 7) VIF diagnostics.
 
@@ -605,11 +605,13 @@ def main():
     fe_data = demean_by_gvkey(obs, 'car', fe_vars)
     res_fe = ols(fe_data, 'car', fe_vars, cluster_var='event_id')
 
-    # ── Task 5: bandwidth sensitivity (250km, 1000km) ──
-    print('Building bandwidth sensitivity (250km, 1000km)...', flush=True)
+    # ── Task 5: bandwidth sensitivity (250, 500, 750, 1000, 1500 km) ──
+    print('Building bandwidth sensitivity (250, 500, 750, 1000, 1500 km)...',
+          flush=True)
     centroids_path = derived_path('networks', 'firm_centroids.csv')
-    W_geo_250 = build_geo_weights_from_centroids(centroids_path, half_life_km=250)
-    W_geo_1000 = build_geo_weights_from_centroids(centroids_path, half_life_km=1000)
+    bandwidths = [250, 500, 750, 1000, 1500]
+    W_geo_alt = {h: build_geo_weights_from_centroids(centroids_path, half_life_km=h)
+                 for h in bandwidths}
 
     def rebuild_obs_with_geo(W_geo_alt):
         obs_alt = []
@@ -665,10 +667,14 @@ def main():
                     })
         return obs_alt
 
-    obs_250 = rebuild_obs_with_geo(W_geo_250)
-    obs_1000 = rebuild_obs_with_geo(W_geo_1000)
-    res_250 = ols(obs_250, 'car', ['w_geo', 'w_fuel', 'w_reg', 'same_sector'], cluster_var='event_id')
-    res_1000 = ols(obs_1000, 'car', ['w_geo', 'w_fuel', 'w_reg', 'same_sector'], cluster_var='event_id')
+    bw_results = {}
+    for h in bandwidths:
+        obs_h = rebuild_obs_with_geo(W_geo_alt[h])
+        bw_results[h] = ols(
+            obs_h, 'car',
+            ['w_geo', 'w_fuel', 'w_reg', 'same_sector'],
+            cluster_var='event_id',
+        )
 
     # ── Assemble JSON output ──
     print('Writing JSON...', flush=True)
@@ -694,8 +700,9 @@ def main():
             'firm_fe': serialize_ols_result(res_fe, ['w_geo', 'w_fuel', 'w_reg', 'same_sector']),
         },
         'bandwidth_sensitivity': {
-            'half_life_250km': serialize_ols_result(res_250, ['w_geo', 'w_fuel', 'w_reg', 'same_sector']),
-            'half_life_1000km': serialize_ols_result(res_1000, ['w_geo', 'w_fuel', 'w_reg', 'same_sector']),
+            f'half_life_{h}km': serialize_ols_result(
+                bw_results[h], ['w_geo', 'w_fuel', 'w_reg', 'same_sector'])
+            for h in bandwidths
         },
     }
 

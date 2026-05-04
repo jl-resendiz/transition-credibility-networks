@@ -2,8 +2,14 @@
 
 Writes both to stdout and to results/summaries/summary_statistics.md
 so that all manuscript claims are traceable to a pipeline output.
+
+Runs at the end of the analysis stage so it can read panel_facts.json
+emitted by two_way_clustering.py — that file carries the unique-firm
+count of the operational regression panel (manuscript's "565 firms"),
+which cannot be derived from the network matrices alone because the
+panel includes random controls drawn from the SIC universe.
 """
-import csv, os, math
+import csv, json, os, math
 from collections import defaultdict, Counter
 
 from _paths import derived_path, results_path, raw_path
@@ -86,9 +92,14 @@ def stats(vals):
     }
 
 # ── Dual output: stdout + lines list ──
+# Tolerate Windows cp1252 stdout: if stdout cannot encode a character,
+# print an ascii-safe version. The .md file is always UTF-8.
 lines = []
 def out(s=''):
-    print(s)
+    try:
+        print(s)
+    except UnicodeEncodeError:
+        print(s.encode('ascii', errors='replace').decode('ascii'))
     lines.append(s)
 
 # ── Analysis sample (complete theta) ──
@@ -98,29 +109,34 @@ analysis_sample = [d for d in sample if all(
 out('# Summary Statistics')
 out()
 
-# ── Key sample counts (traceable provenance for manuscript claims) ──
-all_countries = set(d['fic'] for d in sample if d['fic'])
-analysis_countries = set(d['fic'] for d in analysis_sample if d['fic'])
-total_capacity_mw = sum(d['total_mw'] for d in analysis_sample)
-total_capacity_tw = total_capacity_mw / 1e6
-
-out('## Sample Overview')
-out()
-out(f'- Total Compustat utility firms: {len(sample)}')
-out(f'- Analysis sample (complete theta): {len(analysis_sample)} firms')
-out(f'- Countries (all): {len(all_countries)}')
-out(f'- Countries (analysis sample): {len(analysis_countries)}')
-out(f'- Total installed capacity (analysis sample): {total_capacity_mw:,.0f} MW = {total_capacity_tw:.1f} TW')
-out()
-
-# ── Event-study sample chain (the firms that actually enter the regressions) ──
+# ── Returns-coverage firms (manuscript's "703 listed utilities") ──
 returns_firms = set()
+returns_countries_by_firm = {}  # gvkey -> country (from fundamentals)
 ret_path = derived_path('returns', 'monthly_returns.csv')
 if os.path.exists(ret_path):
     with open(ret_path, 'r', encoding='utf-8') as f:
         for row in csv.DictReader(f):
             returns_firms.add(row['gvkey'])
 
+returns_countries = set()
+for gk in returns_firms:
+    f_row = firms.get(gk)
+    if f_row and f_row.get('fic'):
+        returns_countries.add(f_row['fic'])
+
+total_capacity_mw = sum(d['total_mw'] for d in analysis_sample)
+total_capacity_tw = total_capacity_mw / 1e6
+
+out('## Sample Overview')
+out()
+out(f'- Total Compustat utility firms: {len(sample)}')
+out(f'- Returns-coverage firms (manuscript: "703 listed utilities"): {len(returns_firms)}')
+out(f'- Countries with returns coverage (manuscript: "80 countries"): {len(returns_countries)}')
+out(f'- Analysis sample (complete fundamentals theta): {len(analysis_sample)} firms')
+out(f'- Total installed capacity (analysis sample): {total_capacity_mw:,.0f} MW = {total_capacity_tw:.1f} TW')
+out()
+
+# ── Network coverage (per-layer firm counts) ──
 def _firms_in_network(path):
     """Count unique firms that appear as either side of any pair in a weight CSV."""
     out = set()
@@ -132,13 +148,11 @@ def _firms_in_network(path):
             out.add(row['gvkey_j'])
     return out
 
-network_firms = _firms_in_network(derived_path('networks', 'weight_matrix_W_geo.csv'))
+geo_firms = _firms_in_network(derived_path('networks', 'weight_matrix_W_geo.csv'))
 fuel_firms = _firms_in_network(derived_path('networks', 'weight_matrix_W_fuel.csv'))
 reg_firms = _firms_in_network(derived_path('networks', 'weight_matrix_W_regulatory.csv'))
 
-three_layer_firms = network_firms & fuel_firms & reg_firms
-returns_three_layer = returns_firms & three_layer_firms
-
+# ── ESG coverage ──
 esg_firms = set()
 esg_path = raw_path('refinitiv', 'refinitiv_esg.csv')
 if os.path.exists(esg_path):
@@ -147,22 +161,38 @@ if os.path.exists(esg_path):
             score = row.get('env_score') or row.get('environmental_score')
             if score and score.strip() not in ('', 'NA'):
                 esg_firms.add(row['gvkey'].zfill(6))
-returns_esg = {g.zfill(6) for g in returns_firms} & esg_firms
 
-out('### Event-study sample (chain to manuscript abstract)')
+# ── Operational regression panel from two_way_clustering.py ──
+panel_facts = None
+panel_facts_path = results_path('summaries', 'panel_facts.json')
+if os.path.exists(panel_facts_path):
+    with open(panel_facts_path, 'r', encoding='utf-8') as f:
+        panel_facts = json.load(f)
+
+panel_firms = set(panel_facts['panel_firms_gvkeys']) if panel_facts else set()
+panel_esg = {g.zfill(6) for g in panel_firms} & esg_firms
+panel_no_esg = panel_firms - {g for g in panel_firms if g.zfill(6) in esg_firms}
+
+out('### Sample chain (chain to manuscript §3.1 and Abstract)')
 out()
-out('| Stage | Sample | N firms |')
+out('| Stage | Population | N firms |')
 out('|---|---|---:|')
-out(f'| 1 | Firms with monthly returns coverage (manuscript: "703 listed utilities") | {len(returns_firms)} |')
-out(f'| 2 | Firms in the GEM-derived weight matrices (W_geo / W_fuel) | {len(network_firms)} |')
-out(f'| 3 | Firms in the regulatory weight matrix (W_reg) | {len(reg_firms)} |')
-out(f'| 4 | Returns AND ESG coverage (manuscript: "153 also have ESG environmental scores") | {len(returns_esg)} |')
+out(f'| 1 | Firms with monthly returns coverage (manuscript: 703) | {len(returns_firms)} |')
+out(f'| 2 | Firms in W_geo / W_fuel (manuscript: 414 with valid GEM GPS) | {len(geo_firms)} |')
+out(f'| 3 | Firms in W_reg (manuscript: 242, regulatory layer) | {len(reg_firms)} |')
+if panel_facts is not None:
+    out(f'| 4 | Unique firms in event-firm regression panel (manuscript: 565) | {len(panel_firms)} |')
+    out(f'| 5 | Panel firms with ESG environmental scores (manuscript: 153) | {len(panel_esg)} |')
+    out(f'| 6 | Panel firms without ESG (manuscript: 412) | {len(panel_no_esg)} |')
+else:
+    out('| 4-6 | (panel_facts.json not yet produced — run `two_way_clustering.py`) | — |')
 out()
-out('Note: the "565 firms" cited in the abstract is the unique-firm count in the event-firm regression panel '
-    '(neighbours of retiring firms PLUS random controls drawn from the SIC universe), not a strict subset of '
-    'the network-coverage firms. It is reported by `joint_tests.py` as the firm-cluster count when '
-    'two-way clustering by (event, firm). The three-network intersection above is more restrictive than the '
-    'operational regression sample because the latter includes random controls.')
+out('The panel in Stage 4 is the operational regression sample used by '
+    '`robust_inference.py`, `joint_tests.{py,jl}`, and `two_way_clustering.py`. '
+    'It comprises geographic neighbours of retiring firms plus random controls '
+    'drawn from the same SIC universe (with a stable per-firm seed), not the strict '
+    'intersection of returns and network layers (Stages 1, 2, 3 above) -- that '
+    'intersection is more restrictive because controls come from outside the network.')
 out()
 
 # ── Panel A: Analysis sample ──

@@ -223,18 +223,16 @@ def main():
         extra_rows=[('Firm FE', ['No', 'No', 'Yes'])],
     )
 
-    # ── Table 7: Bandwidth sensitivity ──
+    # ── Table 7: Bandwidth sensitivity (5 half-lives) ──
     bw = data['bandwidth_sensitivity']
-    cols_bw = [
-        bw['half_life_250km'],
-        bw['half_life_1000km'],
-    ]
+    bandwidths = [250, 500, 750, 1000, 1500]
+    cols_bw = [bw[f'half_life_{h}km'] for h in bandwidths]
     latex_table_spec(
         cols_bw,
         results_path('tables', 'table_bandwidth_sensitivity.tex'),
         'Bandwidth Sensitivity (3-Month CARs)',
         'tab:bandwidth_sensitivity',
-        col_labels=['Half-life 250 km', 'Half-life 1000 km'],
+        col_labels=[f'Half-life {h} km' for h in bandwidths],
     )
 
     print('Reviewer tables written to results/tables/')
