@@ -21,6 +21,7 @@ import sys
 import time
 
 from _paths import raw_path, derived_path
+import _credentials  # auto-loads .env into os.environ
 
 try:
     import eikon as ek
@@ -32,7 +33,7 @@ except ImportError:
 # ── Configuration ──
 APP_KEY = os.getenv("EIKON_APP_KEY") or os.getenv("REFINITIV_APP_KEY")
 if not APP_KEY:
-    print("Set EIKON_APP_KEY (or REFINITIV_APP_KEY) in your environment.")
+    print("Set EIKON_APP_KEY in .env at the repo root (see .env.example).")
     sys.exit(1)
 ek.set_app_key(APP_KEY)
 
