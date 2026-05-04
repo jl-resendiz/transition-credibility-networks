@@ -87,7 +87,7 @@ The remainder of the paper proceeds as follows. Section~\ref{sec:model} formalis
 \section{A Conceptual Framework for Networked Transition Risk}\label{sec:model}
 %----------------------------------------------------------------------
 
-When a power utility retires a fossil plant, two consequences follow. Locally, competitors gain market share as residual demand shifts to remaining generators. Globally, every firm using similar technology faces a repricing of its obsolescence risk. These two consequences aggregate to the stock level in fundamentally different ways. The local effect diversifies across markets. The technology effect does not. This section formalises the asymmetry and derives the estimating equation.
+When a power utility retires a fossil plant, two consequences follow. Locally, competitors gain market share as residual demand shifts to remaining generators. Globally, every firm using similar technology faces a repricing of its obsolescence risk. These two consequences aggregate to the stock level in different ways. The local effect diversifies across markets. The technology effect does not. This section formalises the asymmetry and derives the estimating equation.
 
 \subsection{Environment}\label{sec:environment}
 
@@ -97,9 +97,9 @@ Firm $i$ operates plants in $K_i \geq 1$ local electricity markets, with revenue
 
 Firm $i$'s terminal cash flow is:
 \begin{equation}\label{eq:cashflows}
-    \Pi_i = \bar{\Pi} + \sum_{k=1}^{K_i} \theta_{ik}\, G_{ik}(\mathbf{s}) \;-\; \varphi_i(\alpha_i, \mathbf{s}) + \eta_i,
+    \Pi_i = \bar{\Pi} + \sum_{k=1}^{K_i} \theta_{ik}\, G_{ik}(\mathbf{s}) \;-\; \psi_i(\alpha_i, \mathbf{s}) + \eta_i,
 \end{equation}
-where $\bar{\Pi} > 0$ is baseline profitability, $G_{ik}$ captures the competitive benefit in local market $k$, $\varphi_i$ is a technology obsolescence penalty, and $\eta_i$ is mean-zero idiosyncratic noise. The two middle terms formalise the two consequences of a restructuring shock.
+where $\bar{\Pi} > 0$ is baseline profitability, $G_{ik}$ captures the competitive benefit in local market $k$, $\psi_i$ is a technology obsolescence penalty, and $\eta_i$ is mean-zero idiosyncratic noise. The two middle terms formalise the two consequences of a restructuring shock.
 
 \subsection{Two Assumptions}\label{sec:channels}
 
@@ -110,17 +110,21 @@ where $\bar{\Pi} > 0$ is baseline profitability, $G_{ik}$ captures the competiti
 \begin{assumption}[Technology obsolescence originates at the plant level]\label{ass:obsolescence}
     Each plant of technology type $\tau$ faces an obsolescence penalty $\phi_\tau \geq 0$ proportional to the signal that $\tau$ is losing economic viability. Retirement shocks reveal information about coal technology specifically, so $\phi_{\mathrm{coal}} = \phi > 0$ and $\phi_\tau = 0$ for non-coal types. Aggregating to the firm level, the technology penalty for firm $i$ is the capacity-weighted sum of its plant-level penalties:
     \begin{equation}\label{eq:obsolescence}
-        \varphi_i(\alpha_i, \mathbf{s}) = \sum_\tau \frac{\mathrm{MW}_{i\tau}}{\mathrm{MW}_i}\,\phi_\tau \left(1 + \sum_{j} w^{\mathrm{fuel}}_{ij}\, s_j\right) = \phi\,\alpha_i\!\left(1 + \sum_{j} w^{\mathrm{fuel}}_{ij}\, s_j\right),
+        \psi_i(\alpha_i, \mathbf{s}) = \sum_\tau \frac{\mathrm{MW}_{i\tau}}{\mathrm{MW}_i}\,\phi_\tau \left(1 + \sum_{j} w^{\mathrm{fuel}}_{ij}\, s_j\right) = \phi\,\alpha_i\!\left(1 + \sum_{j} w^{\mathrm{fuel}}_{ij}\, s_j\right),
     \end{equation}
     where $\alpha_i = \mathrm{MW}_{i,\mathrm{coal}} / \mathrm{MW}_i \in [0,1]$ is firm $i$'s coal share and the second equality follows because only coal carries a positive penalty. The firm-level common factor is therefore a derived consequence of plant-level primitives, not a separate assumption.
 \end{assumption}
 
-The first assumption is standard: a rival's exit raises residual demand for remaining local generators \citep{DavisHausman2016}. The independence condition captures the fact that local grids serve geographically segmented markets. The second assumption starts from plant-level technology penalties and derives the firm-level obsolescence factor by capacity-weighted aggregation. The economic content is that retirements reveal a generation technology is losing viability, and the penalty falls on each plant using that technology in proportion to the strength of the signal. Because only coal plants carry a positive penalty, the firm-level exposure reduces to $\alpha_i \cdot \phi$: a firm's coal share is a sufficient statistic for its own-technology vulnerability. I assume $\phi > 0$ throughout, meaning some technology obsolescence risk is priced. The cross-sectional regression in Section~\ref{sec:empirical} identifies the product $A\phi\bar\alpha$ (with $\bar\alpha$ the sample-mean coal share) rather than $\phi$ in isolation; this combined object is sufficient for the comparative test of fuel-versus-geographic transmission.
+The first assumption is standard: a rival's exit raises residual demand for remaining local generators \citep{DavisHausman2016}. The independence condition captures the fact that local grids serve geographically segmented markets. The second assumption starts from plant-level technology penalties and derives the firm-level obsolescence factor by capacity-weighted aggregation. The economic content is that retirements reveal that a generation technology is losing viability, and the penalty falls on each plant using that technology in proportion to signal strength. Because only coal plants carry a positive penalty, the firm-level exposure reduces to $\alpha_i \cdot \phi$: a firm's coal share is a sufficient statistic for its own-technology vulnerability.
 
-The linear specification $\varphi_i = \phi\,\alpha_i(\cdot)$ is a restriction. If penalties are convex in coal share, high-$\alpha$ firms face disproportionately larger losses than the linear model implies. I test for such nonlinearity in the robustness section by including $\alpha_i^2$ interactions.
+The cross-sectional regression in Section~\ref{sec:empirical} identifies the product $A\phi\bar\alpha$ (with $\bar\alpha$ the sample-mean coal share) rather than $\phi$ in isolation; this combined object suffices for the comparative test of fuel-versus-geographic transmission.
+
+The linear specification $\psi_i = \phi\,\alpha_i(\cdot)$ is a restriction. If penalties are convex in coal share, high-$\alpha$ firms face disproportionately larger losses than the linear model implies. I test for such nonlinearity in the robustness section by including $\alpha_i^2$ interactions.
+
+The obsolescence parameter $\phi$ appears as a structural primitive in Assumption~\ref{ass:obsolescence}, but it is best understood as a reduced-form composite of several economic forces.
 
 \begin{remark}[Interpretation of $\phi$]\label{rem:phi_interpretation}
-The obsolescence parameter $\phi$ is reduced-form: it absorbs the joint price of three economic forces that retirement events plausibly transmit. First, expected fiscal carbon-tax adjustments that raise the marginal cost of coal generation. Second, the option value of stranded generating assets when retirement signals shorten the expected useful life of the fleet. Third, demand-side preference shifts that reduce the value of coal-generated electricity. The model treats the composite as a primitive; the empirical work identifies the product $A\phi\bar{\alpha}$ rather than its components separately (Section~\ref{sec:bridge}).
+The obsolescence parameter $\phi$ absorbs the joint price of three economic forces that retirement events transmit. First, expected fiscal carbon-tax adjustments that raise the marginal cost of coal generation. Second, stranded-asset option values that rise as retirement signals shorten the expected useful life of the fleet. Third, demand-side preference shifts that reduce the value of coal-generated electricity. The model treats the composite as a primitive; the empirical work identifies the product $A\phi\bar{\alpha}$ rather than its components separately (Section~\ref{sec:bridge}).
 \end{remark}
 
 \subsection{Aggregation}\label{sec:aggregation}
@@ -136,10 +140,12 @@ Let $\xi_{ik} \equiv \sum_j w^{\mathrm{geo},k}_{ij}\, s_j$ denote firm $i$'s wit
     \[
     \mathrm{Var}\!\Bigl(\sum_k \theta_{ik}\, G_{ik}\Bigr) = \delta^2\, H_i\, \bar{\sigma}^2, \qquad H_i \equiv \sum_k \theta_{ik}^2 \in [1/K_i, 1].
     \]
-    Along sequences of firms with $H_i \to 0$ (equivalently, $\max_k \theta_{ik} \to 0$), the geographic variance vanishes. The variance of the technology penalty $\varphi_i$ is independent of $H_i$.
+    Along sequences of firms with $H_i \to 0$ (equivalently, $\max_k \theta_{ik} \to 0$), the geographic variance vanishes. The variance of the technology penalty $\psi_i$ is independent of $H_i$.
 \end{lemma}
 
 \noindent The proof, which follows from the independence of local market shocks and the constraint $\sum_k \theta_{ik} = 1$, is given in Appendix~\ref{app:aggregation_proof}. The logic parallels the diversification argument in production networks \citep{AcemogluCarvalhoOzdaglarTahbazSalehi2012}: in a balanced network, idiosyncratic shocks wash out at rate $1/\sqrt{N}$. Lemma~\ref{lem:aggregation}'s Herfindahl scaling $H_i \in [1/K_i, 1]$ is the firm-level analogue: a firm with $K_i$ symmetric markets ($\theta_{ik} = 1/K_i$) achieves $H_i = 1/K_i$ (maximum diversification), while a firm concentrated in one market achieves $H_i = 1$ (no diversification). Here, technology obsolescence is the common factor, and all firms sharing that technology are the nodes.
+
+A natural extension allows for partial cross-market correlation among shocks.
 
 \begin{proposition}[Partial Cross-Market Correlation]\label{prop:partial_correlation}
     Replace the independence condition in Assumption~\ref{ass:competition} with the equicorrelation condition $\mathrm{Corr}(\xi_{ik}, \xi_{ik'}) = \rho \in [0,1]$ for $k \neq k'$, where $\xi_{ik}$ is defined in Assumption~\ref{ass:variance}. The variance of geographic exposure is
@@ -160,14 +166,14 @@ Let $\xi_{ik} \equiv \sum_j w^{\mathrm{geo},k}_{ij}\, s_j$ denote firm $i$'s wit
 \subsection{Technology Dominance}\label{sec:predictions}
 
 \begin{definition}[Pricing Equilibrium]\label{def:equilibrium}
-Prices at $t=1$ are set by a representative investor with a strictly positive stochastic discount factor $m_{1,2} > 0$, taken as exogenous. The investor holds the market portfolio and prices each firm by the no-arbitrage condition
+Prices at $t=1$ are set by a representative investor with stochastic discount factor $m_{1,2} > 0$, taken as exogenous. The investor holds the market portfolio and prices each firm by the no-arbitrage condition
 \begin{equation}\label{eq:pricing}
 V_{i,1} = \E_1[m_{1,2}\, \Pi_i], \qquad i = 1, \ldots, N,
 \end{equation}
 where $\Pi_i$ is given by equation~(\ref{eq:cashflows}) and $\E_1[\cdot]$ denotes expectations conditional on the $t=1$ information set, including the realised retirement vector $\mathbf{s}$. Let $A \equiv \E_1[m_{1,2}] > 0$.
 \end{definition}
 
-Factoring $A$ out of equation~(\ref{eq:pricing}) treats the technology penalty as if priced at the risk-free rate, absorbing $\mathrm{Cov}(m_{1,2},\,\varphi_i)$ into the constant. If technology obsolescence is systematic, meaning correlated with the SDF, this approximation understates the true penalty: the omitted covariance term is negative (the SDF is low in states where obsolescence is severe), so the linear reduced form biases the fuel coefficient toward zero. The empirical estimates in Section~\ref{sec:empirical} should therefore be read as conservative lower bounds on the pricing of technology exposure.
+Factoring $A$ out of equation~(\ref{eq:pricing}) treats the technology penalty as if priced at the risk-free rate; the omitted covariance $\mathrm{Cov}(m_{1,2},\,\psi_i)$ is absorbed into the constant. If technology obsolescence is systematic (that is, correlated with the SDF), this approximation understates the true penalty. The omitted covariance term is negative because the SDF is low in states where obsolescence is severe, so the linear reduced form biases the fuel coefficient toward zero. The empirical estimates in Section~\ref{sec:empirical} should therefore be read as conservative lower bounds on the pricing of technology exposure.
 
 \begin{proposition}[Technology Dominance]\label{prop:tech_dominance}
     Under Assumptions~\ref{ass:competition}--\ref{ass:variance} and Lemma~\ref{lem:aggregation}, a restructuring shock $\mathbf{s}$ transmits to stock prices primarily through fuel-mix similarity:
@@ -194,6 +200,8 @@ Factoring $A$ out of equation~(\ref{eq:pricing}) treats the technology penalty a
     where $\bar{e} \equiv \frac{1}{N}\sum_{i=1}^N \alpha_i\bigl(1 + \sum_j w^{\mathrm{fuel}}_{ij}\, s_j\bigr)$ is the cross-sectional mean of technology exposure.
 \end{corollary}
 
+Proposition~\ref{prop:tech_dominance} and Corollary~\ref{cor:asymmetry} together produce the section's empirical content: a negative pricing coefficient on fuel-mix similarity, an attenuated geographic coefficient, and a negative cross-sectional mean return. The next subsection bridges these theoretical objects to what the cross-sectional regression in Section~\ref{sec:empirical} actually estimates.
+
 \subsection{From Theoretical to Empirical Coefficient}\label{sec:bridge}
 
 Proposition~\ref{prop:tech_dominance}(i) implies that firm $i$'s fuel-similarity load is $-A\phi\,\alpha_i$, scaling with each firm's own coal share. The cross-sectional regression in Section~\ref{sec:empirical} estimates a single scalar $\gamma_{\mathrm{fuel}}$. Decomposing the firm-specific load around the cross-sectional mean coal share $\bar\alpha$:
@@ -202,9 +210,9 @@ Proposition~\ref{prop:tech_dominance}(i) implies that firm $i$'s fuel-similarity
 \end{equation}
 The first term is constant across firms. The cross-sectional regression of $\mathrm{CAR}_i$ on $w^{\mathrm{fuel}}_i$ alone therefore identifies a sample-weighted average of the firm-specific loads, anchored at $\gamma_{\mathrm{fuel}} = -A\phi\,\bar\alpha$ when within-event variation in $\alpha_i$ is uncorrelated with $w^{\mathrm{fuel}}_i$. The bracketed term generates a refutable heterogeneity prediction: in the augmented specification
 \begin{equation}\label{eq:augmented}
-    \mathrm{CAR}_i = a + \gamma_{\mathrm{fuel}}\, w^{\mathrm{fuel}}_i + \gamma_{\mathrm{het}}\, w^{\mathrm{fuel}}_i \cdot (\alpha_i - \bar\alpha) + \varepsilon_i,
+    \mathrm{CAR}_i = \alpha + \gamma_{\mathrm{fuel}}\, w^{\mathrm{fuel}}_i + \gamma_{\mathrm{het}}\, w^{\mathrm{fuel}}_i \cdot (\alpha_i - \bar\alpha) + \varepsilon_i,
 \end{equation}
-the model predicts $\gamma_{\mathrm{het}} = -A\phi < 0$. The empirical implementation uses pre-2014 coal share as a pre-determined proxy for $\alpha_i$, avoiding the endogeneity of contemporaneous coal share to the retirement event. Under the linear specification $\varphi_i = \phi\,\alpha_i(\cdot)$ adopted in Assumption~\ref{ass:obsolescence}, equation~(\ref{eq:decomposition}) is exact. If $\varphi_i$ is convex in $\alpha_i$ (a possibility flagged after Assumption~\ref{ass:obsolescence}), equation~(\ref{eq:decomposition}) holds as a first-order Taylor expansion with second-order remainder $O((\alpha_i - \bar\alpha)^2)$, testable separately via $\alpha_i^2$ interactions in the robustness section.
+the model predicts $\gamma_{\mathrm{het}} = -A\phi < 0$. Pre-2014 coal share serves as a pre-determined proxy for $\alpha_i$, avoiding endogeneity from contemporaneous response to the retirement event. Under the linear specification $\psi_i = \phi\,\alpha_i(\cdot)$ adopted in Assumption~\ref{ass:obsolescence}, equation~(\ref{eq:decomposition}) is exact. If $\psi_i$ is convex in $\alpha_i$ (a possibility flagged after Assumption~\ref{ass:obsolescence}), equation~(\ref{eq:decomposition}) holds as a first-order Taylor expansion with second-order remainder $O((\alpha_i - \bar\alpha)^2)$, testable separately via $\alpha_i^2$ interactions in the robustness section.
 
 The model generates two predictions.\label{prop:ets}
 
@@ -690,7 +698,7 @@ so $H_i\geq 1/K_i$, with equality iff $\theta_{ik}=1/K_i$ for all $k$ (uniform s
 
 The lemma's claim that the geographic variance vanishes as $H_i\to 0$ applies along sequences of firms whose maximum revenue share $\max_k\theta_{ik}\to 0$. A sufficient condition is $K_i\to\infty$ together with $\max_k\theta_{ik}=O(1/K_i)$. The pure $K_i\to\infty$ statement, without conditions on share concentration, is insufficient: a firm with one dominant market and many marginal ones has $H_i$ bounded away from zero.
 
-The technology penalty $\varphi_i = \phi\, \alpha_i\, (1 + \sum_j w^{\mathrm{fuel}}_{ij} s_j)$ is a firm-level scalar that does not decompose into independent across-market components; its variance is independent of $H_i$. \qed
+The technology penalty $\psi_i = \phi\, \alpha_i\, (1 + \sum_j w^{\mathrm{fuel}}_{ij} s_j)$ is a firm-level scalar that does not decompose into independent across-market components; its variance is independent of $H_i$. \qed
 
 
 \section{Calibration of the Obsolescence Parameter $\phi$}\label{app:phi_calibration}
