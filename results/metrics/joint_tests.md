@@ -1,7 +1,7 @@
 # Focused Hypothesis Tests: Channel Split
 
 Window: [-1, +3] months (monthly CARs, vwretd)
-Events: 179 first-mover coal retirements
+Events: 179 first-mover-matched (175 used in pooled regression below; 117 with ≥20 firms qualify for FM)
 N = 55580 observations, 175 event clusters
 Standard errors: event-clustered
 

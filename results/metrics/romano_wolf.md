@@ -10,7 +10,7 @@ Specification for each window:
 
 Bootstrap replications: B = 999
 Seed: 42
-Events: 179 first-mover coal retirements
+Events: 179 first-mover-matched (175 used in pooled regression below)
 Return model: vwretd (market-adjusted, Fama-French)
 
 Methods:

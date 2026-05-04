@@ -4,7 +4,7 @@ Tests whether multinational diversification attenuates the geographic
 competitive channel (w_geo). If geographic effects are real at the plant
 level, single-country utilities should show a stronger geo coefficient.
 
-Events: 179 first-mover coal retirements
+Events: 179 first-mover-matched (175 used in pooled regression below; 117 with ≥20 firms qualify for FM)
 Window: [-1, +3] months, vwretd market-adjusted returns
 Minimum obs per event: 20
 Single-country definition: >=90% of MW in one country

@@ -4,7 +4,7 @@ Two-way clustering (event + firm) showed that event-only clustered
 t-stats were inflated by within-firm correlation across events.
 These three approaches provide valid inference under this structure.
 
-Events: 179 first-mover coal retirements
+Events: 179 first-mover-matched (175 used in pooled regression; 117 with ≥20 firms qualify for FM)
 Window: [-1, +3] months, vwretd market-adjusted returns
 
 ## Approach 1: Fama-MacBeth (1973) with Newey-West SEs
@@ -31,16 +31,16 @@ Valid events: 175 (min 25 firms per event for quintile formation)
 
 | Spread | Mean | NW SE | t(NW) | p | t(simple) |
 |---|---:|---:|---:|---:|---:|
-| Fuel Q5-Q1 | -0.0097 | 0.0091 | -1.068 | 0.2853 | -1.676 |
-| Geo Q5-Q1 | +0.0050 | 0.0106 | 0.470 | 0.6383 | 0.679 |
-| Channel split (G-F) | +0.0147 | 0.0098 | 1.506 | 0.1321 | 2.380 |
+| Fuel Q5-Q1 | -0.0085 | 0.0092 | -0.921 | 0.3572 | -1.436 |
+| Geo Q5-Q1 | +0.0053 | 0.0106 | 0.502 | 0.6157 | 0.727 |
+| Channel split (G-F) | +0.0138 | 0.0099 | 1.396 | 0.1628 | 2.216 |
 
 ## Approach 3: Long-Short Portfolio (Newey-West)
 
 Events: 175
-Mean L/S return: +0.0057 (+0.57%)
-NW SE: 0.0048, t(NW) = 1.208, p = 0.2270
-t(simple) = 1.964 (for comparison)
+Mean L/S return: +0.0047 (+0.47%)
+NW SE: 0.0048, t(NW) = 0.987, p = 0.3236
+t(simple) = 1.589 (for comparison)
 
 ## Summary: Inference Comparison
 
@@ -48,7 +48,7 @@ t(simple) = 1.964 (for comparison)
 |---|---:|---:|---:|---|
 | Pooled, event-clustered | 0.823 | -7.940 | -- | Primary |
 | Fama-MacBeth + NW | -1.756 | -7.323 | 5.968 | Gold standard |
-| Portfolio sorts + NW | 0.470 | -1.068 | 1.506 | Non-parametric |
+| Portfolio sorts + NW | 0.502 | -0.921 | 1.396 | Non-parametric |
 
 ## Interpretation
 
@@ -117,18 +117,20 @@ No significant evidence of non-linearity (convexity) in the obsolescence effect.
 
 ## Approach 8: Event Overlap Statistics (m9)
 
-Temporal structure of the 175 coal retirement events.
+Temporal structure of the regression-eligible coal retirement events
+(events with at least one valid firm-event observation in the pooled panel: 175 of 179 first-mover-matched).
 
 | Statistic | Value |
 |---|---:|
-| Events | 179 |
-| Calendar span | 150 months |
+| Events used in regression | 175 |
+| First-mover-matched (full registry) | 179 |
+| Calendar span | 136 months |
 | Mean inter-event gap | 0.8 months |
 | Median inter-event gap | 0 months |
 | Min gap | 0 months |
 | Max gap | 14 months |
 | Max concurrent active windows | 39 |
-| Months with >1 active window | 94/150 (62.7%) |
+| Months with >1 active window | 89/136 (65.4%) |
 
 The high overlap fraction motivates the use of event-clustered
 standard errors and the Fama-MacBeth approach.

@@ -4,13 +4,13 @@ Within-event permutation of $w^{\mathrm{fuel}}_i$ values, recomputing the Fama-M
 
 ## Distribution
 
-- Permutation mean: -0.0002
-- Permutation 1st percentile: -1.4867
-- Permutation 5th percentile: -0.9760
-- Permutation 50th percentile (median): -0.0194
-- Permutation 95th percentile: +1.0335
-- Permutation 99th percentile: +1.5084
-- Range: [-2.0387, +1.8854]
+- Permutation mean: -0.0439
+- Permutation 1st percentile: -1.5678
+- Permutation 5th percentile: -1.1584
+- Permutation 50th percentile (median): -0.0501
+- Permutation 95th percentile: +1.0162
+- Permutation 99th percentile: +1.5982
+- Range: [-1.9300, +2.2071]
 
 ## Test
 

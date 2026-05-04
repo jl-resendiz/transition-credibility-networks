@@ -3,21 +3,23 @@
 ## Sample Overview
 
 - Total Compustat utility firms: 873
-- Analysis sample (complete theta): 428 firms
-- Countries (all): 81
-- Countries (analysis sample): 69
+- Returns-coverage firms (manuscript: "703 listed utilities"): 703
+- Countries with returns coverage (manuscript: "80 countries"): 80
+- Analysis sample (complete fundamentals theta): 428 firms
 - Total installed capacity (analysis sample): 2,983,226 MW = 3.0 TW
 
-### Event-study sample (chain to manuscript abstract)
+### Sample chain (chain to manuscript §3.1 and Abstract)
 
-| Stage | Sample | N firms |
+| Stage | Population | N firms |
 |---|---|---:|
-| 1 | Firms with monthly returns coverage (manuscript: "703 listed utilities") | 703 |
-| 2 | Returns AND at least one network layer (W_geo) | 350 |
-| 3 | Returns AND all three network layers (manuscript: "565 have complete spatial weight data") | 183 |
-| 4 | Returns AND ESG coverage (manuscript: "153 also have ESG environmental scores") | 169 |
+| 1 | Firms with monthly returns coverage (manuscript: 703) | 703 |
+| 2 | Firms in W_geo / W_fuel (manuscript: 414 with valid GEM GPS) | 414 |
+| 3 | Firms in W_reg (manuscript: 242, regulatory layer) | 242 |
+| 4 | Unique firms in event-firm regression panel (manuscript: 565) | 565 |
+| 5 | Panel firms with ESG environmental scores (manuscript: 153) | 153 |
+| 6 | Panel firms without ESG (manuscript: 412) | 412 |
 
-Note: the "analysis sample (complete theta)" reported above is the firm universe with complete *fundamentals* (alpha, lambda, rho, kappa) used by Panels A and B. The event-study regressions in Section 4 use the monthly-returns sample (Stage 1) intersected with the network layers (Stage 3), which is the sample size cited in the abstract.
+The panel in Stage 4 is the operational regression sample used by `robust_inference.py`, `joint_tests.{py,jl}`, and `two_way_clustering.py`. It comprises geographic neighbours of retiring firms plus random controls drawn from the same SIC universe (with a stable per-firm seed), not the strict intersection of returns and network layers (Stages 1, 2, 3 above) -- that intersection is more restrictive because controls come from outside the network.
 
 ## Panel A: Analysis Sample (N = 428 firms, latest fiscal year)
 
