@@ -11,8 +11,11 @@ import os, sys, re
 
 SRC = os.path.dirname(os.path.abspath(__file__))
 ALLOWLIST = {
-    '_paths.py', 'run_all.py', 'romano_wolf_bootstrap.jl',
+    '_paths.py', '_credentials.py', 'run_all.py', 'romano_wolf_bootstrap.jl',
     'check_orphans.py',
+    # Pre-flight diagnostic for Refinitiv API (run manually before
+    # pull_refinitiv_extra.py; not part of the analysis DAG).
+    'test_eikon_preflight.py',
 }
 ALLOW_PREFIXES = ('pull_', 'update_')
 

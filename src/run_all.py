@@ -22,6 +22,12 @@ import sys
 import shutil
 import subprocess
 
+# Pin Python hash randomization so set / dict iteration is bit-deterministic
+# across runs. Without this, scripts like fisher_ri.py that iterate over sets
+# of gvkeys produce slightly different permutation-distribution percentiles
+# run-to-run (point estimates and p-values are unaffected).
+os.environ.setdefault('PYTHONHASHSEED', '42')
+
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 SRC = os.path.join(ROOT, 'src')
 
@@ -100,9 +106,6 @@ def main():
         run('build_coal_phaseout_events.py')
         run('build_eia860_announcement_events.py')
 
-        # ── Stage 5: Summary statistics ──
-        run('summary_statistics.py')
-
     # ── Stage 6: Analysis scripts (9 scripts, consolidated) ──
     #
     # Each script addresses a specific identification threat:
@@ -119,6 +122,7 @@ def main():
         # Main results
         'robust_inference.py',
         'joint_tests.jl',        # ~42s Julia vs ~268s Python
+        'two_way_clustering.py', # CGM two-way SEs for Table 2 col 3
         'esg_horse_race.py',
 
         # Identification and robustness
@@ -156,9 +160,37 @@ def main():
         # Conley spatial standard errors (skipped if Rscript not on PATH)
         'robustness_conley_se.R',
 
+        # Phase 4: WRDS-enabled robustness (US sub-sample)
+        'build_institutional_panel.py',     # 13F holdings → US institutional panel
+        'institutional_split.py',           # HHI tercile split (US)
+        'build_dgtw_chars.py',              # size × B/M × momentum chars (US)
+        'dgtw_robustness.py',               # DGTW characteristic-matched CARs
+        'multifactor_5f_inference.py',      # FF3 + UMD + Utility 5-factor
+
+        # Phase 4: daily event-study (full panel)
+        'compute_daily_ar_panel.py',        # FF3-adjusted daily ARs
+        'compute_daily_ar_panel_marketadj.py',  # market-adjusted (sign-flip diagnostic)
+        'daily_event_study.py',             # cross-sectional regs at multiple windows
+        'daily_event_time_path.py',         # γ_fuel(τ) path for τ ∈ [-21, +21]
+
+        # Phase 4: pre-trends randomization placebo
+        'pretrends_placebo.py',
+
+        # Phase 5: figure generation (depends on daily_event_time_path.md)
+        'generate_fig5.py',                 # cumulative-AR daily path figure
+
+        # Phase 6: non-US institutional split (requires Refinitiv data;
+        # gracefully skipped if data/raw/refinitiv/refinitiv_extra.csv missing)
+        'build_nonus_institutional_panel.py',
+        'institutional_split_nonus.py',
+
         # Output generation (compute exports JSON; tables reads it)
         'referee_compute.py',
         'referee_tables.py',
+
+        # Summary statistics last so it can read panel_facts.json from
+        # two_way_clustering.py and emit a consistent sample chain.
+        'summary_statistics.py',
     ]
 
     for s in analysis_scripts:
