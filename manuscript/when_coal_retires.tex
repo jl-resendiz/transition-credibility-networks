@@ -119,22 +119,30 @@ The first assumption is standard: a rival's exit raises residual demand for rema
 
 The linear specification $\varphi_i = \phi\,\alpha_i(\cdot)$ is a restriction. If penalties are convex in coal share, high-$\alpha$ firms face disproportionately larger losses than the linear model implies. I test for such nonlinearity in the robustness section by including $\alpha_i^2$ interactions.
 
+\begin{remark}[Interpretation of $\phi$]\label{rem:phi_interpretation}
+The obsolescence parameter $\phi$ is reduced-form: it absorbs the joint price of three economic forces that retirement events plausibly transmit. First, expected fiscal carbon-tax adjustments that raise the marginal cost of coal generation. Second, the option value of stranded generating assets when retirement signals shorten the expected useful life of the fleet. Third, demand-side preference shifts that reduce the value of coal-generated electricity. The model treats the composite as a primitive; the empirical work identifies the product $A\phi\bar{\alpha}$ rather than its components separately (Section~\ref{sec:bridge}).
+\end{remark}
+
 \subsection{Aggregation}\label{sec:aggregation}
 
 The geographic and technology channels enter equation~(\ref{eq:cashflows}) symmetrically as weighted sums over peer shocks. But they aggregate to the stock level in asymmetric ways. Geographic proximity varies at the plant level: a firm with plants in Germany and Brazil has different geographic neighbours in each market. Fuel-mix similarity is a property of the portfolio: a firm with 60 per cent coal has 60 per cent coal regardless of where it operates.
 
+\begin{assumption}[Common within-market shock variance]\label{ass:variance}
+Let $\xi_{ik} \equiv \sum_j w^{\mathrm{geo},k}_{ij}\, s_j$ denote firm $i$'s within-market geographic exposure in market $k$. The within-market shock variance $\bar{\sigma}^2 \equiv \mathrm{Var}(\xi_{ik})$ is common across local markets $k$. Relaxing this gives a weighted version of Lemma~\ref{lem:aggregation} with the same qualitative attenuation.
+\end{assumption}
+
 \begin{lemma}[Aggregation Attenuation]\label{lem:aggregation}
-    Under Assumptions~\ref{ass:competition}--\ref{ass:obsolescence}, with within-market shock variance $\bar{\sigma}^2 \equiv \mathrm{Var}\bigl(\sum_j w^{\mathrm{geo},k}_{ij}\, s_j\bigr)$ assumed common across markets, the variance of firm $i$'s geographic exposure satisfies
+    Under Assumptions~\ref{ass:competition}--\ref{ass:variance}, the variance of firm $i$'s geographic exposure satisfies
     \[
     \mathrm{Var}\!\Bigl(\sum_k \theta_{ik}\, G_{ik}\Bigr) = \delta^2\, H_i\, \bar{\sigma}^2, \qquad H_i \equiv \sum_k \theta_{ik}^2 \in [1/K_i, 1].
     \]
     Along sequences of firms with $H_i \to 0$ (equivalently, $\max_k \theta_{ik} \to 0$), the geographic variance vanishes. The variance of the technology penalty $\varphi_i$ is independent of $H_i$.
 \end{lemma}
 
-\noindent The proof, which follows from the independence of local market shocks and the constraint $\sum_k \theta_{ik} = 1$, is given in Appendix~\ref{app:aggregation_proof}. The logic parallels the diversification argument in production networks \citep{AcemogluCarvalhoOzdaglarTahbazSalehi2012}: in a balanced network, idiosyncratic shocks wash out at rate $1/\sqrt{N}$, while a common factor transmits to all connected nodes simultaneously. Here, technology obsolescence is the common factor, and all firms sharing that technology are the nodes.
+\noindent The proof, which follows from the independence of local market shocks and the constraint $\sum_k \theta_{ik} = 1$, is given in Appendix~\ref{app:aggregation_proof}. The logic parallels the diversification argument in production networks \citep{AcemogluCarvalhoOzdaglarTahbazSalehi2012}: in a balanced network, idiosyncratic shocks wash out at rate $1/\sqrt{N}$. Lemma~\ref{lem:aggregation}'s Herfindahl scaling $H_i \in [1/K_i, 1]$ is the firm-level analogue: a firm with $K_i$ symmetric markets ($\theta_{ik} = 1/K_i$) achieves $H_i = 1/K_i$ (maximum diversification), while a firm concentrated in one market achieves $H_i = 1$ (no diversification). Here, technology obsolescence is the common factor, and all firms sharing that technology are the nodes.
 
-\begin{corollary}[Partial Cross-Market Correlation]\label{cor:partial_correlation}
-    If across-market shocks are equicorrelated with $\mathrm{Corr}(\xi_{ik}, \xi_{ik'}) = \rho \in [0,1]$ for $k \neq k'$, the variance of geographic exposure is
+\begin{proposition}[Partial Cross-Market Correlation]\label{prop:partial_correlation}
+    Replace the independence condition in Assumption~\ref{ass:competition} with the equicorrelation condition $\mathrm{Corr}(\xi_{ik}, \xi_{ik'}) = \rho \in [0,1]$ for $k \neq k'$, where $\xi_{ik}$ is defined in Assumption~\ref{ass:variance}. The variance of geographic exposure is
     \[
     \mathrm{Var}\!\Bigl(\sum_k \theta_{ik}\, G_{ik}\Bigr) = \delta^2\, \bar{\sigma}^2\, \bigl[\rho + (1-\rho)\, H_i\bigr].
     \]
@@ -143,7 +151,7 @@ The geographic and technology channels enter equation~(\ref{eq:cashflows}) symme
     \phi^2\,\mathrm{Var}\!\bigl(\alpha_i\, w^{\mathrm{fuel}}_i\,\mathbf{s}\bigr) \,>\, \delta^2\,\bar{\sigma}^2\,\bigl[\rho + (1-\rho)\, H_i\bigr].
     \]
     Independence ($\rho=0$) is the special case in which the technology channel dominates strictly for any firm with $H_i\to 0$. Under partial correlation, dominance is a quantitative condition on the relative magnitudes of the technology coefficient $\phi$ and the competition coefficient $\delta$.
-\end{corollary}
+\end{proposition}
 
 \begin{remark}\label{rem:network_valueadded}
     The fuel-mix similarity weight $w^{\mathrm{fuel}}_{ij}$ is not redundant with own coal share $\alpha_i$. Two firms with identical $\alpha_i$ but different fuel vectors, for instance one holding coal and solar while the other holds coal and wind, will have different similarity profiles to any given retiring firm and therefore different $w^{\mathrm{fuel}}$ values. The network contributes information beyond own exposure precisely because the full capacity-share vector, not the scalar coal share alone, determines pairwise similarity.
@@ -162,9 +170,9 @@ where $\Pi_i$ is given by equation~(\ref{eq:cashflows}) and $\E_1[\cdot]$ denote
 Factoring $A$ out of equation~(\ref{eq:pricing}) treats the technology penalty as if priced at the risk-free rate, absorbing $\mathrm{Cov}(m_{1,2},\,\varphi_i)$ into the constant. If technology obsolescence is systematic, meaning correlated with the SDF, this approximation understates the true penalty: the omitted covariance term is negative (the SDF is low in states where obsolescence is severe), so the linear reduced form biases the fuel coefficient toward zero. The empirical estimates in Section~\ref{sec:empirical} should therefore be read as conservative lower bounds on the pricing of technology exposure.
 
 \begin{proposition}[Technology Dominance]\label{prop:tech_dominance}
-    Under Assumptions~\ref{ass:competition}--\ref{ass:obsolescence} and Lemma~\ref{lem:aggregation}, a restructuring shock $\mathbf{s}$ transmits to stock prices primarily through fuel-mix similarity:
+    Under Assumptions~\ref{ass:competition}--\ref{ass:variance} and Lemma~\ref{lem:aggregation}, a restructuring shock $\mathbf{s}$ transmits to stock prices primarily through fuel-mix similarity:
     \begin{enumerate}
-        \item[(i)] The fuel-similarity coefficient is $-A\phi\,\alpha_i < 0$ for any firm with $\alpha_i > 0$ (systematic, does not attenuate with diversification).
+        \item[(i)] The fuel-similarity load on firm $i$'s cash flow is $-A\phi\,\alpha_i < 0$ for any firm with $\alpha_i > 0$ (systematic, does not attenuate with diversification). The cross-sectional regression coefficient $\gamma_{\mathrm{fuel}}$ in part (iii) recovers a sample-weighted average of these firm-specific loads (see Section~\ref{sec:bridge}).
         \item[(ii)] The geographic coefficient is attenuated by a factor proportional to the Herfindahl index $H_i = \sum_k \theta_{ik}^2$, which vanishes for diversified firms (idiosyncratic).
         \item[(iii)] In the cross-section of cumulative abnormal returns, technology dominates:
     \end{enumerate}
@@ -175,15 +183,15 @@ Factoring $A$ out of equation~(\ref{eq:pricing}) treats the technology penalty a
 \end{proposition}
 
 \begin{proof}
-    Part (i): substituting equation~(\ref{eq:obsolescence}) into the pricing equation, the fuel penalty enters as $-A\phi\,\alpha_i(1 + \sum_j w^{\mathrm{fuel}}_{ij} s_j)$, a firm-level term independent of market count. The cross-sectional coefficient on $w^{\mathrm{fuel}}_i$ is $-A\phi\,\alpha_i$, which is negative for any firm with positive coal share. Part (ii): by Lemma~\ref{lem:aggregation}, the variance of the geographic exposure scales with the Herfindahl index $H_i \in [1/K_i, 1]$ and vanishes along sequences of firms with $\max_k\theta_{ik}\to 0$. The cross-sectional regression coefficient on $w^{\mathrm{geo}}_i$, equal to $\mathrm{Cov}(\mathrm{CAR}_i, w^{\mathrm{geo}}_i)/\mathrm{Var}(w^{\mathrm{geo}}_i)$, inherits this attenuation: as the geographic component of cash-flow variance shrinks toward zero, the cross-sectional covariance between $\mathrm{CAR}_i$ and $w^{\mathrm{geo}}_i$ vanishes faster than the variance of $w^{\mathrm{geo}}_i$, driving the population coefficient toward zero. Part (iii): combining (i) and (ii), the cross-sectional regression of $\mathrm{CAR}_i$ on both network exposures recovers a negative fuel coefficient and a geographic coefficient attenuated toward zero. \qed
+    Part (i): substituting equation~(\ref{eq:obsolescence}) into the pricing equation, the fuel penalty enters as $-A\phi\,\alpha_i(1 + \sum_j w^{\mathrm{fuel}}_{ij} s_j)$, a firm-level term independent of market count. The firm-specific load on $w^{\mathrm{fuel}}_i$ is therefore $-A\phi\,\alpha_i$, negative for any firm with positive coal share; the cross-sectional regression coefficient $\gamma_{\mathrm{fuel}}$ recovers a sample-weighted average of these loads (Section~\ref{sec:bridge}). Part (ii): by Lemma~\ref{lem:aggregation}, the variance of firm $i$'s geographic cash-flow component $C^{\mathrm{geo}}_i \equiv \sum_k \theta_{ik}\, G_{ik}$ scales with $H_i \in [1/K_i, 1]$ and vanishes as $H_i \to 0$. Among CAR's components, only $C^{\mathrm{geo}}_i$ covaries with $w^{\mathrm{geo}}_i$ (the fuel and noise components are orthogonal by construction). By Cauchy-Schwarz, $|\mathrm{Cov}(C^{\mathrm{geo}}_i, w^{\mathrm{geo}}_i)| \leq \sqrt{\mathrm{Var}(C^{\mathrm{geo}}_i)\cdot\mathrm{Var}(w^{\mathrm{geo}}_i)}$. As $\mathrm{Var}(C^{\mathrm{geo}}_i) \to 0$ along sequences of diversified firms while $\mathrm{Var}(w^{\mathrm{geo}}_i)$ remains bounded, $\gamma_{\mathrm{geo}} = \mathrm{Cov}(\mathrm{CAR}_i, w^{\mathrm{geo}}_i)/\mathrm{Var}(w^{\mathrm{geo}}_i) \to 0$. Part (iii): combining (i) and (ii), the cross-sectional regression of $\mathrm{CAR}_i$ on both network exposures recovers a negative fuel coefficient and a geographic coefficient attenuated toward zero. \qed
 \end{proof}
 
 \begin{corollary}[Negative Cross-Sectional Mean]\label{cor:asymmetry}
     The cross-sectional average return around a restructuring shock is negative, driven by the technology penalty:
     \begin{equation}
-        \frac{1}{N}\sum_{i=1}^N \Delta V_{i,1} \approx -A\phi\,\overline{\varphi} < 0,
+        \frac{1}{N}\sum_{i=1}^N \Delta V_{i,1} \approx -A\phi\,\bar{e} < 0,
     \end{equation}
-    where $\overline{\varphi}$ is the cross-sectional mean of technology exposure.
+    where $\bar{e} \equiv \frac{1}{N}\sum_{i=1}^N \alpha_i\bigl(1 + \sum_j w^{\mathrm{fuel}}_{ij}\, s_j\bigr)$ is the cross-sectional mean of technology exposure.
 \end{corollary}
 
 \subsection{From Theoretical to Empirical Coefficient}\label{sec:bridge}
@@ -246,11 +254,13 @@ where $\bar{d} = h/\ln 2$ and $h = 1000$\,km. Bandwidth sensitivity (Table~\ref{
 
 \paragraph{Regulatory co-membership ($\bW^{\mathrm{reg}}$).} Binary indicator for co-membership in an emissions trading system, row-normalised.\footnote{The regulatory weight matrix is included as an empirical control for correlated policy exposure, not as a third theoretical channel. The model derives predictions for the fuel and geographic channels only.}
 
+\paragraph{Same-sector indicator ($\mathrm{SameSector}_i$).} Binary indicator equal to one if firm $i$ shares a SIC code with the retiring firm.\footnote{The same-sector indicator is included as an empirical control for sector-level co-movement, not as a fourth theoretical channel. As with $\bW^{\mathrm{reg}}$, the model derives predictions for the fuel and geographic channels only; $\mathrm{SameSector}$ absorbs sector-level variance that is orthogonal to the network exposures.}
+
 The pairwise correlations among the three weight layers are below 0.16, confirming that they capture distinct proximity dimensions.
 
 \subsection{Specification}\label{sec:specification}
 
-For each retirement event $e$, I compute the cumulative abnormal return $\text{CAR}_{ie}$ over $[-1, +3]$ months, market-adjusted using value-weighted returns. The baseline specification is:
+For each retirement event $e$, I compute the cumulative abnormal return $\text{CAR}_{ie}$ over $[-1, +3]$ months, market-adjusted using value-weighted returns. The baseline specification extends the reduced form of Proposition~\ref{prop:tech_dominance} (equation~\ref{eq:reduced_form}) by adding two empirical controls ($w^{\mathrm{reg}}$ and $\mathrm{SameSector}$):
 \begin{equation}\label{eq:baseline}
     \text{CAR}_{ie} = \alpha + \gamma_{\text{geo}}\, w^{\text{geo}}_i + \gamma_{\text{fuel}}\, w^{\text{fuel}}_i + \gamma_{\text{reg}}\, w^{\text{reg}}_i + \gamma_s\, \text{SameSector}_i + \varepsilon_{ie}.
 \end{equation}
