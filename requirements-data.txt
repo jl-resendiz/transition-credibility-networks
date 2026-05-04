@@ -1,0 +1,22 @@
+# Data-acquisition dependencies (Stage 0 only).
+#
+# These packages are NOT required to run the analysis pipeline against
+# the derived data already in the repo (`data/derived/`). They are only
+# needed to re-pull raw data from external providers.
+#
+# Install with:
+#   pip install -r requirements-data.txt
+#
+# Credentials: see .env.example at repo root.
+
+# WRDS — Wharton Research Data Services
+# Used by: pull_wrds_*.py (CRSP daily, Compustat fundamentals,
+# Thomson 13F holdings, characteristic data for DGTW-style sorts).
+wrds>=3.2
+
+# LSEG Eikon (Refinitiv) — desktop app must be running locally
+# Used by: pull_eikon_returns.py, pull_refinitiv_*.py
+eikon>=1.1.16
+
+# pandas — used by both wrds and eikon pull paths
+pandas>=2.0

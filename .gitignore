@@ -18,10 +18,11 @@ __pycache__/
 # Pipeline logs
 results/logs/
 
-# Licensed data — not redistributed (Compustat, CRSP, Refinitiv)
+# Licensed data — not redistributed (Compustat, CRSP, Refinitiv, WRDS)
 data/raw/compustat/
 data/raw/crsp_compustat/
 data/raw/refinitiv/
+data/raw/wrds/
 
 # IDE
 .vscode/
@@ -65,3 +66,9 @@ exhibition/
 
 # Claude session lock files
 .claude/scheduled_tasks.lock
+
+# Credentials (WRDS, Eikon/Refinitiv) — never commit
+.env
+.env.local
+.env.*.local
+*.pgpass
