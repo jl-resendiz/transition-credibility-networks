@@ -163,6 +163,7 @@ def main():
         # Phase 4: WRDS-enabled robustness (US sub-sample)
         'build_institutional_panel.py',     # 13F holdings → US institutional panel
         'institutional_split.py',           # HHI tercile split (US)
+        'horizon_ownership.py',             # H × HHI tercile decomposition (Appendix G)
         'build_dgtw_chars.py',              # size × B/M × momentum chars (US)
         'dgtw_robustness.py',               # DGTW characteristic-matched CARs
         'multifactor_5f_inference.py',      # FF3 + UMD + Utility 5-factor

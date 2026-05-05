@@ -573,7 +573,7 @@ The four-phase pattern is consistent with gradual information diffusion. \citet{
 
 With magnitudes large enough to invite a ``risk-premium versus mispricing'' interpretation, I extend the headline window to $[-1, +H]$ for $H \in \{1, 3, 6, 12, 24\}$ months. Under a risk-premium reading, $\hat\beta_{\mathrm{fuel}}(H)$ should accumulate roughly linearly with $H$; under a mispricing reading, it should plateau or decay as institutional arbitrage corrects the initial repricing. The estimates are $\hat\beta(1) = -2.89$ ($t = -4.19$), $\hat\beta(3) = -4.77$ ($t = -7.32$), $\hat\beta(6) = -4.70$ ($t = -5.07$), $\hat\beta(12) = -3.18$ ($t = -1.00$), $\hat\beta(24) = -2.45$ ($t = -0.40$). The effect concentrates between $H = 1$ and $H = 6$ months and is essentially indistinguishable from zero at the longest horizons.
 
-Two readings are consistent with the data: (i) discrete information arrival followed by persistent repricing, where the $H \geq 12$ standard errors swamp any genuine continuation; (ii) partial mispricing that decays as arbitrageurs correct the under-reaction. The data do not discriminate between these. The institutional-ownership split (Section~\ref{sec:inst_heterogeneity}) tightens the demarcation: the channel concentrates in firms with active institutional pricing, consistent with discrete information arrival followed by gradual repricing rather than a pure mispricing artefact.
+Two readings are consistent with the $H$-aggregate decay pattern: (i) discrete information arrival followed by persistent repricing, where the $H \geq 12$ standard errors swamp any genuine continuation; (ii) partial mispricing that decays as arbitrageurs correct the under-reaction. Crossing the horizon decomposition with the 13F institutional-ownership terciles (Appendix~\ref{app:horizon_ownership}) sharpens the demarcation. At the headline window ($H = 3$), $\hat\gamma^{T3}_{\text{fuel}}(3) = -7.86$ and $\hat\gamma^{T1}_{\text{fuel}}(3) = +2.04$, with a difference of $-9.90$ (Welch $t = -4.12$). At longer horizons, both terciles' point estimates are statistically indistinguishable from zero with wide standard errors (T3 NW SE rises from 2.29 at $H = 3$ to 13.41 at $H = 24$). The pattern supports a layered reading: the T1 sign-reversal at the headline window decays toward zero by $H = 24$ (consistent with retail-flow misallocation correction), while T3 attains its peak at $H = 3$ and reverts thereafter (consistent with discrete information arrival followed by rapid pricing in concentrated-ownership firms). Both effects operate; the decomposition rejects a pure-systematic-risk reading in which T1 and T3 should track each other across horizons.
 
 \subsection{Robustness}\label{sec:robustness}
 
@@ -770,5 +770,32 @@ The headline pipeline sets $t = 0$ at the announcement date when available. To t
 
 \paragraph{Fisher randomization inference.}
 A non-parametric alternative tests the sharp null that fuel-mix similarity carries no cross-sectional information by randomly permuting the firm-level $w^{\mathrm{fuel}}_i$ values within each event and recomputing the FM coefficient. Across 999 within-event permutations, the observed FM coefficient ($-4.83$) is more extreme than every single permuted value, yielding a Fisher RI $p$-value of $0.001$.
+
+
+\section{Horizon-by-Tercile Decomposition}\label{app:horizon_ownership}
+
+For each post-event horizon $H \in \{1, 3, 6, 12, 24\}$ months and each HHI tercile of US-listed firms with 13F coverage, I run cross-sectional Fama-MacBeth regressions of $\mathrm{CAR}_{ie}^{[-1, +H]}$ on $(w^{\mathrm{geo}}, w^{\mathrm{fuel}}, w^{\mathrm{reg}}, \mathrm{SameSector})$ within tercile, with Newey-West (lag 4) standard errors on the FM time series. Within-event tercile assignment uses the Herfindahl index of 13F manager shares-of-shares at the most recent quarter on or before the announcement date.
+
+\begin{table}[H]
+\centering
+\caption{Fuel-similarity coefficient by ($H$, HHI tercile)}
+\label{tab:horizon_ownership}
+\begin{tabular}{ccccc}
+\toprule
+$H$ & T1 (dispersed) $\hat\gamma_{\text{fuel}}$ ($t$, $T$) & T3 (concentrated) $\hat\gamma_{\text{fuel}}$ ($t$, $T$) & Difference T3 - T1 (Welch $t$) \\
+\midrule
+1  & $+0.41$ ($+0.88$, 80) & $-1.62$ ($-0.80$, 81) & $-2.02$ ($-0.97$) \\
+3  & $+2.04$ ($+2.79$, 80) & $-7.86$ ($-3.43$, 81) & $-9.90$ ($-4.12$)*** \\
+6  & $-1.65$ ($-1.76$, 80) & $-3.92$ ($-0.95$, 81) & $-2.27$ ($-0.53$) \\
+12 & $-1.86$ ($-1.09$, 80) & $+1.16$ ($+0.13$, 81) & $+3.03$ ($+0.34$) \\
+24 & $-0.01$ ($-0.01$, 80) & $+12.91$ ($+0.96$, 81) & $+12.92$ ($+0.96$) \\
+\bottomrule
+\end{tabular}
+\begin{flushleft}\footnotesize
+Notes: Sample restricted to US-listed firms with 13F coverage at the event quarter. T = number of FM events with at least 8 firms within tercile. Welch $t$ for $\hat\gamma^{T3} - \hat\gamma^{T1}$ assumes independence of the two FM time series; *** $p < 0.001$. The T1 sign-reversal at $H = 3$ (consistent with retail-flow misallocation) decays toward zero by $H = 24$. T3 attains its most negative value at $H = 3$ and reverts at long horizons; the rising NW standard error from 2.29 at $H = 3$ to 13.41 at $H = 24$ indicates that long-horizon inference is dominated by noise rather than informative pattern.
+\end{flushleft}
+\end{table}
+
+The $H = 3$ discrimination (Welch $t = -4.12$) confirms the institutional-pricing mechanism documented in Section~\ref{sec:inst_heterogeneity} at the horizon dimension. Beyond $H = 3$, both terciles' point estimates are statistically indistinguishable from zero, so the long-horizon decay analysis cannot distinguish between systematic-risk and mispricing readings on its own; the headline-window split provides the empirical anchor.
 
 \end{document}
